@@ -12,17 +12,31 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../public')));
 
-// Initialize database with courses
-seedCourses();
-
 /**
  * GET /api/courses
  * Get all courses, optionally filtered by region
+ * Only returns courses that have tee times available
  */
 app.get('/api/courses', (req, res) => {
   try {
-    const { region } = req.query;
-    const courses = region ? getCoursesByRegion(region) : getAllCourses();
+    const { region, all } = req.query;
+
+    // Only return courses with tee times unless 'all' param is set
+    let sql = `
+      SELECT DISTINCT c.* FROM courses c
+      INNER JOIN tee_times t ON c.id = t.course_id
+      WHERE t.datetime >= datetime('now', 'localtime')
+    `;
+    const params = [];
+
+    if (region) {
+      sql += ' AND c.region = ?';
+      params.push(region);
+    }
+
+    sql += ' ORDER BY c.region, c.city, c.name';
+
+    const courses = db.prepare(sql).all(...params);
     res.json(courses);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -71,7 +85,8 @@ app.get('/api/tee-times', (req, res) => {
         c.name as course_name,
         c.city,
         c.region,
-        c.holes as course_holes
+        c.holes as course_holes,
+        c.avg_rating
       FROM tee_times t
       JOIN courses c ON t.course_id = c.id
       WHERE 1=1
@@ -123,11 +138,15 @@ app.get('/api/tee-times', (req, res) => {
     }
 
     // Validate sort parameters
-    const validSortFields = ['datetime', 'time', 'price', 'course_name'];
+    const validSortFields = ['datetime', 'time', 'price', 'course_name', 'avg_rating'];
     const validSortOrders = ['ASC', 'DESC'];
 
-    const sortField = validSortFields.includes(sort_by) ? sort_by : 'datetime';
+    let sortField = validSortFields.includes(sort_by) ? sort_by : 'datetime';
     const order = validSortOrders.includes(sort_order.toUpperCase()) ? sort_order.toUpperCase() : 'ASC';
+
+    // Map sort fields to proper column references
+    if (sortField === 'avg_rating') sortField = 'c.avg_rating';
+    if (sortField === 'course_name') sortField = 'c.name';
 
     sql += ` ORDER BY ${sortField} ${order}`;
     sql += ' LIMIT ? OFFSET ?';
@@ -202,6 +221,70 @@ app.post('/api/scrape', async (req, res) => {
 
     // Run scraper in background
     runScraper(days).catch(console.error);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/courses/:id
+ * Get detailed course info including reviews, photos, food, records
+ */
+app.get('/api/courses/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get course basic info
+    const course = db.prepare(`
+      SELECT * FROM courses WHERE id = ?
+    `).get(id);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Get 10 most recent reviews
+    const reviews = db.prepare(`
+      SELECT * FROM reviews
+      WHERE course_id = ?
+      ORDER BY time DESC
+      LIMIT 10
+    `).all(id);
+
+    // Calculate recent avg rating
+    const recentAvg = reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : null;
+
+    // Get course photos
+    const photos = db.prepare(`
+      SELECT * FROM course_photos
+      WHERE course_id = ?
+      ORDER BY is_primary DESC, scraped_at DESC
+    `).all(id);
+
+    // Get top-rated food item
+    const topFood = db.prepare(`
+      SELECT * FROM food_items
+      WHERE course_id = ?
+      ORDER BY avg_rating DESC, mention_count DESC
+      LIMIT 1
+    `).get(id);
+
+    // Get upcoming tee times count
+    const teeTimeCount = db.prepare(`
+      SELECT COUNT(*) as count FROM tee_times
+      WHERE course_id = ? AND datetime >= datetime('now', 'localtime')
+    `).get(id);
+
+    res.json({
+      ...course,
+      recent_avg_rating: recentAvg,
+      reviews,
+      photos,
+      top_food: topFood,
+      upcoming_tee_times: teeTimeCount?.count || 0
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

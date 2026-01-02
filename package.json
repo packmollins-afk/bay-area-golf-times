@@ -10,7 +10,12 @@
     "demo": "node src/scripts/generate-demo-data.js",
     "setup": "node src/scripts/setup.js"
   },
-  "keywords": ["golf", "tee-times", "bay-area", "aggregator"],
+  "keywords": [
+    "golf",
+    "tee-times",
+    "bay-area",
+    "aggregator"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -22,5 +27,8 @@
     "express": "^5.2.1",
     "node-cron": "^4.2.1",
     "puppeteer-core": "^24.34.0"
+  },
+  "devDependencies": {
+    "vercel": "^50.1.3"
   }
 }
