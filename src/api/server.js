@@ -25,7 +25,7 @@ app.get('/api/courses', (req, res) => {
     let sql = `
       SELECT DISTINCT c.* FROM courses c
       INNER JOIN tee_times t ON c.id = t.course_id
-      WHERE t.datetime >= datetime('now', 'localtime')
+      WHERE t.datetime >= datetime('now', '-8 hours')
     `;
     const params = [];
 
@@ -94,8 +94,9 @@ app.get('/api/tee-times', (req, res) => {
     const params = [];
 
     // If next_available mode, show all future tee times (ignore date filter)
+    // Use Pacific time offset (-8 hours from UTC) for Bay Area
     if (next_available === 'true' || next_available === '1') {
-      sql += " AND t.datetime >= datetime('now', 'localtime')";
+      sql += " AND t.datetime >= datetime('now', '-8 hours')";
     } else if (date) {
       sql += ' AND t.date = ?';
       params.push(date);
