@@ -93,11 +93,11 @@ app.get('/api/tee-times', (req, res) => {
     `;
     const params = [];
 
-    // If next_available mode, show all future tee times (ignore date filter)
-    // Use Pacific time offset (-8 hours from UTC) for Bay Area
-    if (next_available === 'true' || next_available === '1') {
-      sql += " AND t.datetime >= datetime('now', '-8 hours')";
-    } else if (date) {
+    // Always filter out past tee times (use Pacific time: UTC-8)
+    sql += " AND t.datetime >= datetime('now', '-8 hours')";
+
+    // If not next_available mode, also filter by specific date
+    if (next_available !== 'true' && next_available !== '1' && date) {
       sql += ' AND t.date = ?';
       params.push(date);
     }
