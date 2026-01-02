@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a8c3f"/>
+      <stop offset="100%" style="stop-color:#2d5a27"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#grass)"/>
+  <!-- Golf ball -->
+  <circle cx="50" cy="45" r="18" fill="#ffffff" stroke="#e0e0e0" stroke-width="1"/>
+  <!-- Ball dimples -->
+  <circle cx="44" cy="40" r="2" fill="#f0f0f0"/>
+  <circle cx="52" cy="38" r="2" fill="#f0f0f0"/>
+  <circle cx="56" cy="44" r="2" fill="#f0f0f0"/>
+  <circle cx="48" cy="48" r="2" fill="#f0f0f0"/>
+  <circle cx="42" cy="46" r="2" fill="#f0f0f0"/>
+  <circle cx="58" cy="50" r="2" fill="#f0f0f0"/>
+  <!-- Golf tee -->
+  <path d="M50 63 L47 85 Q50 88 53 85 L50 63" fill="#c4a35a"/>
+  <!-- Flag pole -->
+  <line x1="70" y1="25" x2="70" y2="55" stroke="#8B4513" stroke-width="2"/>
+  <!-- Flag -->
+  <path d="M70 25 L88 32 L70 39 Z" fill="#c9302c"/>
+</svg>

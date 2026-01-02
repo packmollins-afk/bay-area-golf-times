@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB"/>
+      <stop offset="100%" style="stop-color:#E0F4FF"/>
+    </linearGradient>
+    <linearGradient id="grassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a8c3f"/>
+      <stop offset="100%" style="stop-color:#2d5a27"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="1200" height="630" fill="url(#skyGrad)"/>
+
+  <!-- Golf course grass -->
+  <ellipse cx="600" cy="750" rx="900" ry="350" fill="url(#grassGrad)"/>
+
+  <!-- Fairway -->
+  <ellipse cx="600" cy="520" rx="300" ry="80" fill="#5a9c4f"/>
+
+  <!-- Green -->
+  <ellipse cx="600" cy="420" rx="120" ry="50" fill="#6ab85c"/>
+
+  <!-- Flag pole -->
+  <line x1="600" y1="340" x2="600" y2="420" stroke="#8B4513" stroke-width="4"/>
+
+  <!-- Flag -->
+  <path d="M600 340 L660 360 L600 380 Z" fill="#c9302c"/>
+
+  <!-- Golf Ball -->
+  <circle cx="550" cy="400" r="15" fill="#ffffff" stroke="#e0e0e0" stroke-width="1"/>
+
+  <!-- Sun -->
+  <circle cx="100" cy="80" r="50" fill="#FFD700" opacity="0.8"/>
+
+  <!-- Mountains in background -->
+  <path d="M0 400 L150 280 L300 380 L450 250 L600 350 L750 220 L900 320 L1050 200 L1200 300 L1200 500 L0 500 Z" fill="#a8d5a0" opacity="0.5"/>
+
+  <!-- Text Background Bar -->
+  <rect x="0" y="470" width="1200" height="160" fill="#2d5a27"/>
+
+  <!-- Main Title -->
+  <text x="600" y="540" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white" text-anchor="middle">Bay Area Golf Tee Times</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="590" font-family="Arial, sans-serif" font-size="28" fill="white" text-anchor="middle" opacity="0.9">Find &amp; Book Tee Times at 40+ Public Courses</text>
+
+  <!-- Region badges -->
+  <g font-family="Arial, sans-serif" font-size="16" fill="white" opacity="0.8">
+    <text x="300" y="618" text-anchor="middle">San Francisco</text>
+    <text x="450" y="618" text-anchor="middle">South Bay</text>
+    <text x="600" y="618" text-anchor="middle">East Bay</text>
+    <text x="750" y="618" text-anchor="middle">Marin</text>
+  </g>
+
+</svg>

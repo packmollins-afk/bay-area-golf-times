@@ -1,0 +1,28 @@
+# Bay Area Golf Tee Times - robots.txt
+# https://bayareagolf.now
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://bayareagolf.now/sitemap.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 1
+
+# Disallow API routes from indexing
+Disallow: /api/
+
+# Allow main content
+Allow: /index.html
+Allow: /
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
