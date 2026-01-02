@@ -1,0 +1,26 @@
+{
+  "name": "bay-area-golf-times",
+  "version": "1.0.0",
+  "description": "Bay Area Golf Tee Times Aggregator - Find available tee times across 40+ public courses",
+  "main": "src/api/server.js",
+  "scripts": {
+    "start": "node src/api/server.js",
+    "dev": "node --watch src/api/server.js",
+    "scrape": "node src/scripts/scrape.js",
+    "demo": "node src/scripts/generate-demo-data.js",
+    "setup": "node src/scripts/setup.js"
+  },
+  "keywords": ["golf", "tee-times", "bay-area", "aggregator"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "cheerio": "^1.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "node-cron": "^4.2.1",
+    "puppeteer-core": "^24.34.0"
+  }
+}

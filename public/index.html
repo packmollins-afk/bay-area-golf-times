@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bay Area Golf Tee Times</title>
+  <style>
+    :root {
+      --primary: #2d5a27;
+      --primary-light: #4a8c3f;
+      --bg: #f5f7f5;
+      --card-bg: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --border: #e0e0e0;
+      --success: #2d5a27;
+      --deal: #c9302c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    header p {
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    /* Quick Actions Section */
+    .quick-actions {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 20px 0 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .quick-actions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .next-available-btn {
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .next-available-btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+    }
+
+    .next-available-btn.active {
+      background: #1a3d17;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .region-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .region-chip {
+      padding: 8px 16px;
+      background: #f0f0f0;
+      border: 2px solid transparent;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .region-chip:hover {
+      background: #e8f5e9;
+      border-color: var(--primary);
+    }
+
+    .region-chip.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .filters {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .filter-group select,
+    .filter-group input {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: white;
+      cursor: pointer;
+    }
+
+    .filter-group select:focus,
+    .filter-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+    }
+
+    .filter-group input:disabled {
+      background: #f5f5f5;
+      cursor: not-allowed;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--primary-light);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: #f0f7f0;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 16px 24px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .stat-card .value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .results-count {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .sort-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .sort-controls select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .tee-times-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tee-time-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: grid;
+      grid-template-columns: 100px 1fr auto auto;
+      gap: 20px;
+      align-items: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .tee-time-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .time-block {
+      text-align: center;
+    }
+
+    .time-block .time {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .time-block .date {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .course-info h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .course-info .location {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .course-info .badges {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #e8f5e9;
+      color: var(--primary);
+    }
+
+    .badge.holes {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .badge.players {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .price-block {
+      text-align: right;
+    }
+
+    .price-block .price {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .price-block .original-price {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .price-block .deal-tag {
+      font-size: 0.75rem;
+      color: var(--deal);
+      font-weight: 600;
+    }
+
+    .book-btn {
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .book-btn:hover {
+      background: var(--primary-light);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+    }
+
+    .no-results h3 {
+      margin-bottom: 8px;
+    }
+
+    .no-results p {
+      color: var(--text-muted);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .tee-time-card {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .time-block {
+        text-align: left;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+
+      .price-block {
+        text-align: left;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .quick-actions-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .next-available-btn {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Bay Area Golf Tee Times</h1>
+      <p>Find available tee times across 40+ public courses</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Quick Actions: Next Available + Region Chips -->
+    <div class="quick-actions">
+      <div class="quick-actions-header">
+        <button class="next-available-btn" id="next-available-btn" onclick="toggleNextAvailable()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          Next Available Tee Times
+        </button>
+
+        <div class="region-chips">
+          <button class="region-chip active" data-region="" onclick="selectRegion('')">All Regions</button>
+          <button class="region-chip" data-region="San Francisco" onclick="selectRegion('San Francisco')">SF</button>
+          <button class="region-chip" data-region="South Bay" onclick="selectRegion('South Bay')">South Bay</button>
+          <button class="region-chip" data-region="East Bay" onclick="selectRegion('East Bay')">East Bay</button>
+          <button class="region-chip" data-region="Marin" onclick="selectRegion('Marin')">Marin</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" />
+        </div>
+
+        <div class="filter-group">
+          <label for="players">Players</label>
+          <select id="players">
+            <option value="">Any</option>
+            <option value="1">1+ spots</option>
+            <option value="2">2+ spots</option>
+            <option value="3">3+ spots</option>
+            <option value="4">4 spots</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="min-time">After</label>
+          <select id="min-time">
+            <option value="">Any time</option>
+            <option value="06:00">6:00 AM</option>
+            <option value="07:00">7:00 AM</option>
+            <option value="08:00">8:00 AM</option>
+            <option value="09:00">9:00 AM</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="11:00">11:00 AM</option>
+            <option value="12:00">12:00 PM</option>
+            <option value="13:00">1:00 PM</option>
+            <option value="14:00">2:00 PM</option>
+            <option value="15:00">3:00 PM</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="max-time">Before</label>
+          <select id="max-time">
+            <option value="">Any time</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="12:00">12:00 PM</option>
+            <option value="14:00">2:00 PM</option>
+            <option value="16:00">4:00 PM</option>
+            <option value="18:00">6:00 PM</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="max-price">Max Price</label>
+          <select id="max-price">
+            <option value="">Any price</option>
+            <option value="30">Under $30</option>
+            <option value="50">Under $50</option>
+            <option value="75">Under $75</option>
+            <option value="100">Under $100</option>
+            <option value="150">Under $150</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="holes">Holes</label>
+          <select id="holes">
+            <option value="">All</option>
+            <option value="18">18 holes</option>
+            <option value="9">9 holes</option>
+          </select>
+        </div>
+
+        <button class="btn" onclick="searchTeeTimes()">Search</button>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <!-- Stats loaded dynamically -->
+    </div>
+
+    <div class="results-header">
+      <span class="results-count" id="results-count"></span>
+      <div class="sort-controls">
+        <label>Sort by:</label>
+        <select id="sort-by" onchange="searchTeeTimes()">
+          <option value="datetime">Time</option>
+          <option value="price">Price</option>
+          <option value="course_name">Course</option>
+        </select>
+        <select id="sort-order" onchange="searchTeeTimes()">
+          <option value="ASC">Ascending</option>
+          <option value="DESC">Descending</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="results" class="tee-times-grid">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading tee times...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Bay Area Golf Tee Times Aggregator</p>
+  </footer>
+
+  <script>
+    const API_BASE = '/api';
+
+    // State
+    let isNextAvailableMode = false;
+    let selectedRegion = '';
+
+    // Set default date to today
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = today;
+      loadStats();
+      searchTeeTimes();
+    });
+
+    function toggleNextAvailable() {
+      isNextAvailableMode = !isNextAvailableMode;
+      const btn = document.getElementById('next-available-btn');
+      const dateInput = document.getElementById('date');
+
+      if (isNextAvailableMode) {
+        btn.classList.add('active');
+        btn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Showing All Next Available
+        `;
+        dateInput.disabled = true;
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          Next Available Tee Times
+        `;
+        dateInput.disabled = false;
+      }
+
+      searchTeeTimes();
+    }
+
+    function selectRegion(region) {
+      selectedRegion = region;
+
+      // Update chip styles
+      document.querySelectorAll('.region-chip').forEach(chip => {
+        if (chip.dataset.region === region) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+
+      searchTeeTimes();
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API_BASE}/tee-times/summary`);
+        const stats = await res.json();
+
+        document.getElementById('stats').innerHTML = `
+          <div class="stat-card">
+            <div class="value">${stats.total_tee_times || 0}</div>
+            <div class="label">Available Tee Times</div>
+          </div>
+          <div class="stat-card">
+            <div class="value">${stats.courses_with_times || 0}</div>
+            <div class="label">Courses</div>
+          </div>
+          <div class="stat-card">
+            <div class="value">${stats.days_available || 0}</div>
+            <div class="label">Days Available</div>
+          </div>
+          <div class="stat-card">
+            <div class="value">$${Math.round(stats.avg_price || 0)}</div>
+            <div class="label">Avg Price</div>
+          </div>
+        `;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    async function searchTeeTimes() {
+      const resultsEl = document.getElementById('results');
+      resultsEl.innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>Searching for tee times...</p>
+        </div>
+      `;
+
+      const params = new URLSearchParams();
+
+      // Use next_available mode or specific date
+      if (isNextAvailableMode) {
+        params.set('next_available', 'true');
+      } else {
+        const date = document.getElementById('date').value;
+        if (date) params.set('date', date);
+      }
+
+      // Use selected region from chips (overrides any other region selection)
+      if (selectedRegion) {
+        params.set('region', selectedRegion);
+      }
+
+      const players = document.getElementById('players').value;
+      if (players) params.set('players', players);
+
+      const minTime = document.getElementById('min-time').value;
+      if (minTime) params.set('min_time', minTime);
+
+      const maxTime = document.getElementById('max-time').value;
+      if (maxTime) params.set('max_time', maxTime);
+
+      const maxPrice = document.getElementById('max-price').value;
+      if (maxPrice) params.set('max_price', maxPrice);
+
+      const holes = document.getElementById('holes').value;
+      if (holes) params.set('holes', holes);
+
+      params.set('sort_by', document.getElementById('sort-by').value);
+      params.set('sort_order', document.getElementById('sort-order').value);
+      params.set('limit', '100');
+
+      try {
+        const res = await fetch(`${API_BASE}/tee-times?${params}`);
+        const teeTimes = await res.json();
+
+        const modeText = isNextAvailableMode ? 'next available ' : '';
+        const regionText = selectedRegion ? ` in ${selectedRegion}` : '';
+        document.getElementById('results-count').textContent =
+          `${teeTimes.length} ${modeText}tee times found${regionText}`;
+
+        if (teeTimes.length === 0) {
+          resultsEl.innerHTML = `
+            <div class="no-results">
+              <h3>No tee times found</h3>
+              <p>Try adjusting your filters or selecting a different date.</p>
+            </div>
+          `;
+          return;
+        }
+
+        resultsEl.innerHTML = teeTimes.map(tt => renderTeeTime(tt)).join('');
+      } catch (error) {
+        console.error('Error searching:', error);
+        resultsEl.innerHTML = `
+          <div class="no-results">
+            <h3>Error loading tee times</h3>
+            <p>Please try again later.</p>
+          </div>
+        `;
+      }
+    }
+
+    function renderTeeTime(tt) {
+      const time = formatTime(tt.time);
+      const date = formatDate(tt.date);
+      const price = tt.price ? `$${Math.round(tt.price)}` : 'Call';
+      const hasDiscount = tt.original_price && tt.original_price > tt.price;
+
+      return `
+        <div class="tee-time-card">
+          <div class="time-block">
+            <div class="time">${time}</div>
+            <div class="date">${date}</div>
+          </div>
+
+          <div class="course-info">
+            <h3>${tt.course_name}</h3>
+            <div class="location">${tt.city}, ${tt.region}</div>
+            <div class="badges">
+              <span class="badge holes">${tt.holes || 18} holes</span>
+              <span class="badge players">${tt.players || 4} spots</span>
+              ${tt.has_cart ? '<span class="badge">Cart</span>' : ''}
+            </div>
+          </div>
+
+          <div class="price-block">
+            ${hasDiscount ? `<div class="original-price">$${Math.round(tt.original_price)}</div>` : ''}
+            <div class="price">${price}</div>
+            ${hasDiscount ? '<div class="deal-tag">HOT DEAL</div>' : ''}
+          </div>
+
+          <a href="${tt.booking_url}" target="_blank" rel="noopener" class="book-btn">Book Now</a>
+        </div>
+      `;
+    }
+
+    function formatTime(timeStr) {
+      if (!timeStr) return '';
+      // Handle various time formats
+      if (timeStr.includes('AM') || timeStr.includes('PM')) {
+        return timeStr;
+      }
+      const [hours, minutes] = timeStr.split(':');
+      const h = parseInt(hours);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      return `${h12}:${minutes} ${ampm}`;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr + 'T00:00:00');
+      const options = { weekday: 'short', month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+  </script>
+</body>
+</html>
