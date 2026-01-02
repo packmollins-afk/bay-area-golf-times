@@ -355,8 +355,7 @@ function generateTeeTimes() {
   const today = new Date();
 
   for (const [courseName, course] of Object.entries(courseMap)) {
-    if (!course.golfnow_id) continue;
-
+    // Generate tee times for all courses (not just those with golfnow_id)
     for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
       const date = new Date(today);
       date.setDate(date.getDate() + dayOffset);
