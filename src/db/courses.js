@@ -52,12 +52,20 @@ const courses = [
   { name: "StoneTree Golf Club", city: "Novato", region: "Marin", holes: 18, golfnow_id: "633", booking_url: "https://www.golfnow.com/tee-times/facility/633-stonetree-golf-club/search", booking_system: "golfnow" },
   { name: "McInnis Park Golf Center", city: "San Rafael", region: "Marin", holes: 9, golfnow_id: "566", booking_url: "https://www.golfnow.com/tee-times/facility/566-mcinnis-park-golf-center/search", booking_system: "golfnow" },
   { name: "Mill Valley Golf Course", city: "Mill Valley", region: "Marin", holes: 9, golfnow_id: "572", booking_url: "https://www.golfnow.com/tee-times/facility/572-mill-valley-golf-course/search", booking_system: "golfnow" },
+  { name: "The Links at Bodega Harbour", city: "Bodega Bay", region: "Marin", holes: 18, par: 70, yardage: 6275, golfnow_id: "149", booking_url: "https://www.golfnow.com/tee-times/facility/149-the-links-at-bodega-harbour/search", booking_system: "golfnow" },
+  { name: "Northwood Golf Club", city: "Monte Rio", region: "Marin", holes: 9, par: 36, yardage: 2893, golfnow_id: null, booking_url: "https://www.northwoodgolf.com/", booking_system: "other" },
+
+  // Santa Cruz / South Bay Extended
+  { name: "Pasatiempo Golf Club", city: "Santa Cruz", region: "South Bay", holes: 18, par: 70, yardage: 6439, golfnow_id: null, booking_url: "https://www.pasatiempo.com/tee-times/", booking_system: "other" },
+
+  // East Bay - Additional
+  { name: "Diablo Creek Golf Course", city: "Concord", region: "East Bay", holes: 18, par: 71, yardage: 6830, golfnow_id: "1448", booking_url: "https://www.golfnow.com/tee-times/facility/1448-diablo-creek-golf-course/search", booking_system: "golfnow" },
 ];
 
 // Insert courses if they don't exist
 const insertCourse = db.prepare(`
-  INSERT OR IGNORE INTO courses (name, city, region, holes, golfnow_id, foreup_id, booking_url, booking_system)
-  VALUES (@name, @city, @region, @holes, @golfnow_id, @foreup_id, @booking_url, @booking_system)
+  INSERT OR IGNORE INTO courses (name, city, region, holes, par, yardage, golfnow_id, foreup_id, booking_url, booking_system)
+  VALUES (@name, @city, @region, @holes, @par, @yardage, @golfnow_id, @foreup_id, @booking_url, @booking_system)
 `);
 
 const insertMany = db.transaction((courses) => {
@@ -67,6 +75,8 @@ const insertMany = db.transaction((courses) => {
       city: course.city,
       region: course.region,
       holes: course.holes,
+      par: course.par || null,
+      yardage: course.yardage || null,
       golfnow_id: course.golfnow_id || null,
       foreup_id: course.foreup_id || null,
       booking_url: course.booking_url,
