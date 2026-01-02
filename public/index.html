@@ -1295,7 +1295,7 @@
 
     async function loadCourses() {
       try {
-        const res = await fetch(`${API_BASE}/courses`);
+        const res = await fetch(`${API_BASE}/courses?_t=${Date.now()}`);
         coursesData = await res.json();
         updateCourseDropdown();
       } catch (e) { console.error('Error loading courses:', e); }
@@ -1434,7 +1434,7 @@
       params.set('limit', '100');
 
       try {
-        const res = await fetch(`${API_BASE}/tee-times?${params}`);
+        const res = await fetch(`${API_BASE}/tee-times?${params}&_t=${Date.now()}`);
         let teeTimes = await res.json();
 
         // Filter by favorites if selected
@@ -1582,7 +1582,7 @@
       favBtn.classList.toggle('favorited', isFavorite(courseId));
 
       try {
-        const res = await fetch(`${API_BASE}/courses/${courseId}`);
+        const res = await fetch(`${API_BASE}/courses/${courseId}?_t=${Date.now()}`);
         const course = await res.json();
         renderCourseDetail(course);
       } catch (e) {
