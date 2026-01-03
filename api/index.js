@@ -17,8 +17,40 @@ const hashPassword = (password) => {
 // Generate session token
 const generateToken = () => crypto.randomBytes(32).toString('hex');
 
-// In-memory session store (in production, use Redis or database)
-const sessions = new Map();
+// Database session helpers
+const createSession = (userId) => {
+  const token = generateToken();
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
+  db.prepare(`
+    INSERT INTO sessions (token, user_id, expires_at)
+    VALUES (?, ?, ?)
+  `).run(token, userId, expiresAt);
+  return token;
+};
+
+const getSession = (token) => {
+  if (!token) return null;
+  const session = db.prepare(`
+    SELECT s.*, u.email, u.display_name
+    FROM sessions s
+    JOIN users u ON s.user_id = u.id
+    WHERE s.token = ? AND (s.expires_at IS NULL OR s.expires_at > datetime('now'))
+  `).get(token);
+  if (!session) return null;
+  return { id: session.user_id, email: session.email, displayName: session.display_name };
+};
+
+const deleteSession = (token) => {
+  db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+};
+
+// Clean up expired sessions periodically
+const cleanExpiredSessions = () => {
+  try {
+    db.prepare("DELETE FROM sessions WHERE expires_at < datetime('now')").run();
+  } catch (e) {}
+};
+setInterval(cleanExpiredSessions, 60 * 60 * 1000); // Every hour
 
 app.use(cors());
 app.use(express.json());
@@ -27,18 +59,20 @@ app.use(express.static(path.join(__dirname, '../public')));
 // User auth middleware
 const userAuth = (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token || !sessions.has(token)) {
+  const user = getSession(token);
+  if (!user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
-  req.user = sessions.get(token);
+  req.user = user;
   next();
 };
 
 // Optional auth - doesn't fail, just adds user if logged in
 const optionalAuth = (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  if (token && sessions.has(token)) {
-    req.user = sessions.get(token);
+  const user = getSession(token);
+  if (user) {
+    req.user = user;
   }
   next();
 };
@@ -445,10 +479,9 @@ app.post('/api/auth/signup', (req, res) => {
       VALUES (?, ?, ?)
     `).run(email.toLowerCase(), passwordHash, displayName || email.split('@')[0]);
 
-    // Create session
-    const token = generateToken();
+    // Create session in database
+    const token = createSession(result.lastInsertRowid);
     const user = { id: result.lastInsertRowid, email: email.toLowerCase(), displayName: displayName || email.split('@')[0] };
-    sessions.set(token, user);
 
     res.json({ success: true, token, user });
   } catch (error) {
@@ -473,10 +506,9 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Create session
-    const token = generateToken();
+    // Create session in database
+    const token = createSession(user.id);
     const userData = { id: user.id, email: user.email, displayName: user.display_name };
-    sessions.set(token, userData);
 
     res.json({ success: true, token, user: userData });
   } catch (error) {
@@ -490,7 +522,7 @@ app.post('/api/auth/login', (req, res) => {
  */
 app.post('/api/auth/logout', userAuth, (req, res) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  sessions.delete(token);
+  deleteSession(token);
   res.json({ success: true });
 });
 

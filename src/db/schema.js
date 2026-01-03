@@ -184,10 +184,19 @@ db.exec(`
     UNIQUE(round_id, hole_number)
   );
 
+  CREATE TABLE IF NOT EXISTS sessions (
+    token TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+
   CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
   CREATE INDEX IF NOT EXISTS idx_user_favorites ON user_favorites(user_id);
   CREATE INDEX IF NOT EXISTS idx_rounds_user ON rounds(user_id);
   CREATE INDEX IF NOT EXISTS idx_rounds_course ON rounds(course_id);
+  CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 `);
 
 // Migration: Add new columns to existing courses table
