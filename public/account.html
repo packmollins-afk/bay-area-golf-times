@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account | Bay Area Golf</title>
+  <meta name="description" content="Sign in or create an account to track your rounds and earn your Bay Area Golf Passport.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2d5a27;
+      --primary-light: #4a7a3f;
+      --primary-dark: #1a3d17;
+      --bg: #f4f1e8;
+      --bg-paper: #f9f6ef;
+      --card-bg: #fffef9;
+      --text: #3d2914;
+      --text-muted: #6b5344;
+      --border: #c4a882;
+      --border-light: #ddd0bc;
+      --gold: #b8860b;
+      --error: #c62828;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #f4f1e8;
+      padding: 24px 0;
+      border-bottom: 4px solid var(--border);
+    }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .back-link {
+      color: #f4f1e8;
+      text-decoration: none;
+      font-family: 'Playfair Display', Georgia, serif;
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+    .page-title {
+      text-align: center;
+      padding: 40px 0;
+    }
+    .page-title h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    .page-title p { color: var(--text-muted); font-style: italic; }
+
+    /* Auth Form */
+    .auth-container {
+      max-width: 400px;
+      margin: 0 auto 60px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 24px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 14px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border-light);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .auth-tab:first-child { border-radius: 4px 0 0 4px; border-right: none; }
+    .auth-tab:last-child { border-radius: 0 4px 4px 0; }
+    .auth-tab.active {
+      background: var(--primary);
+      color: #f4f1e8;
+      border-color: var(--primary-dark);
+    }
+
+    .auth-form {
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--bg-paper);
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #f4f1e8;
+      border: 2px solid var(--primary-dark);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover { background: var(--primary-light); }
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .error-msg {
+      background: #fce4ec;
+      color: var(--error);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .success-msg {
+      background: #e8f5e9;
+      color: var(--primary);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    /* Logged In State */
+    .user-profile {
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .user-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .user-email {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .user-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--bg-paper);
+      border-radius: 8px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+    .stat-value {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .logout-btn {
+      padding: 12px 32px;
+      background: var(--bg-paper);
+      color: var(--text);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover {
+      background: var(--bg);
+      border-color: var(--primary);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Bay Area Golf</h1>
+      <a href="/" class="back-link">Back to Map</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-title">
+      <h2 id="page-heading">Create an Account</h2>
+      <p id="page-subtitle">Track your rounds and earn your Bay Area Golf Passport</p>
+    </div>
+
+    <!-- Auth Forms (shown when logged out) -->
+    <div class="auth-container" id="auth-container">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showTab('signup')">Sign Up</button>
+        <button class="auth-tab" onclick="showTab('login')">Log In</button>
+      </div>
+
+      <div id="error-container"></div>
+      <div id="success-container"></div>
+
+      <!-- Sign Up Form -->
+      <form class="auth-form" id="signup-form" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label for="signup-name">Display Name</label>
+          <input type="text" id="signup-name" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" placeholder="At least 6 characters" minlength="6" required>
+        </div>
+        <button type="submit" class="submit-btn" id="signup-btn">Create Account</button>
+      </form>
+
+      <!-- Login Form -->
+      <form class="auth-form hidden" id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="Your password" required>
+        </div>
+        <button type="submit" class="submit-btn" id="login-btn">Log In</button>
+      </form>
+    </div>
+
+    <!-- User Profile (shown when logged in) -->
+    <div class="auth-container hidden" id="profile-container">
+      <div class="user-profile">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-name" id="user-name">Loading...</div>
+        <div class="user-email" id="user-email"></div>
+
+        <div class="user-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="stat-rounds">0</div>
+            <div class="stat-label">Rounds</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-courses">0</div>
+            <div class="stat-label">Courses</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-avg">--</div>
+            <div class="stat-label">Avg Score</div>
+          </div>
+        </div>
+
+        <button class="logout-btn" onclick="handleLogout()">Log Out</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = '/api';
+
+    // Check if user is logged in on page load
+    document.addEventListener('DOMContentLoaded', checkAuth);
+
+    function getToken() {
+      return localStorage.getItem('authToken');
+    }
+
+    function setToken(token) {
+      localStorage.setItem('authToken', token);
+    }
+
+    function clearToken() {
+      localStorage.removeItem('authToken');
+    }
+
+    async function checkAuth() {
+      const token = getToken();
+      if (!token) {
+        showAuthForms();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          showProfile(data.user);
+        } else {
+          clearToken();
+          showAuthForms();
+        }
+      } catch (e) {
+        clearToken();
+        showAuthForms();
+      }
+    }
+
+    function showAuthForms() {
+      document.getElementById('auth-container').classList.remove('hidden');
+      document.getElementById('profile-container').classList.add('hidden');
+      document.getElementById('page-heading').textContent = 'Create an Account';
+      document.getElementById('page-subtitle').textContent = 'Track your rounds and earn your Bay Area Golf Passport';
+    }
+
+    async function showProfile(user) {
+      document.getElementById('auth-container').classList.add('hidden');
+      document.getElementById('profile-container').classList.remove('hidden');
+      document.getElementById('page-heading').textContent = 'My Account';
+      document.getElementById('page-subtitle').textContent = 'Your Bay Area Golf journey';
+
+      document.getElementById('user-avatar').textContent = (user.displayName || user.email)[0].toUpperCase();
+      document.getElementById('user-name').textContent = user.displayName || user.email.split('@')[0];
+      document.getElementById('user-email').textContent = user.email;
+
+      // Load user stats
+      try {
+        const res = await fetch(`${API_BASE}/user/stats`, {
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('stat-rounds').textContent = data.stats.total_rounds || 0;
+          document.getElementById('stat-courses').textContent = data.stats.courses_played || 0;
+          document.getElementById('stat-avg').textContent = data.stats.avg_score ? Math.round(data.stats.avg_score) : '--';
+        }
+      } catch (e) {
+        console.error('Error loading stats:', e);
+      }
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach((btn, i) => {
+        btn.classList.toggle('active', (tab === 'signup' && i === 0) || (tab === 'login' && i === 1));
+      });
+      document.getElementById('signup-form').classList.toggle('hidden', tab !== 'signup');
+      document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+      clearMessages();
+    }
+
+    function showError(msg) {
+      document.getElementById('error-container').innerHTML = `<div class="error-msg">${msg}</div>`;
+      document.getElementById('success-container').innerHTML = '';
+    }
+
+    function showSuccess(msg) {
+      document.getElementById('success-container').innerHTML = `<div class="success-msg">${msg}</div>`;
+      document.getElementById('error-container').innerHTML = '';
+    }
+
+    function clearMessages() {
+      document.getElementById('error-container').innerHTML = '';
+      document.getElementById('success-container').innerHTML = '';
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      const btn = document.getElementById('signup-btn');
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+      clearMessages();
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            displayName: document.getElementById('signup-name').value,
+            email: document.getElementById('signup-email').value,
+            password: document.getElementById('signup-password').value
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setToken(data.token);
+          showSuccess('Account created! Redirecting...');
+          setTimeout(() => showProfile(data.user), 1000);
+        } else {
+          showError(data.error || 'Failed to create account');
+        }
+      } catch (e) {
+        showError('Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+      clearMessages();
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-password').value
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setToken(data.token);
+          showSuccess('Welcome back!');
+          setTimeout(() => showProfile(data.user), 500);
+        } else {
+          showError(data.error || 'Invalid email or password');
+        }
+      } catch (e) {
+        showError('Network error. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Log In';
+      }
+    }
+
+    async function handleLogout() {
+      const token = getToken();
+      if (token) {
+        try {
+          await fetch(`${API_BASE}/auth/logout`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        } catch (e) {}
+      }
+      clearToken();
+      showAuthForms();
+    }
+  </script>
+</body>
+</html>

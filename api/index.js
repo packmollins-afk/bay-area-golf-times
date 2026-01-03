@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const crypto = require('crypto');
 const db = require('../src/db/schema');
 const { seedCourses, getAllCourses, getCoursesByRegion, getTournamentHistory, getCourseBySlug, getStaffPicks, setStaffPick } = require('../src/db/courses');
 const { runScraper } = require('../src/scrapers/golfnow');
@@ -8,9 +9,39 @@ const { runScraper } = require('../src/scrapers/golfnow');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Simple password hashing (in production, use bcrypt)
+const hashPassword = (password) => {
+  return crypto.createHash('sha256').update(password + 'baygolf_salt_2024').digest('hex');
+};
+
+// Generate session token
+const generateToken = () => crypto.randomBytes(32).toString('hex');
+
+// In-memory session store (in production, use Redis or database)
+const sessions = new Map();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+
+// User auth middleware
+const userAuth = (req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token || !sessions.has(token)) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  req.user = sessions.get(token);
+  next();
+};
+
+// Optional auth - doesn't fail, just adds user if logged in
+const optionalAuth = (req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (token && sessions.has(token)) {
+    req.user = sessions.get(token);
+  }
+  next();
+};
 
 /**
  * GET /api/courses
@@ -381,6 +412,325 @@ app.get('/api/courses/:id', (req, res) => {
  */
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ========== USER AUTH ENDPOINTS ==========
+
+/**
+ * POST /api/auth/signup
+ * Create a new user account
+ */
+app.post('/api/auth/signup', (req, res) => {
+  try {
+    const { email, password, displayName } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Check if user exists
+    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
+    if (existing) {
+      return res.status(400).json({ error: 'An account with this email already exists' });
+    }
+
+    // Create user
+    const passwordHash = hashPassword(password);
+    const result = db.prepare(`
+      INSERT INTO users (email, password_hash, display_name)
+      VALUES (?, ?, ?)
+    `).run(email.toLowerCase(), passwordHash, displayName || email.split('@')[0]);
+
+    // Create session
+    const token = generateToken();
+    const user = { id: result.lastInsertRowid, email: email.toLowerCase(), displayName: displayName || email.split('@')[0] };
+    sessions.set(token, user);
+
+    res.json({ success: true, token, user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/auth/login
+ * Login with email and password
+ */
+app.post('/api/auth/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+    if (!user || user.password_hash !== hashPassword(password)) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Create session
+    const token = generateToken();
+    const userData = { id: user.id, email: user.email, displayName: user.display_name };
+    sessions.set(token, userData);
+
+    res.json({ success: true, token, user: userData });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/auth/logout
+ * Logout current session
+ */
+app.post('/api/auth/logout', userAuth, (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  sessions.delete(token);
+  res.json({ success: true });
+});
+
+/**
+ * GET /api/auth/me
+ * Get current user info
+ */
+app.get('/api/auth/me', userAuth, (req, res) => {
+  res.json({ user: req.user });
+});
+
+// ========== USER FAVORITES ==========
+
+/**
+ * GET /api/user/favorites
+ * Get user's favorite courses
+ */
+app.get('/api/user/favorites', userAuth, (req, res) => {
+  try {
+    const favorites = db.prepare(`
+      SELECT c.* FROM courses c
+      INNER JOIN user_favorites uf ON c.id = uf.course_id
+      WHERE uf.user_id = ?
+      ORDER BY uf.created_at DESC
+    `).all(req.user.id);
+    res.json(favorites);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/user/favorites/:courseId
+ * Add course to favorites
+ */
+app.post('/api/user/favorites/:courseId', userAuth, (req, res) => {
+  try {
+    const { courseId } = req.params;
+    db.prepare(`
+      INSERT OR IGNORE INTO user_favorites (user_id, course_id)
+      VALUES (?, ?)
+    `).run(req.user.id, courseId);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/user/favorites/:courseId
+ * Remove course from favorites
+ */
+app.delete('/api/user/favorites/:courseId', userAuth, (req, res) => {
+  try {
+    const { courseId } = req.params;
+    db.prepare(`
+      DELETE FROM user_favorites WHERE user_id = ? AND course_id = ?
+    `).run(req.user.id, courseId);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== ROUNDS / SCOREBOOK ==========
+
+/**
+ * GET /api/user/rounds
+ * Get user's round history
+ */
+app.get('/api/user/rounds', userAuth, (req, res) => {
+  try {
+    const rounds = db.prepare(`
+      SELECT r.*, c.name as course_name, c.city, c.slug
+      FROM rounds r
+      INNER JOIN courses c ON r.course_id = c.id
+      WHERE r.user_id = ?
+      ORDER BY r.date DESC
+      LIMIT 50
+    `).all(req.user.id);
+    res.json(rounds);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/user/rounds
+ * Log a new round
+ */
+app.post('/api/user/rounds', userAuth, (req, res) => {
+  try {
+    const { courseId, date, totalScore, totalPutts, notes, holes } = req.body;
+
+    const result = db.prepare(`
+      INSERT INTO rounds (user_id, course_id, date, total_score, total_putts, notes)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(req.user.id, courseId, date, totalScore, totalPutts, notes);
+
+    const roundId = result.lastInsertRowid;
+
+    // Insert hole-by-hole data if provided
+    if (holes && holes.length > 0) {
+      const insertHole = db.prepare(`
+        INSERT INTO round_holes (round_id, hole_number, par, score, putts, fairway_hit, gir)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+      for (const hole of holes) {
+        insertHole.run(roundId, hole.number, hole.par, hole.score, hole.putts, hole.fairwayHit ? 1 : 0, hole.gir ? 1 : 0);
+      }
+    }
+
+    res.json({ success: true, roundId });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/user/stats
+ * Get user's golf stats
+ */
+app.get('/api/user/stats', userAuth, (req, res) => {
+  try {
+    const stats = db.prepare(`
+      SELECT
+        COUNT(*) as total_rounds,
+        COUNT(DISTINCT course_id) as courses_played,
+        AVG(total_score) as avg_score,
+        MIN(total_score) as best_score,
+        AVG(total_putts) as avg_putts
+      FROM rounds
+      WHERE user_id = ?
+    `).get(req.user.id);
+
+    const recentRounds = db.prepare(`
+      SELECT r.*, c.name as course_name
+      FROM rounds r
+      INNER JOIN courses c ON r.course_id = c.id
+      WHERE r.user_id = ?
+      ORDER BY r.date DESC
+      LIMIT 5
+    `).all(req.user.id);
+
+    res.json({ stats, recentRounds });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/user/passport
+ * Get user's passport progress (courses played)
+ */
+app.get('/api/user/passport', userAuth, (req, res) => {
+  try {
+    const played = db.prepare(`
+      SELECT DISTINCT c.id, c.name, c.slug, c.city, c.region,
+        MIN(r.date) as first_played,
+        COUNT(r.id) as times_played,
+        MIN(r.total_score) as best_score
+      FROM courses c
+      INNER JOIN rounds r ON c.id = r.course_id
+      WHERE r.user_id = ?
+      GROUP BY c.id
+      ORDER BY c.region, c.name
+    `).all(req.user.id);
+
+    const total = db.prepare('SELECT COUNT(*) as count FROM courses').get();
+
+    res.json({
+      played,
+      totalCourses: total.count,
+      completionPercent: Math.round((played.length / total.count) * 100)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== COMMUNITY / LEADERBOARD ==========
+
+/**
+ * GET /api/community/leaderboard
+ * Get community leaderboard
+ */
+app.get('/api/community/leaderboard', (req, res) => {
+  try {
+    const { period = 'month' } = req.query;
+
+    let dateFilter = "date >= date('now', '-30 days')";
+    if (period === 'week') dateFilter = "date >= date('now', '-7 days')";
+    if (period === 'all') dateFilter = '1=1';
+
+    const leaderboard = db.prepare(`
+      SELECT
+        u.id,
+        u.display_name,
+        COUNT(DISTINCT r.course_id) as courses_played,
+        COUNT(r.id) as total_rounds,
+        ROUND(AVG(r.total_score), 1) as avg_score
+      FROM users u
+      INNER JOIN rounds r ON u.id = r.user_id
+      WHERE ${dateFilter}
+      GROUP BY u.id
+      ORDER BY courses_played DESC, total_rounds DESC
+      LIMIT 20
+    `).all();
+
+    res.json(leaderboard);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/community/activity
+ * Get recent community activity
+ */
+app.get('/api/community/activity', (req, res) => {
+  try {
+    const activity = db.prepare(`
+      SELECT
+        r.id,
+        r.date,
+        r.total_score,
+        u.display_name,
+        c.name as course_name,
+        c.slug as course_slug
+      FROM rounds r
+      INNER JOIN users u ON r.user_id = u.id
+      INNER JOIN courses c ON r.course_id = c.id
+      ORDER BY r.created_at DESC
+      LIMIT 20
+    `).all();
+
+    res.json(activity);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Admin endpoints

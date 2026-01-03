@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Community | Bay Area Golf</title>
-  <meta name="description" content="Connect with Bay Area golfers. Share photos, rate courses, and compete on leaderboards.">
+  <meta name="description" content="Connect with Bay Area golfers. See who's playing, view leaderboards, and track community activity.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +45,8 @@
       font-size: 1.8rem;
       font-weight: 700;
     }
-    .back-link {
+    .header-nav { display: flex; gap: 10px; }
+    .nav-link {
       color: #f4f1e8;
       text-decoration: none;
       font-family: 'Playfair Display', Georgia, serif;
@@ -54,7 +55,7 @@
       border-radius: 4px;
       transition: all 0.2s;
     }
-    .back-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+    .nav-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
     .page-title {
       text-align: center;
@@ -93,68 +94,13 @@
       border-color: var(--primary-dark);
     }
 
-    /* Coming Soon Card */
-    .coming-soon {
-      max-width: 600px;
-      margin: 0 auto 60px;
-      background: var(--card-bg);
-      border: 2px solid var(--border-light);
-      border-radius: 8px;
-      padding: 48px;
-      text-align: center;
-    }
-    .coming-soon-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 24px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .coming-soon-icon svg {
-      width: 40px;
-      height: 40px;
-      stroke: #fff;
-      fill: none;
-      stroke-width: 2;
-    }
-    .coming-soon h3 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.5rem;
-      margin-bottom: 16px;
-    }
-    .coming-soon p {
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-    .feature-list {
-      text-align: left;
-      max-width: 320px;
-      margin: 0 auto;
-    }
-    .feature-list li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border-light);
-    }
-    .feature-list li:last-child { border-bottom: none; }
-    .feature-list svg {
-      width: 20px;
-      height: 20px;
-      stroke: var(--primary);
-      fill: none;
-      stroke-width: 2;
-      flex-shrink: 0;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
-    /* Leaderboard Preview */
-    .leaderboard-preview {
-      max-width: 500px;
-      margin: 40px auto;
+    /* Leaderboard */
+    .leaderboard {
+      max-width: 600px;
+      margin: 0 auto 40px;
       background: var(--card-bg);
       border: 2px solid var(--border-light);
       border-radius: 8px;
@@ -172,9 +118,13 @@
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.1rem;
     }
-    .leaderboard-header span {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+    .period-select {
+      padding: 6px 12px;
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-family: inherit;
+      background: var(--card-bg);
+      cursor: pointer;
     }
     .leaderboard-row {
       display: flex;
@@ -185,8 +135,8 @@
     }
     .leaderboard-row:last-child { border-bottom: none; }
     .rank {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       background: var(--bg);
       border-radius: 50%;
       display: flex;
@@ -194,7 +144,8 @@
       justify-content: center;
       font-family: 'Playfair Display', Georgia, serif;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      flex-shrink: 0;
     }
     .rank.gold { background: #ffd700; color: #3d2914; }
     .rank.silver { background: #c0c0c0; color: #3d2914; }
@@ -214,89 +165,269 @@
       font-weight: 700;
       color: var(--primary);
     }
+
+    /* Activity Feed */
+    .activity-feed {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .activity-item {
+      display: flex;
+      gap: 16px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .activity-avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .activity-content { flex: 1; }
+    .activity-text { margin-bottom: 4px; }
+    .activity-text strong { color: var(--primary); }
+    .activity-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .empty-state-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 16px;
+      background: var(--bg-paper);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .empty-state-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2;
+    }
+    .empty-state h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .cta-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: #f4f1e8;
+      text-decoration: none;
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .cta-btn:hover { background: var(--primary-light); }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
       <h1>Bay Area Golf</h1>
-      <a href="/" class="back-link">Back to Map</a>
+      <div class="header-nav">
+        <a href="/account.html" class="nav-link" id="auth-link">Sign In</a>
+        <a href="/" class="nav-link">Map</a>
+      </div>
     </div>
   </header>
 
   <main class="container">
     <div class="page-title">
       <h2>Community</h2>
-      <p>Connect with Bay Area golfers</p>
+      <p>See who's playing Bay Area courses</p>
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active">Leaderboard</button>
-      <button class="tab-btn">Activity</button>
-      <button class="tab-btn">Photos</button>
+      <button class="tab-btn active" onclick="showTab('leaderboard')">Leaderboard</button>
+      <button class="tab-btn" onclick="showTab('activity')">Activity</button>
     </div>
 
-    <div class="coming-soon">
-      <div class="coming-soon-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-        </svg>
+    <!-- Leaderboard Tab -->
+    <div class="tab-content active" id="leaderboard-tab">
+      <div class="leaderboard">
+        <div class="leaderboard-header">
+          <h3>Passport Collectors</h3>
+          <select class="period-select" id="period-select" onchange="loadLeaderboard()">
+            <option value="month">This Month</option>
+            <option value="week">This Week</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
+        <div id="leaderboard-content">
+          <div class="loading">Loading...</div>
+        </div>
       </div>
-      <h3>Coming Soon</h3>
-      <p>Join the Bay Area golf community.</p>
-      <ul class="feature-list">
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Weekly & monthly leaderboards
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Rate and review courses
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Share course photos
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          See recent community activity
-        </li>
-      </ul>
     </div>
 
-    <div class="leaderboard-preview">
-      <div class="leaderboard-header">
-        <h3>Top Passport Collectors</h3>
-        <span>This Month</span>
-      </div>
-      <div class="leaderboard-row">
-        <div class="rank gold">1</div>
-        <div class="player-info">
-          <div class="player-name">Coming Soon</div>
-          <div class="player-stat">Be the first!</div>
-        </div>
-        <div class="player-score">--</div>
-      </div>
-      <div class="leaderboard-row">
-        <div class="rank silver">2</div>
-        <div class="player-info">
-          <div class="player-name">--</div>
-          <div class="player-stat">--</div>
-        </div>
-        <div class="player-score">--</div>
-      </div>
-      <div class="leaderboard-row">
-        <div class="rank bronze">3</div>
-        <div class="player-info">
-          <div class="player-name">--</div>
-          <div class="player-stat">--</div>
-        </div>
-        <div class="player-score">--</div>
+    <!-- Activity Tab -->
+    <div class="tab-content" id="activity-tab">
+      <div class="activity-feed" id="activity-content">
+        <div class="loading">Loading...</div>
       </div>
     </div>
   </main>
+
+  <script>
+    const API_BASE = '/api';
+
+    // Check auth and update header
+    async function checkAuth() {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        try {
+          const res = await fetch(`${API_BASE}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            document.getElementById('auth-link').textContent = data.user.displayName || 'Account';
+          }
+        } catch (e) {}
+      }
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active',
+          (tab === 'leaderboard' && i === 0) ||
+          (tab === 'activity' && i === 1)
+        );
+      });
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`${tab}-tab`).classList.add('active');
+
+      if (tab === 'activity') loadActivity();
+    }
+
+    async function loadLeaderboard() {
+      const period = document.getElementById('period-select').value;
+      const container = document.getElementById('leaderboard-content');
+      container.innerHTML = '<div class="loading">Loading...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/community/leaderboard?period=${period}`);
+        const data = await res.json();
+
+        if (data.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              </div>
+              <h3>No Activity Yet</h3>
+              <p>Be the first to log a round and appear on the leaderboard!</p>
+              <a href="/scorebook.html" class="cta-btn">Log a Round</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = data.map((player, i) => `
+          <div class="leaderboard-row">
+            <div class="rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i + 1}</div>
+            <div class="player-info">
+              <div class="player-name">${player.display_name}</div>
+              <div class="player-stat">${player.total_rounds} round${player.total_rounds !== 1 ? 's' : ''} played</div>
+            </div>
+            <div class="player-score">${player.courses_played} courses</div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="loading">Error loading leaderboard</div>';
+      }
+    }
+
+    async function loadActivity() {
+      const container = document.getElementById('activity-content');
+      container.innerHTML = '<div class="loading">Loading...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/community/activity`);
+        const data = await res.json();
+
+        if (data.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              </div>
+              <h3>No Recent Activity</h3>
+              <p>Log your rounds to see them appear here!</p>
+              <a href="/scorebook.html" class="cta-btn">Log a Round</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = data.map(item => `
+          <div class="activity-item">
+            <div class="activity-avatar">${item.display_name[0].toUpperCase()}</div>
+            <div class="activity-content">
+              <div class="activity-text">
+                <strong>${item.display_name}</strong> played
+                <a href="/course/${item.course_slug}" style="color: var(--primary); text-decoration: none;">${item.course_name}</a>
+                ${item.total_score ? `and shot <strong>${item.total_score}</strong>` : ''}
+              </div>
+              <div class="activity-meta">${formatDate(item.date)}</div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="loading">Error loading activity</div>';
+      }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diff = now - date;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+      if (days === 0) return 'Today';
+      if (days === 1) return 'Yesterday';
+      if (days < 7) return `${days} days ago`;
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    // Initialize
+    checkAuth();
+    loadLeaderboard();
+  </script>
 </body>
 </html>

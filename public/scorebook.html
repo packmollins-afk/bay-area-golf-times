@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Scorebook | Bay Area Golf</title>
-  <meta name="description" content="Track your rounds, log scores, and earn your Bay Area Golf Passport by playing all 50+ public courses.">
+  <meta name="description" content="Track your rounds, log scores, and earn your Bay Area Golf Passport by playing all 28 public courses.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +23,8 @@
       --border: #c4a882;
       --border-light: #ddd0bc;
       --gold: #b8860b;
+      --success: #2d5a27;
+      --error: #c62828;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -45,7 +47,8 @@
       font-size: 1.8rem;
       font-weight: 700;
     }
-    .back-link {
+    .header-nav { display: flex; gap: 10px; }
+    .nav-link {
       color: #f4f1e8;
       text-decoration: none;
       font-family: 'Playfair Display', Georgia, serif;
@@ -54,7 +57,7 @@
       border-radius: 4px;
       transition: all 0.2s;
     }
-    .back-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+    .nav-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
     .page-title {
       text-align: center;
@@ -93,107 +96,272 @@
       border-color: var(--primary-dark);
     }
 
-    /* Coming Soon Card */
-    .coming-soon {
-      max-width: 600px;
-      margin: 0 auto 60px;
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Auth Required */
+    .auth-required {
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 60px 20px;
       background: var(--card-bg);
       border: 2px solid var(--border-light);
       border-radius: 8px;
-      padding: 48px;
-      text-align: center;
     }
-    .coming-soon-icon {
+    .auth-required-icon {
       width: 80px;
       height: 80px;
       margin: 0 auto 24px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      background: var(--bg-paper);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .coming-soon-icon svg {
-      width: 40px;
-      height: 40px;
-      stroke: #fff;
+    .auth-required-icon svg {
+      width: 36px;
+      height: 36px;
+      stroke: var(--text-muted);
       fill: none;
       stroke-width: 2;
     }
-    .coming-soon h3 {
+    .auth-required h3 {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.5rem;
-      margin-bottom: 16px;
+      font-size: 1.4rem;
+      margin-bottom: 12px;
     }
-    .coming-soon p {
+    .auth-required p {
       color: var(--text-muted);
       margin-bottom: 24px;
     }
-    .feature-list {
-      text-align: left;
-      max-width: 320px;
+    .cta-btn {
+      display: inline-block;
+      padding: 14px 28px;
+      background: var(--primary);
+      color: #f4f1e8;
+      text-decoration: none;
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      transition: background 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .cta-btn:hover { background: var(--primary-light); }
+
+    /* Log Round Form */
+    .log-round-form {
+      max-width: 500px;
       margin: 0 auto;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 32px;
     }
-    .feature-list li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border-light);
+    .form-group {
+      margin-bottom: 20px;
     }
-    .feature-list li:last-child { border-bottom: none; }
-    .feature-list svg {
-      width: 20px;
-      height: 20px;
-      stroke: var(--primary);
-      fill: none;
-      stroke-width: 2;
-      flex-shrink: 0;
+    .form-group label {
+      display: block;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .form-group select,
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--bg-paper);
+    }
+    .form-group select:focus,
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #f4f1e8;
+      border: 2px solid var(--primary-dark);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover { background: var(--primary-light); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .success-msg {
+      background: #e8f5e9;
+      color: var(--success);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .error-msg {
+      background: #fce4ec;
+      color: var(--error);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
     }
 
-    /* Passport Preview */
-    .passport-preview {
-      max-width: 800px;
-      margin: 40px auto;
+    /* My Rounds */
+    .rounds-list {
+      max-width: 700px;
+      margin: 0 auto;
     }
-    .passport-preview h3 {
+    .round-card {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .round-score {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.3rem;
-      margin-bottom: 16px;
-      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      flex-shrink: 0;
     }
+    .round-info { flex: 1; }
+    .round-course {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .round-course a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .round-course a:hover { color: var(--primary); }
+    .round-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Passport */
+    .passport-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .passport-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .passport-progress {
+      background: var(--bg-paper);
+      border-radius: 10px;
+      height: 20px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .passport-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      transition: width 0.5s ease;
+    }
+    .passport-stats {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+    }
+    .passport-stats strong { color: var(--primary); }
     .passport-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 12px;
     }
     .passport-stamp {
       aspect-ratio: 1;
       background: var(--card-bg);
       border: 2px dashed var(--border-light);
-      border-radius: 4px;
+      border-radius: 8px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 600;
       color: var(--text-muted);
+      text-align: center;
+      padding: 8px;
       opacity: 0.5;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .passport-stamp:hover {
+      border-color: var(--primary);
+      opacity: 0.7;
     }
     .passport-stamp.earned {
-      background: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
       border: 2px solid var(--primary-dark);
       color: #fff;
       opacity: 1;
     }
+    .passport-stamp.earned:hover {
+      transform: scale(1.05);
+    }
+    .stamp-initial {
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+    .stamp-name {
+      font-size: 0.65rem;
+      line-height: 1.2;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
       <h1>Bay Area Golf</h1>
-      <a href="/" class="back-link">Back to Map</a>
+      <div class="header-nav">
+        <a href="/account.html" class="nav-link" id="auth-link">Sign In</a>
+        <a href="/" class="nav-link">Map</a>
+      </div>
     </div>
   </header>
 
@@ -203,14 +371,9 @@
       <p>Track your rounds & earn your Bay Area Golf Passport</p>
     </div>
 
-    <div class="tabs">
-      <button class="tab-btn active">Log Round</button>
-      <button class="tab-btn">My Rounds</button>
-      <button class="tab-btn">Passport</button>
-    </div>
-
-    <div class="coming-soon">
-      <div class="coming-soon-icon">
+    <!-- Auth Required State -->
+    <div id="auth-required" class="auth-required">
+      <div class="auth-required-icon">
         <svg viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
@@ -218,53 +381,279 @@
           <line x1="16" y1="17" x2="8" y2="17"></line>
         </svg>
       </div>
-      <h3>Coming Soon</h3>
-      <p>Sign in to start tracking your Bay Area golf journey.</p>
-      <ul class="feature-list">
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Log rounds hole-by-hole
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Track scores, putts & stats
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          Earn passport stamps
-        </li>
-        <li>
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          View your golf history
-        </li>
-      </ul>
+      <h3>Sign In to Track Your Rounds</h3>
+      <p>Create a free account to log scores, track stats, and earn your Bay Area Golf Passport.</p>
+      <a href="/account.html" class="cta-btn">Create Account</a>
     </div>
 
-    <div class="passport-preview">
-      <h3>Bay Area Golf Passport - 50+ Courses</h3>
-      <div class="passport-grid" id="passport-grid">
-        <!-- Will be populated with course stamps -->
+    <!-- Logged In Content -->
+    <div id="logged-in-content" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('log')">Log Round</button>
+        <button class="tab-btn" onclick="showTab('rounds')">My Rounds</button>
+        <button class="tab-btn" onclick="showTab('passport')">Passport</button>
+      </div>
+
+      <!-- Log Round Tab -->
+      <div class="tab-content active" id="log-tab">
+        <form class="log-round-form" onsubmit="handleLogRound(event)">
+          <div id="form-messages"></div>
+          <div class="form-group">
+            <label for="course-select">Course</label>
+            <select id="course-select" required>
+              <option value="">Select a course...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="round-date">Date</label>
+            <input type="date" id="round-date" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="total-score">Total Score</label>
+              <input type="number" id="total-score" min="30" max="200" placeholder="e.g. 85">
+            </div>
+            <div class="form-group">
+              <label for="total-putts">Total Putts</label>
+              <input type="number" id="total-putts" min="10" max="100" placeholder="e.g. 32">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="round-notes">Notes (optional)</label>
+            <textarea id="round-notes" rows="3" placeholder="How did it go?"></textarea>
+          </div>
+          <button type="submit" class="submit-btn" id="submit-btn">Log Round</button>
+        </form>
+      </div>
+
+      <!-- My Rounds Tab -->
+      <div class="tab-content" id="rounds-tab">
+        <div class="rounds-list" id="rounds-list">
+          <div class="loading">Loading rounds...</div>
+        </div>
+      </div>
+
+      <!-- Passport Tab -->
+      <div class="tab-content" id="passport-tab">
+        <div class="passport-container">
+          <div class="passport-header">
+            <div class="passport-progress">
+              <div class="passport-progress-bar" id="passport-progress" style="width: 0%"></div>
+            </div>
+            <div class="passport-stats">
+              <strong id="passport-played">0</strong> of <strong id="passport-total">28</strong> courses played
+            </div>
+          </div>
+          <div class="passport-grid" id="passport-grid">
+            <div class="loading">Loading passport...</div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
 
   <script>
-    // Load courses for passport preview
-    async function loadPassportPreview() {
+    const API_BASE = '/api';
+    let courses = [];
+    let currentUser = null;
+
+    function getToken() {
+      return localStorage.getItem('authToken');
+    }
+
+    async function checkAuth() {
+      const token = getToken();
+      if (!token) {
+        showAuthRequired();
+        return;
+      }
+
       try {
-        const res = await fetch('/api/courses?all=true');
-        const courses = await res.json();
-        const grid = document.getElementById('passport-grid');
-        grid.innerHTML = courses.map(course => `
-          <div class="passport-stamp" title="${course.name}">
-            ${course.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
-          </div>
-        `).join('');
+        const res = await fetch(`${API_BASE}/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.user;
+          document.getElementById('auth-link').textContent = data.user.displayName || 'Account';
+          showLoggedIn();
+        } else {
+          showAuthRequired();
+        }
+      } catch (e) {
+        showAuthRequired();
+      }
+    }
+
+    function showAuthRequired() {
+      document.getElementById('auth-required').classList.remove('hidden');
+      document.getElementById('logged-in-content').classList.add('hidden');
+    }
+
+    function showLoggedIn() {
+      document.getElementById('auth-required').classList.add('hidden');
+      document.getElementById('logged-in-content').classList.remove('hidden');
+      loadCourses();
+      // Set default date to today
+      document.getElementById('round-date').value = new Date().toISOString().split('T')[0];
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active',
+          (tab === 'log' && i === 0) ||
+          (tab === 'rounds' && i === 1) ||
+          (tab === 'passport' && i === 2)
+        );
+      });
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`${tab}-tab`).classList.add('active');
+
+      if (tab === 'rounds') loadRounds();
+      if (tab === 'passport') loadPassport();
+    }
+
+    async function loadCourses() {
+      try {
+        const res = await fetch(`${API_BASE}/courses?all=true`);
+        courses = await res.json();
+        const select = document.getElementById('course-select');
+        select.innerHTML = '<option value="">Select a course...</option>' +
+          courses.map(c => `<option value="${c.id}">${c.name} - ${c.city}</option>`).join('');
       } catch (e) {
         console.error('Error loading courses:', e);
       }
     }
-    loadPassportPreview();
+
+    async function handleLogRound(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      const msgContainer = document.getElementById('form-messages');
+      msgContainer.innerHTML = '';
+
+      try {
+        const res = await fetch(`${API_BASE}/user/rounds`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify({
+            courseId: document.getElementById('course-select').value,
+            date: document.getElementById('round-date').value,
+            totalScore: document.getElementById('total-score').value || null,
+            totalPutts: document.getElementById('total-putts').value || null,
+            notes: document.getElementById('round-notes').value || null
+          })
+        });
+
+        if (res.ok) {
+          msgContainer.innerHTML = '<div class="success-msg">Round logged successfully!</div>';
+          // Reset form
+          document.getElementById('course-select').value = '';
+          document.getElementById('total-score').value = '';
+          document.getElementById('total-putts').value = '';
+          document.getElementById('round-notes').value = '';
+        } else {
+          const data = await res.json();
+          msgContainer.innerHTML = `<div class="error-msg">${data.error || 'Failed to log round'}</div>`;
+        }
+      } catch (e) {
+        msgContainer.innerHTML = '<div class="error-msg">Network error. Please try again.</div>';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Log Round';
+      }
+    }
+
+    async function loadRounds() {
+      const container = document.getElementById('rounds-list');
+      container.innerHTML = '<div class="loading">Loading rounds...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/user/rounds`, {
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+        const rounds = await res.json();
+
+        if (rounds.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <p>No rounds logged yet. Log your first round to see it here!</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = rounds.map(r => `
+          <div class="round-card">
+            <div class="round-score">${r.total_score || '--'}</div>
+            <div class="round-info">
+              <div class="round-course">
+                <a href="/course/${r.slug}">${r.course_name}</a>
+              </div>
+              <div class="round-meta">
+                ${formatDate(r.date)} &bull; ${r.city}
+                ${r.total_putts ? ` &bull; ${r.total_putts} putts` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="loading">Error loading rounds</div>';
+      }
+    }
+
+    async function loadPassport() {
+      const container = document.getElementById('passport-grid');
+      container.innerHTML = '<div class="loading">Loading passport...</div>';
+
+      try {
+        const [passportRes, allCoursesRes] = await Promise.all([
+          fetch(`${API_BASE}/user/passport`, {
+            headers: { 'Authorization': `Bearer ${getToken()}` }
+          }),
+          fetch(`${API_BASE}/courses?all=true`)
+        ]);
+
+        const passport = await passportRes.json();
+        const allCourses = await allCoursesRes.json();
+
+        // Update progress
+        document.getElementById('passport-played').textContent = passport.played.length;
+        document.getElementById('passport-total').textContent = passport.totalCourses;
+        document.getElementById('passport-progress').style.width = `${passport.completionPercent}%`;
+
+        // Create set of played course IDs
+        const playedIds = new Set(passport.played.map(c => c.id));
+
+        // Render all courses
+        container.innerHTML = allCourses.map(course => {
+          const played = playedIds.has(course.id);
+          const initial = course.name.split(' ').map(w => w[0]).join('').slice(0, 2);
+          return `
+            <a href="/course/${course.slug}" class="passport-stamp ${played ? 'earned' : ''}" title="${course.name}">
+              <span class="stamp-initial">${initial}</span>
+              <span class="stamp-name">${course.name.length > 18 ? course.name.slice(0, 15) + '...' : course.name}</span>
+            </a>
+          `;
+        }).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="loading">Error loading passport</div>';
+      }
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // Initialize
+    checkAuth();
   </script>
 </body>
 </html>

@@ -329,6 +329,9 @@
     .region-chip.favorites { background: #fdf5f5; border-color: var(--deal); color: var(--deal); }
     .region-chip.favorites:hover { background: #fce8e8; }
     .region-chip.favorites.active { background: var(--deal); color: #f4f1e8; }
+    .region-chip.staff-picks { background: #fffbeb; border-color: var(--gold); color: var(--gold); }
+    .region-chip.staff-picks:hover { background: #fef3c7; }
+    .region-chip.staff-picks.active { background: var(--gold); color: #f4f1e8; }
 
     .directory-controls { display: flex; flex-direction: column; gap: 12px; }
     .sort-control {
@@ -1081,30 +1084,10 @@
   <header role="banner">
     <div class="container">
       <h1>Bay Area Golf Tee Times</h1>
-      <p>Find available tee times across 40+ public courses in San Francisco, South Bay, East Bay & North Bay</p>
     </div>
   </header>
 
   <main class="container" id="main-content" role="main">
-    <!-- Page Title -->
-    <div class="page-title-bar">
-      <h2>Find Your Tee Time</h2>
-      <p>Starting from 7:00 AM daily</p>
-    </div>
-
-    <!-- Quick Filters -->
-    <div class="quick-filters">
-      <button class="quick-filter-btn" id="filter-solo" onclick="applyQuickFilter('solo')">
-        Solo Round
-      </button>
-      <button class="quick-filter-btn" id="filter-cheapest" onclick="applyQuickFilter('cheapest')">
-        Cheapest First
-      </button>
-      <button class="quick-filter-btn" id="filter-closest" onclick="applyQuickFilter('closest')">
-        Soonest Available
-      </button>
-    </div>
-
     <!-- Tee Times Section -->
     <section id="tee-times-tab" class="tab-content active">
       <h2 class="sr-only">Available Golf Tee Times in Bay Area</h2>
@@ -1118,7 +1101,13 @@
             Next Available Tee Times
           </button>
           <div class="region-chips">
-            <button class="region-chip active" data-region="" onclick="selectRegion('')">All Regions</button>
+            <button class="region-chip active" data-region="" onclick="selectRegion('')">All Courses</button>
+            <button class="region-chip staff-picks" data-region="staff_picks" onclick="selectRegion('staff_picks')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right: 4px;">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              Staff Picks
+            </button>
             <button class="region-chip favorites" data-region="favorites" onclick="selectRegion('favorites')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -1398,11 +1387,13 @@
       const select = document.getElementById('course');
       select.innerHTML = '<option value="">All Courses</option>';
       let filtered = coursesData;
-      if (selectedRegion && selectedRegion !== 'favorites') {
+      if (selectedRegion && selectedRegion !== 'favorites' && selectedRegion !== 'staff_picks') {
         filtered = coursesData.filter(c => c.region === selectedRegion);
       } else if (selectedRegion === 'favorites') {
         const favs = getFavorites();
         filtered = coursesData.filter(c => favs.includes(c.id));
+      } else if (selectedRegion === 'staff_picks') {
+        filtered = coursesData.filter(c => c.is_staff_pick);
       }
       filtered.forEach(c => {
         const opt = document.createElement('option');
@@ -1560,8 +1551,9 @@
       const params = new URLSearchParams();
       if (isNextAvailableMode) params.set('next_available', 'true');
       else { const date = document.getElementById('date').value; if (date) params.set('date', date); }
-      // Don't pass 'favorites' as region to API - we'll filter client-side
-      if (selectedRegion && selectedRegion !== 'favorites') params.set('region', selectedRegion);
+      // Don't pass 'favorites' or 'staff_picks' as region to API - we'll filter client-side
+      if (selectedRegion && selectedRegion !== 'favorites' && selectedRegion !== 'staff_picks') params.set('region', selectedRegion);
+      if (selectedRegion === 'staff_picks') params.set('staff_picks', 'true');
       const course = document.getElementById('course').value;
       if (course) params.set('course_id', course);
       const players = document.getElementById('players').value;
@@ -1587,7 +1579,10 @@
         }
 
         const modeText = isNextAvailableMode ? 'next available ' : '';
-        const regionText = selectedRegion === 'favorites' ? ' at favorite courses' : (selectedRegion ? ` in ${selectedRegion}` : '');
+        let regionText = '';
+        if (selectedRegion === 'favorites') regionText = ' at favorite courses';
+        else if (selectedRegion === 'staff_picks') regionText = ' at Staff Pick courses';
+        else if (selectedRegion) regionText = ` in ${selectedRegion}`;
         document.getElementById('results-count').textContent = `${teeTimes.length} ${modeText}tee times found${regionText}`;
 
         if (teeTimes.length === 0) {

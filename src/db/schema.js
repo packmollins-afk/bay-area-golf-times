@@ -138,6 +138,56 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_photos_course ON course_photos(course_id);
   CREATE INDEX IF NOT EXISTS idx_food_course ON food_items(course_id);
   CREATE INDEX IF NOT EXISTS idx_tournament_course ON tournament_history(course_id);
+
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    display_name TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS user_favorites (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id),
+    UNIQUE(user_id, course_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS rounds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    total_score INTEGER,
+    total_putts INTEGER,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS round_holes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    round_id INTEGER NOT NULL,
+    hole_number INTEGER NOT NULL,
+    par INTEGER,
+    score INTEGER,
+    putts INTEGER,
+    fairway_hit INTEGER,
+    gir INTEGER,
+    FOREIGN KEY (round_id) REFERENCES rounds(id),
+    UNIQUE(round_id, hole_number)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+  CREATE INDEX IF NOT EXISTS idx_user_favorites ON user_favorites(user_id);
+  CREATE INDEX IF NOT EXISTS idx_rounds_user ON rounds(user_id);
+  CREATE INDEX IF NOT EXISTS idx_rounds_course ON rounds(course_id);
 `);
 
 // Migration: Add new columns to existing courses table
