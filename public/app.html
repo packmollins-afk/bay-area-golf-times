@@ -221,46 +221,69 @@
   }
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --primary: #2d5a27;
-      --primary-light: #4a8c3f;
-      --bg: #f5f7f5;
-      --card-bg: #ffffff;
-      --text: #1a1a1a;
-      --text-muted: #666;
-      --border: #e0e0e0;
+      --primary-light: #4a7a3f;
+      --primary-dark: #1a3d17;
+      --bg: #f4f1e8;
+      --bg-paper: #f9f6ef;
+      --card-bg: #fffef9;
+      --text: #3d2914;
+      --text-muted: #6b5344;
+      --border: #c4a882;
+      --border-light: #ddd0bc;
       --success: #2d5a27;
-      --deal: #c9302c;
-      --gold: #f5a623;
+      --deal: #8b2500;
+      --gold: #b8860b;
+      --contour: #8b7355;
+      --water: #5d8aa8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
       background: var(--bg);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(139, 115, 85, 0.03) 40px, rgba(139, 115, 85, 0.03) 41px),
+        repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(139, 115, 85, 0.03) 40px, rgba(139, 115, 85, 0.03) 41px);
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
     header {
-      background: var(--primary);
-      color: white;
-      padding: 20px 0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #f4f1e8;
+      padding: 24px 0;
+      border-bottom: 4px solid var(--border);
+      box-shadow: 0 4px 12px rgba(61, 41, 20, 0.15);
     }
-    header h1 { font-size: 1.8rem; font-weight: 600; }
-    header p { opacity: 0.9; margin-top: 4px; }
+    header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    header p {
+      opacity: 0.9;
+      margin-top: 6px;
+      font-style: italic;
+    }
 
     .quick-actions {
       background: var(--card-bg);
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin: 20px 0 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 20px 24px;
+      border-radius: 4px;
+      margin: 24px 0 16px;
+      border: 2px solid var(--border-light);
+      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
     }
     .quick-actions-header {
       display: flex;
@@ -272,9 +295,10 @@
     .next-available-btn {
       padding: 12px 24px;
       background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
+      color: #f4f1e8;
+      border: 2px solid var(--primary-dark);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
@@ -282,26 +306,29 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     .next-available-btn:hover { background: var(--primary-light); }
-    .next-available-btn.active { background: #1a3d17; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .next-available-btn.active { background: var(--primary-dark); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
 
-    .region-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .region-chips { display: flex; gap: 10px; flex-wrap: wrap; }
     .region-chip {
-      padding: 8px 16px;
-      background: #f0f0f0;
-      border: 2px solid transparent;
-      border-radius: 20px;
+      padding: 8px 18px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
       font-size: 0.9rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      font-family: 'Playfair Display', Georgia, serif;
     }
-    .region-chip:hover { background: #e8f5e9; border-color: var(--primary); }
-    .region-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .region-chip.favorites { background: #fff0f0; border-color: #e91e63; color: #e91e63; }
-    .region-chip.favorites:hover { background: #fce4ec; }
-    .region-chip.favorites.active { background: #e91e63; color: white; }
+    .region-chip:hover { background: #e8efe6; border-color: var(--primary); }
+    .region-chip.active { background: var(--primary); color: #f4f1e8; border-color: var(--primary-dark); }
+    .region-chip.favorites { background: #fdf5f5; border-color: var(--deal); color: var(--deal); }
+    .region-chip.favorites:hover { background: #fce8e8; }
+    .region-chip.favorites.active { background: var(--deal); color: #f4f1e8; }
 
     .directory-controls { display: flex; flex-direction: column; gap: 12px; }
     .sort-control {
@@ -330,28 +357,31 @@
       display: flex;
       gap: 0;
       background: var(--card-bg);
-      border-radius: 12px;
-      padding: 4px;
-      margin: 20px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-radius: 4px;
+      padding: 6px;
+      margin: 24px 0;
+      border: 2px solid var(--border-light);
+      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
     }
     .tab-btn {
       flex: 1;
-      padding: 12px 24px;
+      padding: 14px 24px;
       border: none;
       background: transparent;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 1rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 3px;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      color: var(--text);
     }
     .tab-btn:hover { background: var(--bg); }
-    .tab-btn.active { background: var(--primary); color: white; }
+    .tab-btn.active { background: var(--primary); color: #f4f1e8; }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -360,34 +390,36 @@
     .courses-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
+      gap: 24px;
     }
     .course-card {
       background: var(--card-bg);
-      border-radius: 12px;
+      border-radius: 4px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid var(--border-light);
+      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
       cursor: pointer;
     }
-    .course-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .course-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(61, 41, 20, 0.15); border-color: var(--primary); }
     .course-card-img {
-      height: 160px;
+      height: 180px;
       background: linear-gradient(135deg, var(--primary), var(--primary-light));
       position: relative;
       overflow: hidden;
+      border-bottom: 3px solid var(--border);
     }
     .course-card-img img { width: 100%; height: 100%; object-fit: cover; }
-    .course-card-body { padding: 16px; }
-    .course-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-    .course-card-header h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin: 0; }
-    .course-card .location { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-style: normal; }
-    .course-card .course-meta { display: flex; gap: 12px; flex-wrap: wrap; }
+    .course-card-body { padding: 18px; }
+    .course-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .course-card-header h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 0; }
+    .course-card .location { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-style: italic; }
+    .course-card .course-meta { display: flex; gap: 14px; flex-wrap: wrap; }
     .course-card .meta-item { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-    .course-card .meta-item strong { color: var(--text); }
-    .course-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .course-card .meta-item strong { color: var(--text); font-weight: 700; }
+    .course-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--border-light); }
     .course-card .tee-times-count { font-size: 0.85rem; color: var(--primary); font-weight: 600; }
-    .course-card .rating-display { display: flex; align-items: center; gap: 4px; color: var(--gold); font-weight: 600; }
+    .course-card .rating-display { display: flex; align-items: center; gap: 4px; color: var(--gold); font-weight: 700; font-size: 1rem; }
 
     /* Favorite Button */
     .fav-btn {
@@ -429,10 +461,11 @@
 
     .filters {
       background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 24px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      border: 2px solid var(--border-light);
+      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
     }
     .filters-grid {
       display: grid;
@@ -441,32 +474,37 @@
       align-items: end;
     }
     .filter-group { display: flex; flex-direction: column; gap: 6px; }
-    .filter-group label { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
+    .filter-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); font-family: 'Playfair Display', Georgia, serif; }
     .filter-group select, .filter-group input {
       padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
       font-size: 0.95rem;
-      background: white;
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--bg-paper);
       cursor: pointer;
+      color: var(--text);
     }
     .filter-group select:focus, .filter-group input:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
     }
-    .filter-group input:disabled { background: #f5f5f5; cursor: not-allowed; }
+    .filter-group input:disabled { background: var(--border-light); cursor: not-allowed; }
 
     .btn {
-      padding: 10px 20px;
+      padding: 12px 24px;
       background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
+      color: #f4f1e8;
+      border: 2px solid var(--primary-dark);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     .btn:hover { background: var(--primary-light); }
 
@@ -487,18 +525,20 @@
 
     .time-slot-card {
       background: var(--card-bg);
-      border-radius: 12px;
+      border-radius: 4px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 2px solid var(--border-light);
+      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
     }
 
     .time-slot-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 20px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      color: white;
+      padding: 18px 24px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #f4f1e8;
+      border-bottom: 3px solid var(--border);
     }
 
     .time-slot-time {
@@ -508,13 +548,15 @@
     }
 
     .time-slot-time .time {
-      font-size: 1.5rem;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.6rem;
       font-weight: 700;
     }
 
     .time-slot-time .date {
       font-size: 0.9rem;
       opacity: 0.9;
+      font-style: italic;
     }
 
     .time-slot-meta {
@@ -553,16 +595,16 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px;
-      background: var(--bg);
-      border-radius: 10px;
+      padding: 14px 16px;
+      background: var(--bg-paper);
+      border-radius: 4px;
       cursor: pointer;
       transition: all 0.2s;
-      border: 2px solid transparent;
+      border: 2px solid var(--border-light);
     }
 
     .course-chip:hover {
-      background: #e8f5e9;
+      background: #e8efe6;
       border-color: var(--primary);
       transform: translateY(-2px);
     }
@@ -574,7 +616,8 @@
 
     .course-chip-name {
       display: block;
-      font-weight: 600;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
       font-size: 0.95rem;
       color: var(--text);
       white-space: nowrap;
@@ -586,6 +629,7 @@
       display: block;
       font-size: 0.8rem;
       color: var(--text-muted);
+      font-style: italic;
     }
 
     .course-chip-details {
@@ -629,15 +673,19 @@
     }
 
     .chip-book {
-      padding: 8px 14px;
+      padding: 8px 16px;
       background: var(--primary);
-      color: white;
+      color: #f4f1e8;
       text-decoration: none;
-      border-radius: 6px;
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 0.85rem;
-      font-weight: 500;
+      font-weight: 600;
       transition: background 0.2s;
       white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 2px solid var(--primary-dark);
     }
 
     .chip-book:hover {
@@ -724,17 +772,18 @@
 
     footer {
       text-align: center;
-      padding: 40px 20px;
+      padding: 48px 20px;
       color: var(--text-muted);
       font-size: 0.9rem;
       background: var(--card-bg);
-      border-top: 1px solid var(--border);
+      border-top: 4px solid var(--border);
     }
     footer .footer-content { max-width: 600px; margin: 0 auto; }
-    footer .footer-content p { margin: 8px 0; }
-    footer .footer-regions { font-size: 0.85rem; }
-    footer .footer-regions span { color: var(--primary); font-weight: 500; }
-    footer .footer-copy { font-size: 0.8rem; margin-top: 16px !important; }
+    footer .footer-content p { margin: 10px 0; }
+    footer .footer-content strong { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; }
+    footer .footer-regions { font-size: 0.85rem; font-style: italic; }
+    footer .footer-regions span { color: var(--primary); font-weight: 600; }
+    footer .footer-copy { font-size: 0.8rem; margin-top: 20px !important; }
 
     /* Skip link for accessibility */
     .skip-link {
@@ -776,7 +825,7 @@
       display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(61, 41, 20, 0.7);
       z-index: 1000;
       overflow-y: auto;
       padding: 20px;
@@ -784,29 +833,30 @@
     .modal-overlay.active { display: flex; justify-content: center; align-items: flex-start; }
     .modal {
       background: var(--card-bg);
-      border-radius: 16px;
+      border-radius: 4px;
       max-width: 800px;
       width: 100%;
       margin: 40px auto;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border: 4px solid var(--border);
+      box-shadow: 0 20px 60px rgba(61, 41, 20, 0.4);
     }
     .modal-header {
       position: relative;
-      height: 250px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      height: 280px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
       overflow: hidden;
     }
     .modal-header img { width: 100%; height: 100%; object-fit: cover; }
     .modal-header-overlay {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      padding: 30px 24px 20px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.7));
-      color: white;
+      padding: 40px 28px 24px;
+      background: linear-gradient(transparent, rgba(26, 61, 23, 0.85));
+      color: #f4f1e8;
     }
-    .modal-header-overlay h2 { font-size: 1.8rem; margin-bottom: 4px; }
-    .modal-header-overlay .subtitle { opacity: 0.9; }
+    .modal-header-overlay h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 2rem; margin-bottom: 6px; font-weight: 700; }
+    .modal-header-overlay .subtitle { opacity: 0.9; font-style: italic; }
     .modal-close {
       position: absolute;
       top: 16px; right: 16px;
@@ -823,56 +873,64 @@
     }
     .modal-close:hover { background: rgba(0,0,0,0.6); }
 
-    .modal-body { padding: 24px; }
-    .modal-section { margin-bottom: 28px; }
+    .modal-body { padding: 28px; }
+    .modal-section { margin-bottom: 32px; }
     .modal-section:last-child { margin-bottom: 0; }
     .modal-section h3 {
-      font-size: 1.1rem;
-      margin-bottom: 12px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
       color: var(--text);
       display: flex;
       align-items: center;
       gap: 8px;
+      border-bottom: 2px solid var(--border-light);
+      padding-bottom: 10px;
     }
 
     .course-stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 12px;
+      gap: 14px;
     }
     .course-stat {
-      background: var(--bg);
-      padding: 12px;
-      border-radius: 8px;
+      background: var(--bg-paper);
+      padding: 14px;
+      border-radius: 4px;
       text-align: center;
+      border: 2px solid var(--border-light);
     }
-    .course-stat .value { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
-    .course-stat .label { font-size: 0.75rem; color: var(--text-muted); }
+    .course-stat .value { font-family: 'Playfair Display', Georgia, serif; font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+    .course-stat .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
     .course-record {
-      background: linear-gradient(135deg, #fff8e1, #fff3e0);
-      padding: 16px;
-      border-radius: 10px;
+      background: linear-gradient(135deg, #fdf8e8, #faf3df);
+      padding: 18px;
+      border-radius: 4px;
+      border-left: 4px solid var(--gold);
+      border: 2px solid var(--border-light);
       border-left: 4px solid var(--gold);
     }
-    .course-record .score { font-size: 2rem; font-weight: 800; color: var(--gold); }
-    .course-record .holder { font-weight: 600; margin-top: 4px; }
-    .course-record .details { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+    .course-record .score { font-family: 'Playfair Display', Georgia, serif; font-size: 2.2rem; font-weight: 800; color: var(--gold); }
+    .course-record .holder { font-weight: 600; margin-top: 6px; }
+    .course-record .details { font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; font-style: italic; }
 
-    .tournament-history { display: flex; flex-direction: column; gap: 12px; }
+    .tournament-history { display: flex; flex-direction: column; gap: 14px; }
     .tournament-item {
-      background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
-      padding: 14px 16px;
-      border-radius: 10px;
+      background: linear-gradient(135deg, #e8efe6, #f0f6ed);
+      padding: 16px 18px;
+      border-radius: 4px;
+      border: 2px solid var(--border-light);
       border-left: 4px solid var(--primary);
     }
-    .tournament-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .tournament-name { font-weight: 700; color: var(--primary-dark); font-size: 0.95rem; }
-    .tournament-year { background: var(--primary); color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+    .tournament-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .tournament-name { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; color: var(--primary-dark); font-size: 1rem; }
+    .tournament-year { background: var(--primary); color: #f4f1e8; padding: 4px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
     .tournament-winner { display: flex; justify-content: space-between; align-items: center; }
-    .winner-name { font-weight: 600; font-size: 1.1rem; }
-    .winner-score { font-weight: 800; color: var(--gold); font-size: 1.1rem; }
-    .tournament-notes { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+    .winner-name { font-weight: 700; font-size: 1.15rem; }
+    .winner-score { font-family: 'Playfair Display', Georgia, serif; font-weight: 800; color: var(--gold); font-size: 1.15rem; }
+    .tournament-notes { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; font-style: italic; }
 
     .photos-grid {
       display: grid;
