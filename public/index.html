@@ -138,6 +138,62 @@
       position: absolute;
       background: var(--fairway);
       box-shadow: 0 0 8px rgba(90, 143, 74, 0.4);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: all 0.3s ease;
+    }
+
+    .fairway:hover {
+      background: var(--fairway-light);
+      box-shadow: 0 0 15px rgba(90, 143, 74, 0.7);
+      z-index: 100;
+      filter: brightness(1.2);
+    }
+
+    a.fairway {
+      text-decoration: none;
+    }
+
+    .fairway::before {
+      content: attr(data-course);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-5px);
+      background: rgba(61, 50, 37, 0.95);
+      color: var(--paper);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    .fairway:hover::before {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-10px);
+    }
+
+    /* Small course initial inside fairway */
+    .fairway::after {
+      content: attr(data-initial);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 8px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
     }
 
     /* SF Courses */
@@ -460,38 +516,38 @@
     <!-- Golf course fairways -->
     <div class="fairways">
       <!-- San Francisco -->
-      <div class="fairway fw-harding"></div>
-      <div class="fairway fw-lincoln"></div>
-      <div class="fairway fw-presidio"></div>
-      <div class="fairway fw-sharp"></div>
-      <div class="fairway fw-gleneagles"></div>
-      <div class="fairway fw-olympic"></div>
+      <a href="/app.html#courses" class="fairway fw-harding" data-course="TPC Harding Park" data-initial="H"></a>
+      <a href="/app.html#courses" class="fairway fw-lincoln" data-course="Lincoln Park" data-initial="L"></a>
+      <a href="/app.html#courses" class="fairway fw-presidio" data-course="Presidio Golf Course" data-initial="P"></a>
+      <a href="/app.html#courses" class="fairway fw-sharp" data-course="Sharp Park" data-initial="S"></a>
+      <a href="/app.html#courses" class="fairway fw-gleneagles" data-course="Gleneagles Golf Course" data-initial="G"></a>
+      <a href="/app.html#courses" class="fairway fw-olympic" data-course="Olympic Club" data-initial="O"></a>
 
       <!-- South Bay -->
-      <div class="fairway fw-paloalto"></div>
-      <div class="fairway fw-santateresa"></div>
-      <div class="fairway fw-cinnabar"></div>
-      <div class="fairway fw-coyote"></div>
-      <div class="fairway fw-sunnyvale"></div>
-      <div class="fairway fw-deepcliff"></div>
-      <div class="fairway fw-sanjose"></div>
+      <a href="/app.html#courses" class="fairway fw-paloalto" data-course="Palo Alto Golf Course" data-initial="PA"></a>
+      <a href="/app.html#courses" class="fairway fw-santateresa" data-course="Santa Teresa Golf Club" data-initial="ST"></a>
+      <a href="/app.html#courses" class="fairway fw-cinnabar" data-course="Cinnabar Hills" data-initial="C"></a>
+      <a href="/app.html#courses" class="fairway fw-coyote" data-course="Coyote Creek" data-initial="CC"></a>
+      <a href="/app.html#courses" class="fairway fw-sunnyvale" data-course="Sunnyvale Golf Course" data-initial="SV"></a>
+      <a href="/app.html#courses" class="fairway fw-deepcliff" data-course="Deep Cliff" data-initial="D"></a>
+      <a href="/app.html#courses" class="fairway fw-sanjose" data-course="San Jose Municipal" data-initial="SJ"></a>
 
       <!-- East Bay -->
-      <div class="fairway fw-corica"></div>
-      <div class="fairway fw-tilden"></div>
-      <div class="fairway fw-boundary"></div>
-      <div class="fairway fw-metropolitan"></div>
-      <div class="fairway fw-lakechabot"></div>
-      <div class="fairway fw-poppy"></div>
-      <div class="fairway fw-laspositas"></div>
-      <div class="fairway fw-diablo"></div>
+      <a href="/app.html#courses" class="fairway fw-corica" data-course="Chuck Corica Park" data-initial="CP"></a>
+      <a href="/app.html#courses" class="fairway fw-tilden" data-course="Tilden Park" data-initial="T"></a>
+      <a href="/app.html#courses" class="fairway fw-boundary" data-course="Boundary Oak" data-initial="B"></a>
+      <a href="/app.html#courses" class="fairway fw-metropolitan" data-course="Metropolitan Golf Links" data-initial="M"></a>
+      <a href="/app.html#courses" class="fairway fw-lakechabot" data-course="Lake Chabot" data-initial="LC"></a>
+      <a href="/app.html#courses" class="fairway fw-poppy" data-course="Poppy Ridge" data-initial="PR"></a>
+      <a href="/app.html#courses" class="fairway fw-laspositas" data-course="Las Positas" data-initial="LP"></a>
+      <a href="/app.html#courses" class="fairway fw-diablo" data-course="Diablo Creek" data-initial="DC"></a>
 
       <!-- Marin -->
-      <div class="fairway fw-peacock"></div>
-      <div class="fairway fw-indian"></div>
-      <div class="fairway fw-stonetree"></div>
-      <div class="fairway fw-millvalley"></div>
-      <div class="fairway fw-bodega"></div>
+      <a href="/app.html#courses" class="fairway fw-peacock" data-course="Peacock Gap" data-initial="PG"></a>
+      <a href="/app.html#courses" class="fairway fw-indian" data-course="Indian Valley" data-initial="IV"></a>
+      <a href="/app.html#courses" class="fairway fw-stonetree" data-course="StoneTree" data-initial="ST"></a>
+      <a href="/app.html#courses" class="fairway fw-millvalley" data-course="Mill Valley" data-initial="MV"></a>
+      <a href="/app.html#courses" class="fairway fw-bodega" data-course="Bodega Harbour" data-initial="BH"></a>
     </div>
 
     <!-- Region labels -->
