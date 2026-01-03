@@ -6,11 +6,11 @@ const dbPath = process.env.VERCEL
   ? '/tmp/golf.db'  // Vercel serverless has writable /tmp
   : path.join(__dirname, '../../data/golf.db');
 
-// For Vercel, copy the bundled db to /tmp if it doesn't exist
+// For Vercel, always copy the bundled db to /tmp (ensures fresh data on each deployment)
 if (process.env.VERCEL) {
   const fs = require('fs');
   const bundledPath = path.join(__dirname, '../../data/golf.db');
-  if (fs.existsSync(bundledPath) && !fs.existsSync(dbPath)) {
+  if (fs.existsSync(bundledPath)) {
     fs.copyFileSync(bundledPath, dbPath);
   }
 }

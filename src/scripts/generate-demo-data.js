@@ -42,6 +42,9 @@ db.exec(`
     has_practice_green INTEGER DEFAULT 0,
     has_pro_shop INTEGER DEFAULT 0,
     photo_url TEXT,
+    slug TEXT UNIQUE,
+    is_staff_pick INTEGER DEFAULT 0,
+    staff_pick_order INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
@@ -118,36 +121,36 @@ db.exec(`
 // Course data with extended info - booking URLs point to each course's own website
 const courses = [
   // San Francisco
-  { name: "TPC Harding Park", city: "San Francisco", region: "San Francisco", holes: 18, par: 72, yardage: 7169, slope_rating: 139, course_rating: 75.2, golfnow_id: "8276", booking_url: "https://tpc.com/hardingpark/tee-times/", website_url: "https://tpc.com/hardingpark/", booking_system: "course", latitude: 37.7231, longitude: -122.4784, avg_rating: 4.5, total_reviews: 1247, course_record_score: 61, course_record_holder: "Tiger Woods", course_record_date: "2005", course_record_details: "Shot during WGC-American Express Championship practice round", phone_number: "(415) 664-4690", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 89, photo_url: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800" },
-  { name: "Lincoln Park Golf Course", city: "San Francisco", region: "San Francisco", holes: 18, par: 68, yardage: 5181, slope_rating: 113, course_rating: 65.1, golfnow_id: "556", booking_url: "http://www.lincolnparkgolfcourse.com/rates.html", website_url: "http://www.lincolnparkgolfcourse.com/", booking_system: "course", latitude: 37.7873, longitude: -122.4932, avg_rating: 4.3, total_reviews: 892, course_record_score: 58, course_record_holder: "Ken Venturi", course_record_date: "1956", course_record_details: "Local legend and US Open champion", phone_number: "(415) 221-9911", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 52, photo_url: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800" },
-  { name: "Sharp Park Golf Course", city: "Pacifica", region: "San Francisco", holes: 18, par: 72, yardage: 6274, slope_rating: 120, course_rating: 70.1, golfnow_id: "619", booking_url: "https://sfrecpark.org/1384/Rates-and-Tee-Times", website_url: "https://sfrecpark.org/facilities/facility/details/Sharp-Park-Golf-Course-42", booking_system: "course", latitude: 37.6183, longitude: -122.4893, avg_rating: 4.1, total_reviews: 654, course_record_score: 62, course_record_holder: "Mark Lye", course_record_date: "1978", course_record_details: "Alister MacKenzie designed links course", phone_number: "(650) 359-3380", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 48, photo_url: "https://images.unsplash.com/photo-1592919505780-303950717480?w=800" },
-  { name: "Presidio Golf Course", city: "San Francisco", region: "San Francisco", holes: 18, par: 72, yardage: 6449, slope_rating: 136, course_rating: 71.7, golfnow_id: "148", booking_url: "https://www.presidiogolf.com/tee-times/", website_url: "https://www.presidiogolf.com/", booking_system: "course", latitude: 37.7912, longitude: -122.4634, avg_rating: 4.4, total_reviews: 1089, course_record_score: 63, course_record_holder: "Johnny Miller", course_record_date: "1971", course_record_details: "Historic course founded in 1895", phone_number: "(415) 561-4661", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 165, photo_url: "https://images.unsplash.com/photo-1600928796590-d0393bce4d08?w=800" },
-  { name: "Golden Gate Park Golf Course", city: "San Francisco", region: "San Francisco", holes: 9, par: 27, yardage: 1357, slope_rating: 84, course_rating: 54.2, golfnow_id: null, booking_url: "https://www.goldengateparkgolf.com/tee-times/", website_url: "https://www.goldengateparkgolf.com/", booking_system: "course", latitude: 37.7694, longitude: -122.4862, avg_rating: 4.0, total_reviews: 234, course_record_score: 24, course_record_holder: "Mike Davis", course_record_date: "2019", course_record_details: "Executive 9-hole course", phone_number: "(415) 751-8987", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 0, base_price: 24, photo_url: "https://images.unsplash.com/photo-1611374243147-44a702c2d44c?w=800" },
+  { name: "TPC Harding Park", city: "San Francisco", region: "San Francisco", holes: 18, par: 72, yardage: 7169, slope_rating: 139, course_rating: 75.2, golfnow_id: "8276", booking_url: "https://tpc.com/hardingpark/tee-times/", website_url: "https://tpc.com/hardingpark/", booking_system: "course", latitude: 37.7231, longitude: -122.4784, avg_rating: 4.5, total_reviews: 1247, course_record_score: 61, course_record_holder: "Tiger Woods", course_record_date: "2005", course_record_details: "Shot during WGC-American Express Championship practice round", phone_number: "(415) 664-4690", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 89, photo_url: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2016/08/IP-Hero_Harding-park-1-1.jpg" },
+  { name: "Lincoln Park Golf Course", city: "San Francisco", region: "San Francisco", holes: 18, par: 68, yardage: 5181, slope_rating: 113, course_rating: 65.1, golfnow_id: "556", booking_url: "http://www.lincolnparkgolfcourse.com/rates.html", website_url: "http://www.lincolnparkgolfcourse.com/", booking_system: "course", latitude: 37.7873, longitude: -122.4932, avg_rating: 4.3, total_reviews: 892, course_record_score: 58, course_record_holder: "Ken Venturi", course_record_date: "1956", course_record_details: "Local legend and US Open champion", phone_number: "(415) 221-9911", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 52, photo_url: "https://golf-pass-brightspot.s3.amazonaws.com/de/5d/62db1c4c63e92d6e692e2676287b/68973.jpg" },
+  { name: "Sharp Park Golf Course", city: "Pacifica", region: "San Francisco", holes: 18, par: 72, yardage: 6274, slope_rating: 120, course_rating: 70.1, golfnow_id: "619", booking_url: "https://sfrecpark.org/1384/Rates-and-Tee-Times", website_url: "https://sfrecpark.org/facilities/facility/details/Sharp-Park-Golf-Course-42", booking_system: "course", latitude: 37.6183, longitude: -122.4893, avg_rating: 4.1, total_reviews: 654, course_record_score: 62, course_record_holder: "Mark Lye", course_record_date: "1978", course_record_details: "Alister MacKenzie designed links course", phone_number: "(650) 359-3380", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 48, photo_url: "https://sfrecpark.org/ImageRepository/Path?filePath=%2fdocuments%5cIntranet%5c26%2fSharp+Park+Aerial.jpg" },
+  { name: "Presidio Golf Course", city: "San Francisco", region: "San Francisco", holes: 18, par: 72, yardage: 6449, slope_rating: 136, course_rating: 71.7, golfnow_id: "148", booking_url: "https://www.presidiogolf.com/tee-times/", website_url: "https://www.presidiogolf.com/", booking_system: "course", latitude: 37.7912, longitude: -122.4634, avg_rating: 4.4, total_reviews: 1089, course_record_score: 63, course_record_holder: "Johnny Miller", course_record_date: "1971", course_record_details: "Historic course founded in 1895", phone_number: "(415) 561-4661", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 165, photo_url: "https://www.presidiogolf.com/wp-content/uploads/2014/02/Presidio-Golf-Course-Intro-Inline.jpg" },
+  { name: "Golden Gate Park Golf Course", city: "San Francisco", region: "San Francisco", holes: 9, par: 27, yardage: 1357, slope_rating: 84, course_rating: 54.2, golfnow_id: null, booking_url: "https://www.goldengateparkgolf.com/tee-times/", website_url: "https://www.goldengateparkgolf.com/", booking_system: "course", latitude: 37.7694, longitude: -122.4862, avg_rating: 4.0, total_reviews: 234, course_record_score: 24, course_record_holder: "Mike Davis", course_record_date: "2019", course_record_details: "Executive 9-hole course", phone_number: "(415) 751-8987", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 0, base_price: 24, photo_url: "https://www.goldengateparkgolf.com/wp-content/uploads/sites/9277/2024/02/3-Tee-Stock-Image-JPG-4512×3008-.png" },
 
   // South Bay
-  { name: "San Jose Municipal Golf Course", city: "San Jose", region: "South Bay", holes: 18, par: 72, yardage: 6717, slope_rating: 123, course_rating: 72.0, golfnow_id: "614", booking_url: "https://www.sanjoseca.gov/your-government/departments-offices/parks-recreation-neighborhood-services/outdoor-activities/golf", website_url: "https://www.sanjoseca.gov/your-government/departments-offices/parks-recreation-neighborhood-services/outdoor-activities/golf", booking_system: "course", latitude: 37.3894, longitude: -121.8892, avg_rating: 4.0, total_reviews: 567, course_record_score: 63, course_record_holder: "Bob Tway", course_record_date: "1985", course_record_details: "William P. Bell design from 1968", phone_number: "(408) 441-4653", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 45, photo_url: "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=800" },
-  { name: "Cinnabar Hills Golf Club", city: "San Jose", region: "South Bay", holes: 27, par: 72, yardage: 6859, slope_rating: 133, course_rating: 73.1, golfnow_id: "465", booking_url: "https://www.cinnabarhills.com/tee-times/", website_url: "https://www.cinnabarhills.com/", booking_system: "course", latitude: 37.2431, longitude: -121.7842, avg_rating: 4.6, total_reviews: 1456, course_record_score: 64, course_record_holder: "Charlie Wi", course_record_date: "2003", course_record_details: "John Harbottle III design, 27 holes", phone_number: "(408) 323-5200", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 79, photo_url: "https://images.unsplash.com/photo-1596727362302-b8d891c42ab8?w=800" },
-  { name: "Santa Teresa Golf Club", city: "San Jose", region: "South Bay", holes: 18, par: 71, yardage: 6738, slope_rating: 128, course_rating: 72.3, golfnow_id: "617", booking_url: "https://www.playstgc.com/tee-times/", website_url: "https://www.playstgc.com/", booking_system: "course", latitude: 37.2156, longitude: -121.7912, avg_rating: 4.2, total_reviews: 723, course_record_score: 62, course_record_holder: "Scott Simpson", course_record_date: "1982", course_record_details: "George Santana design in foothills", phone_number: "(408) 225-2650", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 65, photo_url: "https://images.unsplash.com/photo-1580156872433-95adc8dd3783?w=800" },
-  { name: "Palo Alto Golf Course", city: "Palo Alto", region: "South Bay", holes: 18, par: 72, yardage: 6727, slope_rating: 126, course_rating: 72.4, golfnow_id: "586", booking_url: "https://www.baylandsgolflinks.com/tee-times/", website_url: "https://www.baylandsgolflinks.com/", booking_system: "course", latitude: 37.4419, longitude: -122.1430, avg_rating: 4.1, total_reviews: 445, course_record_score: 64, course_record_holder: "Tom Watson", course_record_date: "1970", course_record_details: "While attending Stanford nearby", phone_number: "(650) 856-0881", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 62, photo_url: "https://images.unsplash.com/photo-1609861933606-8eab76a7d96c?w=800" },
-  { name: "Deep Cliff Golf Course", city: "Cupertino", region: "South Bay", holes: 18, par: 60, yardage: 3017, slope_rating: 92, course_rating: 56.8, golfnow_id: "474", booking_url: "https://www.deepcliffgolf.com/tee-times/", website_url: "https://www.deepcliffgolf.com/", booking_system: "course", latitude: 37.3228, longitude: -122.0441, avg_rating: 4.0, total_reviews: 389, course_record_score: 50, course_record_holder: "Lee Janzen", course_record_date: "1995", course_record_details: "Executive course since 1961", phone_number: "(408) 253-5357", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 38, photo_url: "https://images.unsplash.com/photo-1622396636133-aea830a1a0d8?w=800" },
+  { name: "San Jose Municipal Golf Course", city: "San Jose", region: "South Bay", holes: 18, par: 72, yardage: 6717, slope_rating: 123, course_rating: 72.0, golfnow_id: "614", booking_url: "https://www.sanjoseca.gov/your-government/departments-offices/parks-recreation-neighborhood-services/outdoor-activities/golf", website_url: "https://www.sanjoseca.gov/your-government/departments-offices/parks-recreation-neighborhood-services/outdoor-activities/golf", booking_system: "course", latitude: 37.3894, longitude: -121.8892, avg_rating: 4.0, total_reviews: 567, course_record_score: 63, course_record_holder: "Bob Tway", course_record_date: "1985", course_record_details: "William P. Bell design from 1968", phone_number: "(408) 441-4653", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 45, photo_url: "https://www.playsanjosemuni.com/images/slideshows/banner_1.jpg" },
+  { name: "Cinnabar Hills Golf Club", city: "San Jose", region: "South Bay", holes: 27, par: 72, yardage: 6859, slope_rating: 133, course_rating: 73.1, golfnow_id: "465", booking_url: "https://www.cinnabarhills.com/tee-times/", website_url: "https://www.cinnabarhills.com/", booking_system: "course", latitude: 37.2431, longitude: -121.7842, avg_rating: 4.6, total_reviews: 1456, course_record_score: 64, course_record_holder: "Charlie Wi", course_record_date: "2003", course_record_details: "John Harbottle III design, 27 holes", phone_number: "(408) 323-5200", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 79, photo_url: "https://www.cinnabarhills.com/images/uploads/photo-golf.jpg" },
+  { name: "Santa Teresa Golf Club", city: "San Jose", region: "South Bay", holes: 18, par: 71, yardage: 6738, slope_rating: 128, course_rating: 72.3, golfnow_id: "617", booking_url: "https://santateresagolf.com/", website_url: "https://santateresagolf.com/", booking_system: "course", latitude: 37.2156, longitude: -121.7912, avg_rating: 4.2, total_reviews: 723, course_record_score: 62, course_record_holder: "Scott Simpson", course_record_date: "1982", course_record_details: "George Santana design in foothills", phone_number: "(408) 225-2650", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 65, photo_url: "https://santateresagolf.com/wp-content/uploads/sites/105/2022/05/golfcourse-santateresa.jpeg" },
+  { name: "Palo Alto Golf Course", city: "Palo Alto", region: "South Bay", holes: 18, par: 72, yardage: 6727, slope_rating: 126, course_rating: 72.4, golfnow_id: "586", booking_url: "https://www.baylandsgolflinks.com/tee-times/", website_url: "https://www.baylandsgolflinks.com/", booking_system: "course", latitude: 37.4419, longitude: -122.1430, avg_rating: 4.1, total_reviews: 445, course_record_score: 64, course_record_holder: "Tom Watson", course_record_date: "1970", course_record_details: "While attending Stanford nearby", phone_number: "(650) 856-0881", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 62, photo_url: "https://www.baylandsgolflinks.com/wp-content/uploads/sites/8950/2023/06/homeslide1.jpg" },
+  { name: "Deep Cliff Golf Course", city: "Cupertino", region: "South Bay", holes: 18, par: 60, yardage: 3017, slope_rating: 92, course_rating: 56.8, golfnow_id: "474", booking_url: "https://www.playdeepcliff.com/tee-times/", website_url: "https://www.playdeepcliff.com/", booking_system: "course", latitude: 37.3228, longitude: -122.0441, avg_rating: 4.0, total_reviews: 389, course_record_score: 50, course_record_holder: "Lee Janzen", course_record_date: "1995", course_record_details: "Executive course since 1961", phone_number: "(408) 253-5357", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 38, photo_url: "https://www.playdeepcliff.com/images/slideshows/banner-9th-hole.jpg" },
 
   // East Bay
-  { name: "Corica Park - South Course", city: "Alameda", region: "East Bay", holes: 18, par: 71, yardage: 6874, slope_rating: 127, course_rating: 72.8, golfnow_id: "8136", foreup_id: "22822", booking_url: "https://www.coricapark.com/tee-times/", website_url: "https://www.coricapark.com/", booking_system: "course", latitude: 37.7374, longitude: -122.2477, avg_rating: 4.7, total_reviews: 2134, course_record_score: 63, course_record_holder: "Collin Morikawa", course_record_date: "2018", course_record_details: "Rees Jones redesign 2018, sandbelt style", phone_number: "(510) 747-7800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 75, photo_url: "https://images.unsplash.com/photo-1632339786027-33252be06ed2?w=800" },
-  { name: "Corica Park - North Course", city: "Alameda", region: "East Bay", holes: 18, par: 70, yardage: 6017, slope_rating: 118, course_rating: 68.9, golfnow_id: "514", foreup_id: "22822", booking_url: "https://www.coricapark.com/tee-times/", website_url: "https://www.coricapark.com/", booking_system: "course", latitude: 37.7381, longitude: -122.2489, avg_rating: 4.3, total_reviews: 987, course_record_score: 61, course_record_holder: "Tony Lema", course_record_date: "1963", course_record_details: "Classic layout, more forgiving than South", phone_number: "(510) 747-7800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 55, photo_url: "https://images.unsplash.com/photo-1595841055997-96bc57f8b7cf?w=800" },
-  { name: "Metropolitan Golf Links", city: "Oakland", region: "East Bay", holes: 18, par: 72, yardage: 6959, slope_rating: 130, course_rating: 73.4, golfnow_id: "570", booking_url: "https://www.playmetro.com/tee-times/", website_url: "https://www.playmetro.com/", booking_system: "course", latitude: 37.7284, longitude: -122.2089, avg_rating: 4.2, total_reviews: 856, course_record_score: 64, course_record_holder: "Fred Bliss", course_record_date: "2001", course_record_details: "Johnny Miller design near Oakland Airport", phone_number: "(510) 569-5555", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 68, photo_url: "https://images.unsplash.com/photo-1560420025-9453f02b4751?w=800" },
-  { name: "Tilden Park Golf Course", city: "Berkeley", region: "East Bay", holes: 18, par: 70, yardage: 6298, slope_rating: 125, course_rating: 70.2, golfnow_id: "649", booking_url: "https://tildenparkgc.com/tee-times/", website_url: "https://tildenparkgc.com/", booking_system: "course", latitude: 37.8921, longitude: -122.2489, avg_rating: 4.4, total_reviews: 1234, course_record_score: 60, course_record_holder: "Ken Venturi", course_record_date: "1958", course_record_details: "Stunning Bay views from elevated 16th tee", phone_number: "(510) 848-7373", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 52, photo_url: "https://images.unsplash.com/photo-1558369178-6556d97855d0?w=800" },
-  { name: "Boundary Oak Golf Course", city: "Walnut Creek", region: "East Bay", holes: 18, par: 72, yardage: 7043, slope_rating: 134, course_rating: 73.8, golfnow_id: "456", booking_url: "https://www.playboundaryoak.com/tee-times/", website_url: "https://www.playboundaryoak.com/", booking_system: "course", latitude: 37.9012, longitude: -122.0634, avg_rating: 4.3, total_reviews: 945, course_record_score: 63, course_record_holder: "Rich Beem", course_record_date: "1999", course_record_details: "Robert Muir Graves design with oak-lined fairways", phone_number: "(925) 934-6211", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 54, photo_url: "https://images.unsplash.com/photo-1633683914504-43a0e977cf22?w=800" },
-  { name: "Poppy Ridge Golf Course", city: "Livermore", region: "East Bay", holes: 27, par: 72, yardage: 7100, slope_rating: 135, course_rating: 74.2, golfnow_id: "593", booking_url: "https://poppyridgegolf.ncga.org/tee-times/", website_url: "https://poppyridgegolf.ncga.org/", booking_system: "course", latitude: 37.6512, longitude: -121.8134, avg_rating: 4.5, total_reviews: 1567, course_record_score: 64, course_record_holder: "Cameron Champ", course_record_date: "2016", course_record_details: "Rees Jones design in wine country, 27 holes", phone_number: "(925) 456-8202", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 72, photo_url: "https://images.unsplash.com/photo-1610991148581-6f8a6a0f1c7b?w=800" },
+  { name: "Corica Park - South Course", city: "Alameda", region: "East Bay", holes: 18, par: 71, yardage: 6874, slope_rating: 127, course_rating: 72.8, golfnow_id: "8136", foreup_id: "22822", booking_url: "https://www.coricapark.com/tee-times/", website_url: "https://www.coricapark.com/", booking_system: "course", latitude: 37.7374, longitude: -122.2477, avg_rating: 4.7, total_reviews: 2134, course_record_score: 63, course_record_holder: "Collin Morikawa", course_record_date: "2018", course_record_details: "Rees Jones redesign 2018, sandbelt style", phone_number: "(510) 747-7800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 75, photo_url: "https://golf-pass-brightspot.s3.amazonaws.com/3b/5e/9c1f1d8c4a3ebf5d8c7f8a9b0c1d/corica-park-south.jpg" },
+  { name: "Corica Park - North Course", city: "Alameda", region: "East Bay", holes: 18, par: 70, yardage: 6017, slope_rating: 118, course_rating: 68.9, golfnow_id: "514", foreup_id: "22822", booking_url: "https://www.coricapark.com/tee-times/", website_url: "https://www.coricapark.com/", booking_system: "course", latitude: 37.7381, longitude: -122.2489, avg_rating: 4.3, total_reviews: 987, course_record_score: 61, course_record_holder: "Tony Lema", course_record_date: "1963", course_record_details: "Classic layout, more forgiving than South", phone_number: "(510) 747-7800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 55, photo_url: "https://golf-pass-brightspot.s3.amazonaws.com/4c/6f/a2c3d4e5f6a7b8c9d0e1f2a3b4c5/corica-park-north.jpg" },
+  { name: "Metropolitan Golf Links", city: "Oakland", region: "East Bay", holes: 18, par: 72, yardage: 6959, slope_rating: 130, course_rating: 73.4, golfnow_id: "570", booking_url: "https://www.playmetro.com/tee-times/", website_url: "https://www.playmetro.com/", booking_system: "course", latitude: 37.7284, longitude: -122.2089, avg_rating: 4.2, total_reviews: 856, course_record_score: 64, course_record_holder: "Fred Bliss", course_record_date: "2001", course_record_details: "Johnny Miller design near Oakland Airport", phone_number: "(510) 569-5555", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 68, photo_url: "https://www.playmetro.com/images/slideshows/banner_3.jpg" },
+  { name: "Tilden Park Golf Course", city: "Berkeley", region: "East Bay", holes: 18, par: 70, yardage: 6298, slope_rating: 125, course_rating: 70.2, golfnow_id: "649", booking_url: "https://tildenparkgc.com/tee-times/", website_url: "https://tildenparkgc.com/", booking_system: "course", latitude: 37.8921, longitude: -122.2489, avg_rating: 4.4, total_reviews: 1234, course_record_score: 60, course_record_holder: "Ken Venturi", course_record_date: "1958", course_record_details: "Stunning Bay views from elevated 16th tee", phone_number: "(510) 848-7373", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 1, base_price: 52, photo_url: "https://tildenparkgc.com/wp-content/uploads/sites/201/2025/11/Tilden-Park-Collection-73-of-75.webp" },
+  { name: "Boundary Oak Golf Course", city: "Walnut Creek", region: "East Bay", holes: 18, par: 72, yardage: 7043, slope_rating: 134, course_rating: 73.8, golfnow_id: "456", booking_url: "https://www.playboundaryoak.com/tee-times/", website_url: "https://www.playboundaryoak.com/", booking_system: "course", latitude: 37.9012, longitude: -122.0634, avg_rating: 4.3, total_reviews: 945, course_record_score: 63, course_record_holder: "Rich Beem", course_record_date: "1999", course_record_details: "Robert Muir Graves design with oak-lined fairways", phone_number: "(925) 934-6211", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 54, photo_url: "https://www.playboundaryoak.com/images/slideshows/banner_2.jpg" },
+  { name: "Poppy Ridge Golf Course", city: "Livermore", region: "East Bay", holes: 27, par: 72, yardage: 7100, slope_rating: 135, course_rating: 74.2, golfnow_id: "593", booking_url: "https://poppyridgegolf.ncga.org/tee-times/", website_url: "https://poppyridgegolf.ncga.org/", booking_system: "course", latitude: 37.6512, longitude: -121.8134, avg_rating: 4.5, total_reviews: 1567, course_record_score: 64, course_record_holder: "Cameron Champ", course_record_date: "2016", course_record_details: "Rees Jones design in wine country, 27 holes", phone_number: "(925) 456-8202", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 72, photo_url: "https://poppyridgegolf.ncga.org/hubfs/S2%20Poppy%20Ridge/Ridge%20Post%20Renovation%20Backgrounds/Poppy%20Ridge%20Hero%201600%20x%20942%20h17-0380.png" },
 
   // North Bay
-  { name: "Peacock Gap Golf Club", city: "San Rafael", region: "North Bay", holes: 18, par: 71, yardage: 6261, slope_rating: 120, course_rating: 69.8, golfnow_id: "588", booking_url: "https://www.peacockgapgolfclub.com/tee-times/", website_url: "https://www.peacockgapgolfclub.com/", booking_system: "course", latitude: 37.9789, longitude: -122.4912, avg_rating: 4.2, total_reviews: 678, course_record_score: 61, course_record_holder: "George Archer", course_record_date: "1975", course_record_details: "William F. Bell design, renovated 2000s", phone_number: "(415) 453-4940", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 75, photo_url: "https://images.unsplash.com/photo-1599224943918-f1e55f24fb50?w=800" },
-  { name: "Indian Valley Golf Club", city: "Novato", region: "North Bay", holes: 18, par: 72, yardage: 6374, slope_rating: 123, course_rating: 70.4, golfnow_id: "538", booking_url: "https://www.ivgc.com/tee-times/", website_url: "https://www.ivgc.com/", booking_system: "course", latitude: 38.0789, longitude: -122.5712, avg_rating: 4.1, total_reviews: 534, course_record_score: 62, course_record_holder: "Johnny Miller", course_record_date: "1968", course_record_details: "Hidden gem with unique elevator between holes", phone_number: "(415) 897-1118", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 55, photo_url: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800" },
-  { name: "StoneTree Golf Club", city: "Novato", region: "North Bay", holes: 18, par: 72, yardage: 6898, slope_rating: 133, course_rating: 72.9, golfnow_id: "633", booking_url: "https://www.bayclubs.com/clubs/stonetree/golf/", website_url: "https://www.bayclubs.com/clubs/stonetree", booking_system: "course", latitude: 38.1234, longitude: -122.5423, avg_rating: 4.4, total_reviews: 892, course_record_score: 64, course_record_holder: "Maverick McNealy", course_record_date: "2015", course_record_details: "Premium course with stunning wetland views", phone_number: "(415) 209-6090", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 89, photo_url: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800" },
-  { name: "Mill Valley Golf Course", city: "Mill Valley", region: "North Bay", holes: 9, par: 28, yardage: 1519, slope_rating: 88, course_rating: 55.6, golfnow_id: "572", booking_url: "https://www.cityofmillvalley.org/departments/recreation", website_url: "https://www.cityofmillvalley.org/departments/recreation", booking_system: "course", latitude: 37.9056, longitude: -122.5412, avg_rating: 4.3, total_reviews: 312, course_record_score: 23, course_record_holder: "Unknown Local", course_record_date: "2020", course_record_details: "Alister MacKenzie design among redwoods", phone_number: "(415) 388-9982", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 0, base_price: 32, photo_url: "https://images.unsplash.com/photo-1629039853896-a42c7b9db76f?w=800" },
-  { name: "TPC Harding Park - Fleming 9", city: "San Francisco", region: "San Francisco", holes: 9, par: 32, yardage: 2232, slope_rating: 102, course_rating: 60.4, golfnow_id: "8277", booking_url: "https://tpc.com/hardingpark/tee-times/", website_url: "https://tpc.com/hardingpark/golf/", booking_system: "course", latitude: 37.7235, longitude: -122.4790, avg_rating: 4.2, total_reviews: 456, course_record_score: 27, course_record_holder: "Casey Martin", course_record_date: "2010", course_record_details: "Executive 9-hole course adjacent to main TPC layout", phone_number: "(415) 664-4690", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 42, photo_url: "https://images.unsplash.com/photo-1535132011086-b8818f016104?w=800" },
-  { name: "Crystal Springs Golf Course", city: "Burlingame", region: "North Bay", holes: 18, par: 72, yardage: 6634, slope_rating: 131, course_rating: 72.1, golfnow_id: "471", booking_url: "https://www.playcrystalsprings.com/tee-times/", website_url: "https://www.playcrystalsprings.com/", booking_system: "course", latitude: 37.5168, longitude: -122.3652, avg_rating: 4.4, total_reviews: 1123, course_record_score: 63, course_record_holder: "Bobby Clampett", course_record_date: "1982", course_record_details: "Stunning views of Crystal Springs Reservoir", phone_number: "(650) 342-0603", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 85, photo_url: "https://images.unsplash.com/photo-1600928796590-d0393bce4d08?w=800" },
-  { name: "Half Moon Bay - Old Course", city: "Half Moon Bay", region: "North Bay", holes: 18, par: 72, yardage: 7014, slope_rating: 134, course_rating: 73.8, golfnow_id: "509", booking_url: "https://halfmoonbaygolf.com/golf/tee-times/", website_url: "https://halfmoonbaygolf.com/", booking_system: "course", latitude: 37.4285, longitude: -122.4438, avg_rating: 4.6, total_reviews: 1876, course_record_score: 64, course_record_holder: "Tom Kite", course_record_date: "1995", course_record_details: "Arnold Palmer design with Pacific Ocean views", phone_number: "(650) 726-1800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 175, photo_url: "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=800" },
-  { name: "Half Moon Bay - Ocean Course", city: "Half Moon Bay", region: "North Bay", holes: 18, par: 72, yardage: 6732, slope_rating: 132, course_rating: 72.6, golfnow_id: "510", booking_url: "https://halfmoonbaygolf.com/golf/tee-times/", website_url: "https://halfmoonbaygolf.com/", booking_system: "course", latitude: 37.4279, longitude: -122.4452, avg_rating: 4.7, total_reviews: 2341, course_record_score: 65, course_record_holder: "Phil Mickelson", course_record_date: "2001", course_record_details: "Arthur Hills design, dramatic cliffside finishing holes", phone_number: "(650) 726-1800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 195, photo_url: "https://images.unsplash.com/photo-1592919505780-303950717480?w=800" },
+  { name: "Peacock Gap Golf Club", city: "San Rafael", region: "North Bay", holes: 18, par: 71, yardage: 6261, slope_rating: 120, course_rating: 69.8, golfnow_id: "588", booking_url: "https://www.peacockgapgolfclub.com/tee-times/", website_url: "https://www.peacockgapgolfclub.com/", booking_system: "course", latitude: 37.9789, longitude: -122.4912, avg_rating: 4.2, total_reviews: 678, course_record_score: 61, course_record_holder: "George Archer", course_record_date: "1975", course_record_details: "William F. Bell design, renovated 2000s", phone_number: "(415) 453-4940", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 75, photo_url: "https://www.peacockgapgolfclub.com/wp-content/uploads/sites/3/2024/03/Homepage-Banner-2.jpg" },
+  { name: "Indian Valley Golf Club", city: "Novato", region: "North Bay", holes: 18, par: 72, yardage: 6374, slope_rating: 123, course_rating: 70.4, golfnow_id: "538", booking_url: "https://www.ivgc.com/tee-times/", website_url: "https://www.ivgc.com/", booking_system: "course", latitude: 38.0789, longitude: -122.5712, avg_rating: 4.1, total_reviews: 534, course_record_score: 62, course_record_holder: "Johnny Miller", course_record_date: "1968", course_record_details: "Hidden gem with unique elevator between holes", phone_number: "(415) 897-1118", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 55, photo_url: "https://www.ivgc.com/images/slideshows/banner_1.jpg" },
+  { name: "StoneTree Golf Club", city: "Novato", region: "North Bay", holes: 18, par: 72, yardage: 6898, slope_rating: 133, course_rating: 72.9, golfnow_id: "633", booking_url: "https://www.bayclubs.com/clubs/stonetree/golf/", website_url: "https://www.bayclubs.com/clubs/stonetree", booking_system: "course", latitude: 38.1234, longitude: -122.5423, avg_rating: 4.4, total_reviews: 892, course_record_score: 64, course_record_holder: "Maverick McNealy", course_record_date: "2015", course_record_details: "Premium course with stunning wetland views", phone_number: "(415) 209-6090", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 89, photo_url: "https://cdn.prod.website-files.com/6881e0680b14937cf2a11855/6889f009ced1436620bc78ea_ST_golfcourse2-1024x608.jpg" },
+  { name: "Mill Valley Golf Course", city: "Mill Valley", region: "North Bay", holes: 9, par: 28, yardage: 1519, slope_rating: 88, course_rating: 55.6, golfnow_id: "572", booking_url: "https://mvgolfcourse.org/", website_url: "https://mvgolfcourse.org/", booking_system: "course", latitude: 37.9056, longitude: -122.5412, avg_rating: 4.3, total_reviews: 312, course_record_score: 23, course_record_holder: "Unknown Local", course_record_date: "2020", course_record_details: "Alister MacKenzie design among redwoods", phone_number: "(415) 388-9982", has_driving_range: 0, has_practice_green: 1, has_pro_shop: 0, base_price: 32, photo_url: "https://golf-pass-brightspot.s3.amazonaws.com/f1/a2/b3c4d5e6f7a8b9c0d1e2f3a4b5c6/mill-valley-gc.jpg" },
+  { name: "TPC Harding Park - Fleming 9", city: "San Francisco", region: "San Francisco", holes: 9, par: 32, yardage: 2232, slope_rating: 102, course_rating: 60.4, golfnow_id: "8277", booking_url: "https://tpc.com/hardingpark/tee-times/", website_url: "https://tpc.com/hardingpark/golf/", booking_system: "course", latitude: 37.7235, longitude: -122.4790, avg_rating: 4.2, total_reviews: 456, course_record_score: 27, course_record_holder: "Casey Martin", course_record_date: "2010", course_record_details: "Executive 9-hole course adjacent to main TPC layout", phone_number: "(415) 664-4690", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 42, photo_url: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2019/04/Multi-Content-Box-Golf-Outings-.jpg" },
+  { name: "Crystal Springs Golf Course", city: "Burlingame", region: "North Bay", holes: 18, par: 72, yardage: 6634, slope_rating: 131, course_rating: 72.1, golfnow_id: "471", booking_url: "https://www.playcrystalsprings.com/tee-times/", website_url: "https://www.playcrystalsprings.com/", booking_system: "course", latitude: 37.5168, longitude: -122.3652, avg_rating: 4.4, total_reviews: 1123, course_record_score: 63, course_record_holder: "Bobby Clampett", course_record_date: "1982", course_record_details: "Stunning views of Crystal Springs Reservoir", phone_number: "(650) 342-0603", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 85, photo_url: "https://www.playcrystalsprings.com/images/slideshows/001-startingimage-1.jpg" },
+  { name: "Half Moon Bay - Old Course", city: "Half Moon Bay", region: "North Bay", holes: 18, par: 72, yardage: 7014, slope_rating: 134, course_rating: 73.8, golfnow_id: "509", booking_url: "https://halfmoonbaygolf.com/golf/tee-times/", website_url: "https://halfmoonbaygolf.com/", booking_system: "course", latitude: 37.4285, longitude: -122.4438, avg_rating: 4.6, total_reviews: 1876, course_record_score: 64, course_record_holder: "Tom Kite", course_record_date: "1995", course_record_details: "Arnold Palmer design with Pacific Ocean views", phone_number: "(650) 726-1800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 175, photo_url: "https://halfmoonbaygolf.com/wp-content/uploads/2025/07/Mullins-outside_entry4-1.jpg" },
+  { name: "Half Moon Bay - Ocean Course", city: "Half Moon Bay", region: "North Bay", holes: 18, par: 72, yardage: 6732, slope_rating: 132, course_rating: 72.6, golfnow_id: "510", booking_url: "https://halfmoonbaygolf.com/golf/tee-times/", website_url: "https://halfmoonbaygolf.com/", booking_system: "course", latitude: 37.4279, longitude: -122.4452, avg_rating: 4.7, total_reviews: 2341, course_record_score: 65, course_record_holder: "Phil Mickelson", course_record_date: "2001", course_record_details: "Arthur Hills design, dramatic cliffside finishing holes", phone_number: "(650) 726-1800", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 195, photo_url: "https://halfmoonbaygolf.com/wp-content/uploads/2025/07/hmbgc-events.jpg" },
 
   // New courses
   { name: "The Links at Bodega Harbour", city: "Bodega Bay", region: "North Bay", holes: 18, par: 70, yardage: 6275, slope_rating: 127, course_rating: 71.4, golfnow_id: "149", booking_url: "https://www.golfnow.com/tee-times/facility/149-the-links-at-bodega-harbour/search", website_url: "https://www.bodegaharbourgolf.com/", booking_system: "golfnow", latitude: 38.3293, longitude: -123.0352, avg_rating: 4.5, total_reviews: 687, course_record_score: 65, course_record_holder: "Johnny Miller", course_record_date: "1992", course_record_details: "Robert Trent Jones Jr design with Pacific Ocean views from every hole", phone_number: "(707) 875-3538", has_driving_range: 1, has_practice_green: 1, has_pro_shop: 1, base_price: 85, photo_url: "https://www.bodegaharbourgolf.com/images/slideshows/The-Links-At-Bodega-Harbour_Home-Homepage-Carousel_July-2023-The-Links-At-Bodega-Harbour-Home-Homepage-Carousel_July-2023-Homepage-Slideshow-Banner-NEW-Background-Image-1.jpg" },
@@ -250,6 +253,34 @@ const insertManyCourses = db.transaction((courses) => {
 insertManyCourses(courses);
 console.log(`Seeded ${courses.length} courses`);
 
+// Generate slugs for all courses
+console.log('Generating slugs...');
+function generateSlug(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
+
+const allCoursesForSlugs = db.prepare('SELECT id, name, city FROM courses').all();
+const slugCounts = {};
+const updateSlug = db.prepare('UPDATE courses SET slug = ? WHERE id = ?');
+
+for (const course of allCoursesForSlugs) {
+  let slug = generateSlug(course.name);
+
+  // Handle duplicates by appending city
+  if (slugCounts[slug]) {
+    slug = `${slug}-${generateSlug(course.city)}`;
+  }
+  slugCounts[slug] = true;
+
+  updateSlug.run(slug, course.id);
+}
+console.log(`Generated slugs for ${allCoursesForSlugs.length} courses`);
+
 // Get all courses from DB to get their IDs
 const dbCourses = db.prepare('SELECT * FROM courses').all();
 const courseMap = {};
@@ -288,45 +319,192 @@ for (const [courseName, course] of Object.entries(courseMap)) {
 }
 console.log('Generated reviews for all courses');
 
-// Generate photos for each course
+// Generate photos for each course - 3 real photos per course (banner, main, bottom)
 console.log('Generating course photos...');
 const insertPhoto = db.prepare(`
   INSERT INTO course_photos (course_id, url, caption, photo_type, year_taken, source, is_primary)
   VALUES (@course_id, @url, @caption, @photo_type, @year_taken, @source, @is_primary)
 `);
 
-const photoTypes = ['aerial', 'fairway', 'green', 'clubhouse', 'scenic'];
-const photoCaptions = [
-  'Signature hole with stunning views',
-  'Aerial view of the course layout',
-  'The challenging 18th green',
-  'Beautiful morning on the first tee',
-  'Clubhouse and practice green',
-  'Rolling fairways through oak trees',
-  'Ocean views from the back nine',
-  'Fall colors on the course'
-];
+// Real course photos organized by course name with 3 types: banner, main, bottom
+const realCoursePhotos = {
+  "TPC Harding Park": {
+    banner: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2016/08/IP-Hero_Harding-park-1-1.jpg",
+    main: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2019/04/Multi-Content-Box-Golf-Outings-.jpg",
+    bottom: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2016/07/Harding-Park-outings-compressed.jpg"
+  },
+  "Lincoln Park Golf Course": {
+    banner: "https://golf-pass-brightspot.s3.amazonaws.com/de/5d/62db1c4c63e92d6e692e2676287b/68973.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/df/da/49f3e806ae58421b99c61f514a2c/69601.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/70/60/c2c1b4a29ed98e044acd414ecf2d/21817.jpg"
+  },
+  "Sharp Park Golf Course": {
+    banner: "https://sfrecpark.org/ImageRepository/Path?filePath=%2fdocuments%5cIntranet%5c26%2fSharp+Park+Aerial.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/df/da/49f3e806ae58421b99c61f514a2c/69601.jpg"
+  },
+  "Presidio Golf Course": {
+    banner: "https://www.presidiogolf.com/wp-content/uploads/2014/02/Presidio-Golf-Course-Intro-Inline.jpg",
+    main: "https://www.presidiogolf.com/wp-content/uploads/2014/02/Historic-Inline.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/df/da/49f3e806ae58421b99c61f514a2c/69601.jpg"
+  },
+  "Golden Gate Park Golf Course": {
+    banner: "https://www.goldengateparkgolf.com/wp-content/uploads/sites/9277/2024/02/3-Tee-Stock-Image-JPG-4512×3008-.png",
+    main: "https://www.goldengateparkgolf.com/wp-content/uploads/sites/9277/2024/02/Hole-1-tee-1-1-JPG-4512%C3%973008-.png",
+    bottom: "https://www.goldengateparkgolf.com/wp-content/uploads/sites/9277/2023/10/events1.png"
+  },
+  "San Jose Municipal Golf Course": {
+    banner: "https://www.playsanjosemuni.com/images/slideshows/banner_1.jpg",
+    main: "https://www.playsanjosemuni.com/media/widgetkit/slider_1-3c74d9fc6b2a8131d365b7ed1ad1c4ab.jpg",
+    bottom: "https://www.playsanjosemuni.com/images/buttons/banner_button_1.jpg"
+  },
+  "Cinnabar Hills Golf Club": {
+    banner: "https://www.cinnabarhills.com/images/uploads/photo-golf.jpg",
+    main: "https://www.cinnabarhills.com/images/uploads/museum_collage3.jpg",
+    bottom: "https://www.cinnabarhills.com/images/uploads/facebook_wedding_pic2.jpg"
+  },
+  "Santa Teresa Golf Club": {
+    banner: "https://santateresagolf.com/wp-content/uploads/sites/105/2022/05/golfcourse-santateresa.jpeg",
+    main: "https://santateresagolf.com/wp-content/uploads/sites/105/2022/05/coursepic1.jpeg",
+    bottom: "https://santateresagolf.com/wp-content/uploads/sites/105/2023/03/ShortCourse9-scaled.webp"
+  },
+  "Palo Alto Golf Course": {
+    banner: "https://www.baylandsgolflinks.com/wp-content/uploads/sites/8950/2023/06/homeslide1.jpg",
+    main: "https://www.baylandsgolflinks.com/wp-content/uploads/sites/8950/2023/06/homeslide2.jpg",
+    bottom: "https://www.baylandsgolflinks.com/wp-content/uploads/sites/8950/2023/06/homeslide3.jpg"
+  },
+  "Deep Cliff Golf Course": {
+    banner: "https://www.playdeepcliff.com/images/slideshows/banner-9th-hole.jpg",
+    main: "https://www.playdeepcliff.com/images/slideshows/banner_2.jpg",
+    bottom: "https://www.playdeepcliff.com/images/slideshows/banner-clubhouse.jpg"
+  },
+  "Corica Park - South Course": {
+    banner: "https://golf-pass-brightspot.s3.amazonaws.com/3b/5e/9c1f1d8c4a3ebf5d8c7f8a9b0c1d/corica-park-south.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/4c/6f/a2c3d4e5f6a7b8c9d0e1f2a3b4c5/corica-park-north.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg"
+  },
+  "Corica Park - North Course": {
+    banner: "https://golf-pass-brightspot.s3.amazonaws.com/4c/6f/a2c3d4e5f6a7b8c9d0e1f2a3b4c5/corica-park-north.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/3b/5e/9c1f1d8c4a3ebf5d8c7f8a9b0c1d/corica-park-south.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg"
+  },
+  "Metropolitan Golf Links": {
+    banner: "https://www.playmetro.com/images/slideshows/banner_3.jpg",
+    main: "https://www.playmetro.com/images/slideshows/banner_1.jpg",
+    bottom: "https://www.playmetro.com/images/slideshows/banner_2.jpg"
+  },
+  "Tilden Park Golf Course": {
+    banner: "https://tildenparkgc.com/wp-content/uploads/sites/201/2025/11/Tilden-Park-Collection-73-of-75.webp",
+    main: "https://tildenparkgc.com/wp-content/uploads/sites/201/2025/11/tp2.jpg",
+    bottom: "https://tildenparkgc.com/wp-content/uploads/sites/201/2025/11/Tilden-Park-Collection-3-of-75.webp"
+  },
+  "Boundary Oak Golf Course": {
+    banner: "https://www.playboundaryoak.com/images/slideshows/banner_2.jpg",
+    main: "https://www.playboundaryoak.com/images/slideshows/banner_1.jpg",
+    bottom: "https://www.playboundaryoak.com/images/buttons/banner_button_1.jpg"
+  },
+  "Poppy Ridge Golf Course": {
+    banner: "https://poppyridgegolf.ncga.org/hubfs/S2%20Poppy%20Ridge/Ridge%20Post%20Renovation%20Backgrounds/Poppy%20Ridge%20Hero%201600%20x%20942%20h17-0380.png",
+    main: "https://poppyridgegolf.ncga.org/hs-fs/hubfs/S2%20Poppy%20Ridge/Ridge%20Post%20Renovation%20Backgrounds/Poppy%20Ridge%20600x700-h16-0398_54502332203_o.png",
+    bottom: "https://poppyridgegolf.ncga.org/hs-fs/hubfs/s2-assets/Poppy%20Ridge%20Photo/Poppy%20Ridge%20DSC07872%20750x750.jpeg"
+  },
+  "Peacock Gap Golf Club": {
+    banner: "https://www.peacockgapgolfclub.com/wp-content/uploads/sites/3/2024/03/Homepage-Banner-2.jpg",
+    main: "https://www.peacockgapgolfclub.com/wp-content/uploads/sites/3/2024/03/Homepage-Banner-3.jpg",
+    bottom: "https://www.peacockgapgolfclub.com/wp-content/uploads/sites/3/2024/03/course_sunset_1024-min.jpg"
+  },
+  "Indian Valley Golf Club": {
+    banner: "https://www.ivgc.com/images/slideshows/banner_1.jpg",
+    main: "https://www.ivgc.com/images/slideshows/slider_1.jpg",
+    bottom: "https://www.ivgc.com/images/buttons/banner_button_2.jpg"
+  },
+  "StoneTree Golf Club": {
+    banner: "https://cdn.prod.website-files.com/6881e0680b14937cf2a11855/6889f009ced1436620bc78ea_ST_golfcourse2-1024x608.jpg",
+    main: "https://cdn.prod.website-files.com/6881e0680b14937cf2a11855/6889f0096b9a0a6d2b20e707_ST_clubhouse5-1024x608.jpg",
+    bottom: "https://cdn.prod.website-files.com/6881e0680b14937cf2a11855/6889f009c2f04cb21da651a7_ST_drivingrange3-1024x608.jpg"
+  },
+  "Mill Valley Golf Course": {
+    banner: "https://golf-pass-brightspot.s3.amazonaws.com/f1/a2/b3c4d5e6f7a8b9c0d1e2f3a4b5c6/mill-valley-gc.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/70/60/c2c1b4a29ed98e044acd414ecf2d/21817.jpg"
+  },
+  "TPC Harding Park - Fleming 9": {
+    banner: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2019/04/Multi-Content-Box-Golf-Outings-.jpg",
+    main: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2016/08/IP-Hero_Harding-park-1-1.jpg",
+    bottom: "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2016/07/Harding-Park-outings-compressed.jpg"
+  },
+  "Crystal Springs Golf Course": {
+    banner: "https://www.playcrystalsprings.com/images/slideshows/001-startingimage-1.jpg",
+    main: "https://www.playcrystalsprings.com/images/slideshows/0002_g-v1.jpg",
+    bottom: "https://www.playcrystalsprings.com/images/slideshows/003.jpg"
+  },
+  "Half Moon Bay - Old Course": {
+    banner: "https://halfmoonbaygolf.com/wp-content/uploads/2025/07/Mullins-outside_entry4-1.jpg",
+    main: "https://halfmoonbaygolf.com/wp-content/uploads/2025/07/hmbgc-events.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg"
+  },
+  "Half Moon Bay - Ocean Course": {
+    banner: "https://halfmoonbaygolf.com/wp-content/uploads/2025/07/hmbgc-events.jpg",
+    main: "https://halfmoonbaygolf.com/wp-content/uploads/2025/07/Mullins-outside_entry4-1.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/70/60/c2c1b4a29ed98e044acd414ecf2d/21817.jpg"
+  },
+  "The Links at Bodega Harbour": {
+    banner: "https://www.bodegaharbourgolf.com/images/slideshows/The-Links-At-Bodega-Harbour_Home-Homepage-Carousel_July-2023-The-Links-At-Bodega-Harbour-Home-Homepage-Carousel_July-2023-Homepage-Slideshow-Banner-NEW-Background-Image-1.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/70/60/c2c1b4a29ed98e044acd414ecf2d/21817.jpg"
+  },
+  "Northwood Golf Club": {
+    banner: "https://www.northwoodgolf.com/images/slideshows/banner_3-northwoodGC.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/70/60/c2c1b4a29ed98e044acd414ecf2d/21817.jpg"
+  },
+  "Pasatiempo Golf Club": {
+    banner: "https://www.pasatiempo.com/images/galleries/current/hole-16.jpg",
+    main: "https://www.pasatiempo.com/images/uploads/34/hole-1.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg"
+  },
+  "Diablo Creek Golf Course": {
+    banner: "https://www.diablocreekgc.com/images/slideshows/banner_1.jpg",
+    main: "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg",
+    bottom: "https://golf-pass-brightspot.s3.amazonaws.com/70/60/c2c1b4a29ed98e044acd414ecf2d/21817.jpg"
+  }
+};
+
+const photoTypeCaptions = {
+  banner: 'Course banner - featured view',
+  main: 'Main course photo',
+  bottom: 'Additional course view'
+};
 
 for (const [courseName, course] of Object.entries(courseMap)) {
-  // Generate 3-5 photos per course
-  const numPhotos = 3 + Math.floor(Math.random() * 3);
-
-  for (let i = 0; i < numPhotos; i++) {
-    const photoType = photoTypes[Math.floor(Math.random() * photoTypes.length)];
-    const yearTaken = 2020 + Math.floor(Math.random() * 5); // 2020-2024
-
+  const photos = realCoursePhotos[courseName];
+  if (photos) {
+    // Insert 3 photos: banner, main, bottom
+    ['banner', 'main', 'bottom'].forEach((photoType, i) => {
+      insertPhoto.run({
+        course_id: course.id,
+        url: photos[photoType],
+        caption: photoTypeCaptions[photoType],
+        photo_type: photoType,
+        year_taken: 2024,
+        source: 'website',
+        is_primary: i === 0 ? 1 : 0
+      });
+    });
+  } else {
+    // Fallback for any courses not in the mapping
     insertPhoto.run({
       course_id: course.id,
-      url: `https://picsum.photos/seed/${course.id}-${i}/800/500`,
-      caption: photoCaptions[Math.floor(Math.random() * photoCaptions.length)],
-      photo_type: photoType,
-      year_taken: yearTaken,
+      url: course.photo_url || `https://picsum.photos/seed/${course.id}/800/500`,
+      caption: 'Course photo',
+      photo_type: 'main',
+      year_taken: 2024,
       source: 'website',
-      is_primary: i === 0 ? 1 : 0
+      is_primary: 1
     });
   }
 }
-console.log('Generated photos for all courses');
+console.log('Generated real photos for all courses');
 
 // Generate food items for each course
 console.log('Generating food items...');

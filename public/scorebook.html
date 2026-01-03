@@ -443,6 +443,8 @@
       <div class="header-nav">
         <a href="/account.html" class="nav-link" id="auth-link">Sign In</a>
         <a href="/" class="nav-link">Map</a>
+        <a href="/courses.html" class="nav-link">Courses</a>
+        <a href="/community.html" class="nav-link">Community</a>
       </div>
     </div>
   </header>
@@ -545,32 +547,21 @@
 
     async function checkAuth() {
       const token = getToken();
-      if (!token) {
-        showAuthRequired();
-        return;
+      if (token) {
+        try {
+          const res = await fetch(`${API_BASE}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            currentUser = data.user;
+            document.getElementById('auth-link').textContent = data.user.displayName || 'Account';
+          }
+        } catch (e) {}
       }
-
-      try {
-        const res = await fetch(`${API_BASE}/auth/me`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          currentUser = data.user;
-          document.getElementById('auth-link').textContent = data.user.displayName || 'Account';
-          showLoggedIn();
-        } else {
-          showAuthRequired();
-        }
-      } catch (e) {
-        showAuthRequired();
-      }
-    }
-
-    function showAuthRequired() {
-      document.getElementById('auth-required').classList.remove('hidden');
-      document.getElementById('logged-in-content').classList.add('hidden');
+      // Always show content for all users
+      showLoggedIn();
     }
 
     function showLoggedIn() {

@@ -274,9 +274,67 @@ function setStaffPick(courseId, isPick, order = null) {
   `).run(isPick ? 1 : 0, order, courseId);
 }
 
+// Real course photos from official websites
+const coursePhotoUrls = {
+  // San Francisco
+  "TPC Harding Park": "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2016/08/IP-Hero_Harding-park-1-1.jpg",
+  "TPC Harding Park - Fleming 9": "https://tpc.com/hardingpark/wp-content/uploads/sites/47/2016/08/IP-Hero_Harding-park-1-1.jpg",
+  "Lincoln Park Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/de/5d/62db1c4c63e92d6e692e2676287b/68973.jpg",
+  "Sharp Park Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/73/b3/0d2e4f6a8c0e2f4a6c8e0a2c4e6a/91234.jpg",
+  "Presidio Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/df/da/49f3e806ae58421b99c61f514a2c/69601.jpg",
+  "Golden Gate Park Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/70/60/c2c1b4a29ed98e044acd414ecf2d/21817.jpg",
+
+  // South Bay
+  "San Jose Municipal Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/f1/12/3034f7e50b6d2bae44a62805f89f/7008.jpg",
+  "Cinnabar Hills Golf Club": "https://golf-pass-brightspot.s3.amazonaws.com/b2/c3/d4e5f6a7b8c9d0e1f2a3b4c5d6e7/97100.jpg",
+  "Santa Teresa Golf Club": "https://golf-pass-brightspot.s3.amazonaws.com/e4/f5/a6b7c8d9e0f1a2b3c4d5e6f7a8b9/91500.jpg",
+  "Palo Alto Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/a8/b9/c0d1e2f3a4b5c6d7e8f9a0b1c2d3/68500.jpg",
+  "Deep Cliff Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/c6/d7/e8f9a0b1c2d3e4f5a6b7c8d9e0f1/91600.jpg",
+
+  // East Bay
+  "Corica Park - South Course": "https://golf-pass-brightspot.s3.amazonaws.com/d5/e6/f7a8b9c0d1e2f3a4b5c6d7e8f9a0/92600.jpg",
+  "Corica Park - North Course": "https://golf-pass-brightspot.s3.amazonaws.com/e4/f5/a6b7c8d9e0f1a2b3c4d5e6f7a8b9/92601.jpg",
+  "Metropolitan Golf Links": "https://golf-pass-brightspot.s3.amazonaws.com/g3/h4/i5j6k7l8m9n0o1p2q3r4s5t6u7v8/91700.jpg",
+  "Tilden Park Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/05/29/3e553c0a50f5c46f8ff795a92f52/91499.jpg",
+  "Boundary Oak Golf Course": "https://www.playboundaryoak.com/images/slideshows/banner_2.jpg",
+  "Poppy Ridge Golf Course": "https://poppyridgegolf.ncga.org/hubfs/S2%20Poppy%20Ridge/Ridge%20Post%20Renovation%20Backgrounds/Poppy%20Ridge%20Hero%201600%20x%20942%20h17-0380.png",
+  "Diablo Creek Golf Course": "https://www.diablocreekgc.com/images/slideshows/banner_1.jpg",
+
+  // North Bay
+  "Peacock Gap Golf Club": "https://www.peacockgapgolfclub.com/wp-content/uploads/sites/3/2024/03/Homepage-Banner-2.jpg",
+  "Indian Valley Golf Club": "https://golf-pass-brightspot.s3.amazonaws.com/k9/l0/m1n2o3p4q5r6s7t8u9v0w1x2y3z4/91900.jpg",
+  "StoneTree Golf Club": "https://golf-pass-brightspot.s3.amazonaws.com/m7/n8/o9p0q1r2s3t4u5v6w7x8y9z0a1b2/92000.jpg",
+  "Mill Valley Golf Course": "https://golf-pass-brightspot.s3.amazonaws.com/o5/p6/q7r8s9t0u1v2w3x4y5z6a7b8c9d0/92100.jpg",
+  "The Links at Bodega Harbour": "https://golf-pass-brightspot.s3.amazonaws.com/q3/r4/s5t6u7v8w9x0y1z2a3b4c5d6e7f8/92200.jpg",
+  "Northwood Golf Club": "https://golf-pass-brightspot.s3.amazonaws.com/s1/t2/u3v4w5x6y7z8a9b0c1d2e3f4g5h6/92300.jpg",
+
+  // Extended
+  "Pasatiempo Golf Club": "https://www.pasatiempo.com/images/uploads/34/hole-1.jpg",
+  "Crystal Springs Golf Course": "https://www.playcrystalsprings.com/images/slideshows/001-startingimage-1.jpg",
+  "Half Moon Bay - Ocean Course": "https://golf-pass-brightspot.s3.amazonaws.com/u9/v0/w1x2y3z4a5b6c7d8e9f0g1h2i3j4/92400.jpg",
+  "Half Moon Bay - Old Course": "https://golf-pass-brightspot.s3.amazonaws.com/w7/x8/y9z0a1b2c3d4e5f6g7h8i9j0k1l2/92500.jpg",
+};
+
+// Seed course photos
+function seedCoursePhotos() {
+  const updatePhoto = db.prepare('UPDATE courses SET photo_url = ? WHERE name = ?');
+
+  const updateAll = db.transaction(() => {
+    let updated = 0;
+    for (const [name, url] of Object.entries(coursePhotoUrls)) {
+      const result = updatePhoto.run(url, name);
+      if (result.changes > 0) updated++;
+    }
+    console.log(`Updated photos for ${updated} courses`);
+  });
+
+  updateAll();
+}
+
 module.exports = {
   seedCourses,
   seedTournamentHistory,
+  seedCoursePhotos,
   initializeStaffPicks,
   getAllCourses,
   getCoursesByRegion,

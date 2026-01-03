@@ -27,6 +27,22 @@
       "dest": "public/admin.html"
     },
     {
+      "src": "/account",
+      "dest": "public/account.html"
+    },
+    {
+      "src": "/community",
+      "dest": "public/community.html"
+    },
+    {
+      "src": "/scorebook",
+      "dest": "public/scorebook.html"
+    },
+    {
+      "src": "/courses",
+      "dest": "public/courses.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "public/$1"
     }

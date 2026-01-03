@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -228,6 +229,89 @@ app.post('/api/scrape', async (req, res) => {
 });
 
 /**
+ * GET /api/courses/compare
+ * Compare two courses - stats, weather, costs, tee times, ratings
+ * Query params: course1, course2 (course IDs)
+ */
+app.get('/api/courses/compare', (req, res) => {
+  try {
+    const { course1, course2 } = req.query;
+
+    if (!course1 || !course2) {
+      return res.status(400).json({ error: 'Both course1 and course2 IDs are required' });
+    }
+
+    // Get both courses
+    const courseData1 = db.prepare(`
+      SELECT id, name, slug, city, region, holes, par, yardage, slope_rating, course_rating,
+             phone_number, website_url, booking_url, latitude, longitude, photo_url, avg_rating
+      FROM courses WHERE id = ?
+    `).get(course1);
+
+    const courseData2 = db.prepare(`
+      SELECT id, name, slug, city, region, holes, par, yardage, slope_rating, course_rating,
+             phone_number, website_url, booking_url, latitude, longitude, photo_url, avg_rating
+      FROM courses WHERE id = ?
+    `).get(course2);
+
+    if (!courseData1 || !courseData2) {
+      return res.status(404).json({ error: 'One or both courses not found' });
+    }
+
+    // Get tee times for next 7 days for both courses
+    const today = new Date();
+    const weekLater = new Date(today);
+    weekLater.setDate(weekLater.getDate() + 7);
+    const todayStr = today.toISOString().split('T')[0];
+    const weekStr = weekLater.toISOString().split('T')[0];
+
+    const teeTimes1 = db.prepare(`
+      SELECT date, time, price, holes, players, has_cart, booking_url
+      FROM tee_times
+      WHERE course_id = ? AND date >= ? AND date < ?
+        AND datetime >= datetime('now', '-8 hours')
+      ORDER BY datetime ASC
+    `).all(course1, todayStr, weekStr);
+
+    const teeTimes2 = db.prepare(`
+      SELECT date, time, price, holes, players, has_cart, booking_url
+      FROM tee_times
+      WHERE course_id = ? AND date >= ? AND date < ?
+        AND datetime >= datetime('now', '-8 hours')
+      ORDER BY datetime ASC
+    `).all(course2, todayStr, weekStr);
+
+    // Calculate price stats
+    const calcPriceStats = (times) => {
+      if (!times.length) return { min: null, max: null, avg: null };
+      const prices = times.map(t => t.price);
+      return {
+        min: Math.min(...prices),
+        max: Math.max(...prices),
+        avg: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length)
+      };
+    };
+
+    res.json({
+      course1: {
+        ...courseData1,
+        teeTimes: teeTimes1,
+        priceStats: calcPriceStats(teeTimes1),
+        availableCount: teeTimes1.length
+      },
+      course2: {
+        ...courseData2,
+        teeTimes: teeTimes2,
+        priceStats: calcPriceStats(teeTimes2),
+        availableCount: teeTimes2.length
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * GET /api/courses/:id
  * Get detailed course info including reviews, photos, food, records
  */
@@ -289,6 +373,97 @@ app.get('/api/courses/:id', (req, res) => {
       top_food: topFood,
       upcoming_tee_times: teeTimeCount?.count || 0,
       tournament_history: tournaments
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/courses/:id/booking-info
+ * Get course info from Golf Course API and tee times for next 2 days
+ * This is the simplified endpoint for the booking popup
+ */
+app.get('/api/courses/:id/booking-info', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get course basic info from our database
+    const course = db.prepare(`
+      SELECT id, name, slug, city, region, holes, par, yardage, slope_rating, course_rating,
+             phone_number, website_url, booking_url, latitude, longitude, photo_url
+      FROM courses WHERE id = ?
+    `).get(id);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Get tee times for next 2 days
+    const today = new Date();
+    const twoDaysLater = new Date(today);
+    twoDaysLater.setDate(twoDaysLater.getDate() + 2);
+
+    const todayStr = today.toISOString().split('T')[0];
+    const twoDaysStr = twoDaysLater.toISOString().split('T')[0];
+
+    const teeTimes = db.prepare(`
+      SELECT * FROM tee_times
+      WHERE course_id = ?
+        AND date >= ?
+        AND date < ?
+        AND datetime >= datetime('now', '-8 hours')
+      ORDER BY datetime ASC
+    `).all(id, todayStr, twoDaysStr);
+
+    // Fetch external course info from Golf Course API (RapidAPI)
+    let externalCourseInfo = null;
+    const rapidApiKey = process.env.RAPIDAPI_KEY;
+
+    if (rapidApiKey) {
+      try {
+        const searchResponse = await fetch(
+          `https://golf-course-api.p.rapidapi.com/search?name=${encodeURIComponent(course.name)}`,
+          {
+            headers: {
+              'X-RapidAPI-Key': rapidApiKey,
+              'X-RapidAPI-Host': 'golf-course-api.p.rapidapi.com'
+            }
+          }
+        );
+
+        if (searchResponse.ok) {
+          const searchResults = await searchResponse.json();
+          // Find the best match (first result or match by location)
+          if (searchResults && searchResults.length > 0) {
+            externalCourseInfo = searchResults[0];
+
+            // Try to find a better match by city
+            const cityMatch = searchResults.find(c =>
+              c.city?.toLowerCase() === course.city?.toLowerCase() ||
+              c.address?.toLowerCase().includes(course.city?.toLowerCase())
+            );
+            if (cityMatch) {
+              externalCourseInfo = cityMatch;
+            }
+          }
+        }
+      } catch (apiError) {
+        console.error('Golf Course API error:', apiError.message);
+        // Continue without external data
+      }
+    }
+
+    res.json({
+      course: {
+        ...course,
+        external: externalCourseInfo
+      },
+      teeTimes,
+      dates: {
+        today: todayStr,
+        tomorrow: new Date(today.getTime() + 24*60*60*1000).toISOString().split('T')[0]
+      }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

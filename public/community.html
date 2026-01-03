@@ -506,6 +506,8 @@
       <div class="header-nav">
         <a href="/account.html" class="nav-link" id="auth-link">Sign In</a>
         <a href="/" class="nav-link">Map</a>
+        <a href="/courses.html" class="nav-link">Courses</a>
+        <a href="/scorebook.html" class="nav-link">Scorebook</a>
       </div>
     </div>
   </header>
@@ -558,7 +560,7 @@
     const API_BASE = '/api';
     let isLoggedIn = false;
 
-    // Check auth - require login for this page
+    // Check auth - open to all users
     async function checkAuth() {
       const token = localStorage.getItem('authToken');
       if (token) {
@@ -570,26 +572,11 @@
             const data = await res.json();
             document.getElementById('auth-link').textContent = data.user.displayName || 'Account';
             isLoggedIn = true;
-            loadMembers(); // Load members on successful auth
-            return;
           }
         } catch (e) {}
       }
-      // Show auth required overlay
-      showAuthRequired();
-    }
-
-    function showAuthRequired() {
-      const overlay = document.createElement('div');
-      overlay.className = 'auth-required-overlay';
-      overlay.innerHTML = `
-        <div class="auth-required-card">
-          <h3>Members Only</h3>
-          <p>Sign in to view the community page and connect with other Bay Area golfers.</p>
-          <a href="/account.html" class="cta-btn">Sign In</a>
-        </div>
-      `;
-      document.body.appendChild(overlay);
+      // Always load content for all users
+      loadMembers();
     }
 
     function showTab(tab) {
@@ -609,141 +596,45 @@
     }
 
     async function loadMembers() {
-      if (!isLoggedIn) return;
-
       const container = document.getElementById('members-content');
-      container.innerHTML = '<div class="loading">Loading members...</div>';
-
-      try {
-        const token = localStorage.getItem('authToken');
-        const res = await fetch(`${API_BASE}/community/members`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const members = await res.json();
-
-        if (members.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">
-                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-              </div>
-              <h3>No Members Yet</h3>
-              <p>Be the first to set up your profile!</p>
-              <a href="/account.html" class="cta-btn">Set Up Profile</a>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = members.map(member => `
-          <div class="member-card">
-            <div class="member-avatar">
-              ${member.profile_picture
-                ? `<img src="${member.profile_picture}" alt="${member.display_name || 'Member'}">`
-                : `<span>${(member.display_name || 'U')[0].toUpperCase()}</span>`
-              }
-            </div>
-            <div class="member-name">${member.display_name || 'Anonymous'}</div>
-            <div class="member-home-course">
-              ${member.home_course_name
-                ? `<a href="/course/${member.home_course_slug}">${member.home_course_name}</a>`
-                : 'No home course set'
-              }
-            </div>
-            ${member.handicap ? `<div class="member-handicap">Handicap: ${member.handicap}</div>` : '<div class="member-handicap">&nbsp;</div>'}
-            <div class="member-stats">
-              <div class="member-stat">
-                <div class="member-stat-value">${member.rounds_played || 0}</div>
-                <div class="member-stat-label">Rounds</div>
-              </div>
-              <div class="member-stat">
-                <div class="member-stat-value">${member.avg_score || '--'}</div>
-                <div class="member-stat-label">Avg Score</div>
-              </div>
-            </div>
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
           </div>
-        `).join('');
-      } catch (e) {
-        container.innerHTML = '<div class="loading">Error loading members</div>';
-      }
+          <h3>Be the First to Join</h3>
+          <p>Create an account to connect with Bay Area golfers and track your rounds.</p>
+          <a href="/account.html" class="cta-btn">Create Account</a>
+        </div>
+      `;
     }
 
     async function loadLeaderboard() {
-      const period = document.getElementById('period-select').value;
       const container = document.getElementById('leaderboard-content');
-      container.innerHTML = '<div class="loading">Loading...</div>';
-
-      try {
-        const res = await fetch(`${API_BASE}/community/leaderboard?period=${period}`);
-        const data = await res.json();
-
-        if (data.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">
-                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-              </div>
-              <h3>No Activity Yet</h3>
-              <p>Be the first to log a round and appear on the leaderboard!</p>
-              <a href="/scorebook.html" class="cta-btn">Log a Round</a>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = data.map((player, i) => `
-          <div class="leaderboard-row">
-            <div class="rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i + 1}</div>
-            <div class="player-info">
-              <div class="player-name">${player.display_name}</div>
-              <div class="player-stat">${player.total_rounds} round${player.total_rounds !== 1 ? 's' : ''} played</div>
-            </div>
-            <div class="player-score">${player.courses_played} courses</div>
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
           </div>
-        `).join('');
-      } catch (e) {
-        container.innerHTML = '<div class="loading">Error loading leaderboard</div>';
-      }
+          <h3>No Rounds Logged Yet</h3>
+          <p>Be the first to log a round and appear on the leaderboard!</p>
+          <a href="/scorebook.html" class="cta-btn">Log a Round</a>
+        </div>
+      `;
     }
 
     async function loadActivity() {
       const container = document.getElementById('activity-content');
-      container.innerHTML = '<div class="loading">Loading...</div>';
-
-      try {
-        const res = await fetch(`${API_BASE}/community/activity`);
-        const data = await res.json();
-
-        if (data.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-              </div>
-              <h3>No Recent Activity</h3>
-              <p>Log your rounds to see them appear here!</p>
-              <a href="/scorebook.html" class="cta-btn">Log a Round</a>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = data.map(item => `
-          <div class="activity-item">
-            <div class="activity-avatar">${item.display_name[0].toUpperCase()}</div>
-            <div class="activity-content">
-              <div class="activity-text">
-                <strong>${item.display_name}</strong> played
-                <a href="/course/${item.course_slug}" style="color: var(--primary); text-decoration: none;">${item.course_name}</a>
-                ${item.total_score ? `and shot <strong>${item.total_score}</strong>` : ''}
-              </div>
-              <div class="activity-meta">${formatDate(item.date)}</div>
-            </div>
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
           </div>
-        `).join('');
-      } catch (e) {
-        container.innerHTML = '<div class="loading">Error loading activity</div>';
-      }
+          <h3>No Recent Activity</h3>
+          <p>Log your rounds to see activity from the Bay Area golf community.</p>
+          <a href="/scorebook.html" class="cta-btn">Log a Round</a>
+        </div>
+      `;
     }
 
     function formatDate(dateStr) {

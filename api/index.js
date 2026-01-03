@@ -33,7 +33,7 @@ const sendVerificationEmail = async (email, token, displayName) => {
   const verifyUrl = `https://bayareagolf.now/api/auth/verify?token=${token}`;
 
   await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || 'Bay Area Golf <onboarding@resend.dev>',
+    from: process.env.RESEND_FROM_EMAIL || 'Bay Area Golf <noreply@bayareagolf.now>',
     to: email,
     subject: 'Verify your Bay Area Golf account',
     html: `
