@@ -89,45 +89,94 @@
       border-radius: 50%;
     }
 
-    /* SF Peninsula contours */
-    .contour-sf-1 { top: 20%; left: 15%; width: 25%; height: 40%; transform: rotate(-20deg); }
-    .contour-sf-2 { top: 25%; left: 18%; width: 20%; height: 32%; transform: rotate(-20deg); }
-    .contour-sf-3 { top: 30%; left: 21%; width: 15%; height: 24%; transform: rotate(-20deg); }
+    /* SF Peninsula contours - runs north-south along coast */
+    .contour-sf-1 { top: 22%; left: 16%; width: 18%; height: 35%; transform: rotate(-10deg); }
+    .contour-sf-2 { top: 28%; left: 18%; width: 14%; height: 26%; transform: rotate(-10deg); }
+    .contour-sf-3 { top: 34%; left: 20%; width: 10%; height: 18%; transform: rotate(-10deg); }
 
     /* East Bay hills contours */
-    .contour-eb-1 { top: 15%; left: 55%; width: 35%; height: 55%; transform: rotate(10deg); border-radius: 60% 40% 50% 50%; }
-    .contour-eb-2 { top: 20%; left: 58%; width: 28%; height: 45%; transform: rotate(10deg); border-radius: 60% 40% 50% 50%; }
-    .contour-eb-3 { top: 25%; left: 61%; width: 21%; height: 35%; transform: rotate(10deg); border-radius: 60% 40% 50% 50%; }
+    .contour-eb-1 { top: 20%; left: 58%; width: 32%; height: 50%; transform: rotate(5deg); border-radius: 60% 40% 50% 50%; }
+    .contour-eb-2 { top: 26%; left: 62%; width: 24%; height: 40%; transform: rotate(5deg); border-radius: 60% 40% 50% 50%; }
+    .contour-eb-3 { top: 32%; left: 66%; width: 18%; height: 30%; transform: rotate(5deg); border-radius: 60% 40% 50% 50%; }
 
     /* Marin headlands contours */
-    .contour-ma-1 { top: 5%; left: 20%; width: 22%; height: 25%; transform: rotate(-35deg); border-radius: 45% 55% 50% 50%; }
-    .contour-ma-2 { top: 8%; left: 23%; width: 16%; height: 18%; transform: rotate(-35deg); border-radius: 45% 55% 50% 50%; }
+    .contour-ma-1 { top: 4%; left: 26%; width: 20%; height: 20%; transform: rotate(-15deg); border-radius: 45% 55% 50% 50%; }
+    .contour-ma-2 { top: 8%; left: 30%; width: 14%; height: 14%; transform: rotate(-15deg); border-radius: 45% 55% 50% 50%; }
 
-    /* South Bay contours */
-    .contour-sb-1 { top: 55%; left: 25%; width: 40%; height: 40%; transform: rotate(15deg); border-radius: 50% 50% 60% 40%; }
-    .contour-sb-2 { top: 60%; left: 30%; width: 30%; height: 30%; transform: rotate(15deg); border-radius: 50% 50% 60% 40%; }
+    /* South Bay / Santa Cruz Mtns contours */
+    .contour-sb-1 { top: 60%; left: 22%; width: 35%; height: 38%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
+    .contour-sb-2 { top: 68%; left: 28%; width: 26%; height: 28%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
 
-    /* San Francisco Bay - water */
+    /* San Francisco Bay - more accurate shape */
     .bay-water {
       position: absolute;
-      top: 18%;
-      left: 32%;
-      width: 28%;
-      height: 48%;
+      top: 22%;
+      left: 38%;
+      width: 22%;
+      height: 52%;
       background: var(--water);
-      border-radius: 30% 70% 60% 40% / 50% 40% 60% 50%;
-      transform: rotate(-8deg);
+      border-radius: 45% 55% 30% 20% / 25% 30% 70% 75%;
+      transform: rotate(-5deg);
       box-shadow: inset 0 0 30px rgba(123, 163, 189, 0.5);
     }
 
-    /* Pacific Ocean */
+    /* South Bay extension (narrower) */
+    .south-bay {
+      position: absolute;
+      top: 58%;
+      left: 40%;
+      width: 14%;
+      height: 32%;
+      background: var(--water);
+      border-radius: 50% 50% 30% 30%;
+      transform: rotate(8deg);
+      box-shadow: inset 0 0 20px rgba(123, 163, 189, 0.4);
+    }
+
+    /* San Pablo Bay (north) */
+    .san-pablo-bay {
+      position: absolute;
+      top: 18%;
+      left: 42%;
+      width: 12%;
+      height: 12%;
+      background: var(--water);
+      border-radius: 60% 40% 50% 50%;
+      box-shadow: inset 0 0 15px rgba(123, 163, 189, 0.4);
+    }
+
+    /* Golden Gate strait */
+    .golden-gate-strait {
+      position: absolute;
+      top: 24%;
+      left: 28%;
+      width: 14%;
+      height: 4%;
+      background: var(--water);
+      transform: rotate(-8deg);
+    }
+
+    /* Pacific Ocean - west edge */
     .pacific {
       position: absolute;
       top: 0;
-      left: -10%;
-      width: 30%;
+      left: -5%;
+      width: 22%;
       height: 100%;
-      background: linear-gradient(90deg, var(--water) 0%, var(--water) 70%, transparent 100%);
+      background: linear-gradient(90deg, var(--water) 0%, var(--water) 60%, transparent 100%);
+    }
+
+    /* Tomales Bay (where Bodega is) */
+    .tomales-bay {
+      position: absolute;
+      top: 5%;
+      left: 18%;
+      width: 3%;
+      height: 12%;
+      background: var(--water);
+      border-radius: 50%;
+      transform: rotate(-35deg);
+      opacity: 0.8;
     }
 
     /* Golf course fairway shapes */
@@ -199,41 +248,41 @@
       pointer-events: none;
     }
 
-    /* SF Courses */
-    .fw-harding { top: 38%; left: 18%; width: 28px; height: 45px; border-radius: 40% 60% 55% 45%; transform: rotate(-30deg); }
-    .fw-lincoln { top: 28%; left: 14%; width: 20px; height: 35px; border-radius: 50% 50% 45% 55%; transform: rotate(-45deg); }
-    .fw-presidio { top: 22%; left: 22%; width: 24px; height: 38px; border-radius: 45% 55% 50% 50%; transform: rotate(-15deg); }
-    .fw-sharp { top: 48%; left: 12%; width: 26px; height: 42px; border-radius: 55% 45% 50% 50%; transform: rotate(-25deg); }
-    .fw-gleneagles { top: 42%; left: 21%; width: 18px; height: 30px; border-radius: 50%; transform: rotate(-20deg); }
-    .fw-olympic { top: 34%; left: 11%; width: 22px; height: 36px; border-radius: 48% 52% 50% 50%; transform: rotate(-40deg); }
+    /* SF Courses - on SF Peninsula (west side of bay) */
+    .fw-harding { top: 36%; left: 24%; width: 26px; height: 40px; border-radius: 40% 60% 55% 45%; transform: rotate(-30deg); }
+    .fw-lincoln { top: 28%; left: 20%; width: 18px; height: 30px; border-radius: 50% 50% 45% 55%; transform: rotate(-25deg); }
+    .fw-presidio { top: 24%; left: 26%; width: 22px; height: 34px; border-radius: 45% 55% 50% 50%; transform: rotate(-15deg); }
+    .fw-sharp { top: 46%; left: 18%; width: 24px; height: 38px; border-radius: 55% 45% 50% 50%; transform: rotate(-25deg); }
+    .fw-gleneagles { top: 40%; left: 28%; width: 16px; height: 26px; border-radius: 50%; transform: rotate(-20deg); }
+    .fw-olympic { top: 32%; left: 18%; width: 20px; height: 32px; border-radius: 48% 52% 50% 50%; transform: rotate(-40deg); }
 
-    /* South Bay Courses */
-    .fw-paloalto { top: 58%; left: 28%; width: 24px; height: 40px; border-radius: 45% 55% 52% 48%; transform: rotate(10deg); }
-    .fw-santateresa { top: 78%; left: 38%; width: 26px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(25deg); }
-    .fw-cinnabar { top: 82%; left: 46%; width: 30px; height: 48px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
-    .fw-coyote { top: 88%; left: 52%; width: 28px; height: 45px; border-radius: 52% 48% 50% 50%; transform: rotate(20deg); }
-    .fw-sunnyvale { top: 62%; left: 35%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(5deg); }
-    .fw-deepcliff { top: 66%; left: 30%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
-    .fw-sanjose { top: 72%; left: 42%; width: 22px; height: 36px; border-radius: 50%; transform: rotate(12deg); }
+    /* South Bay Courses - south of the bay, peninsula side */
+    .fw-paloalto { top: 62%; left: 32%; width: 22px; height: 36px; border-radius: 45% 55% 52% 48%; transform: rotate(10deg); }
+    .fw-santateresa { top: 82%; left: 48%; width: 24px; height: 40px; border-radius: 50% 50% 55% 45%; transform: rotate(25deg); }
+    .fw-cinnabar { top: 88%; left: 56%; width: 26px; height: 42px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
+    .fw-coyote { top: 92%; left: 62%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(20deg); }
+    .fw-sunnyvale { top: 68%; left: 38%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(5deg); }
+    .fw-deepcliff { top: 72%; left: 34%; width: 16px; height: 24px; border-radius: 50%; transform: rotate(-5deg); }
+    .fw-sanjose { top: 78%; left: 52%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(12deg); }
 
-    /* East Bay Courses */
-    .fw-corica { top: 35%; left: 52%; width: 30px; height: 48px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
-    .fw-tilden { top: 22%; left: 58%; width: 24px; height: 40px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
-    .fw-boundary { top: 28%; left: 68%; width: 26px; height: 42px; border-radius: 52% 48% 50% 50%; transform: rotate(8deg); }
-    .fw-metropolitan { top: 40%; left: 48%; width: 22px; height: 36px; border-radius: 50%; transform: rotate(-15deg); }
-    .fw-lakechabot { top: 45%; left: 55%; width: 24px; height: 38px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
-    .fw-poppy { top: 52%; left: 72%; width: 28px; height: 44px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
-    .fw-laspositas { top: 58%; left: 76%; width: 22px; height: 35px; border-radius: 50%; transform: rotate(18deg); }
-    .fw-diablo { top: 32%; left: 74%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
+    /* East Bay Courses - east side of bay */
+    .fw-corica { top: 38%; left: 58%; width: 26px; height: 42px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    .fw-tilden { top: 28%; left: 62%; width: 22px; height: 36px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
+    .fw-boundary { top: 34%; left: 72%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(8deg); }
+    .fw-metropolitan { top: 42%; left: 54%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(-15deg); }
+    .fw-lakechabot { top: 48%; left: 62%; width: 22px; height: 34px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
+    .fw-poppy { top: 56%; left: 78%; width: 24px; height: 38px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
+    .fw-laspositas { top: 62%; left: 82%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(18deg); }
+    .fw-diablo { top: 38%; left: 78%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-8deg); }
 
-    /* Marin Courses */
-    .fw-peacock { top: 15%; left: 35%; width: 24px; height: 40px; border-radius: 48% 52% 50% 50%; transform: rotate(-25deg); }
-    .fw-indian { top: 8%; left: 28%; width: 22px; height: 36px; border-radius: 50% 50% 45% 55%; transform: rotate(-35deg); }
-    .fw-stonetree { top: 5%; left: 32%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(-40deg); }
-    .fw-millvalley { top: 18%; left: 26%; width: 16px; height: 26px; border-radius: 50%; transform: rotate(-30deg); }
-    .fw-bodega { top: 2%; left: 8%; width: 26px; height: 42px; border-radius: 45% 55% 52% 48%; transform: rotate(-50deg); }
+    /* Marin Courses - north of Golden Gate */
+    .fw-peacock { top: 16%; left: 42%; width: 22px; height: 36px; border-radius: 48% 52% 50% 50%; transform: rotate(-25deg); }
+    .fw-indian { top: 10%; left: 36%; width: 20px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-20deg); }
+    .fw-stonetree { top: 6%; left: 40%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-15deg); }
+    .fw-millvalley { top: 18%; left: 32%; width: 14px; height: 22px; border-radius: 50%; transform: rotate(-30deg); }
+    .fw-bodega { top: 4%; left: 20%; width: 22px; height: 36px; border-radius: 45% 55% 52% 48%; transform: rotate(-35deg); }
 
-    /* Map title cartouche */
+    /* Map title cartouche - more transparent */
     .cartouche {
       position: absolute;
       top: 50%;
@@ -241,44 +290,46 @@
       transform: translate(-50%, -50%);
       text-align: center;
       z-index: 20;
-      padding: 2rem 3rem;
-      background: rgba(244, 235, 224, 0.82);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border: 3px double var(--contour);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      padding: 1.5rem 2rem;
+      background: rgba(244, 235, 224, 0.65);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      border: 2px solid rgba(139, 115, 85, 0.6);
+      border-radius: 4px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .cartouche::before {
       content: '';
       position: absolute;
-      inset: 6px;
-      border: 1px solid var(--contour-light);
+      inset: 4px;
+      border: 1px solid rgba(139, 115, 85, 0.3);
+      border-radius: 2px;
       pointer-events: none;
     }
 
     .map-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
       font-weight: 700;
       color: var(--text-dark);
       letter-spacing: 0.05em;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.3rem;
     }
 
     .map-subtitle {
-      font-size: clamp(0.85rem, 2vw, 1.1rem);
+      font-size: clamp(0.7rem, 1.5vw, 0.9rem);
       color: var(--text-muted);
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       font-weight: 400;
     }
 
     .map-year {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       font-style: italic;
     }
 
@@ -447,11 +498,11 @@
       z-index: 10;
     }
 
-    .label-sf { top: 44%; left: 10%; transform: rotate(-15deg); }
-    .label-sb { top: 75%; left: 25%; }
-    .label-eb { top: 30%; left: 62%; }
-    .label-ma { top: 12%; left: 22%; transform: rotate(-10deg); }
-    .label-pacific { top: 50%; left: 2%; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.3em; color: var(--water-dark); }
+    .label-sf { top: 38%; left: 16%; transform: rotate(-10deg); }
+    .label-sb { top: 76%; left: 44%; }
+    .label-eb { top: 44%; left: 68%; }
+    .label-ma { top: 8%; left: 32%; transform: rotate(-5deg); }
+    .label-pacific { top: 50%; left: 4%; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.3em; color: var(--water-dark); }
 
     /* Landmarks */
     .landmarks {
@@ -463,15 +514,15 @@
 
     .landmark {
       position: absolute;
-      opacity: 0.7;
+      opacity: 0.75;
     }
 
-    /* Golden Gate Bridge */
+    /* Golden Gate Bridge - spans the strait */
     .landmark-ggb {
-      top: 17%;
-      left: 24%;
-      width: 70px;
-      height: 35px;
+      top: 22%;
+      left: 26%;
+      width: 55px;
+      height: 28px;
     }
 
     .landmark-ggb svg {
@@ -482,10 +533,10 @@
       stroke-width: 1.5;
     }
 
-    /* Marin Redwoods */
+    /* Marin Redwoods / Muir Woods */
     .landmark-redwoods {
-      top: 4%;
-      left: 16%;
+      top: 14%;
+      left: 22%;
     }
 
     .landmark-redwoods svg {
@@ -493,16 +544,16 @@
       opacity: 0.6;
     }
 
-    /* Google Campus label */
+    /* Google Campus label - Mountain View */
     .landmark-google {
-      top: 64%;
-      left: 37%;
+      top: 70%;
+      left: 40%;
       font-family: 'Arial', sans-serif;
-      font-size: 7px;
+      font-size: 6px;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      opacity: 0.5;
-      transform: rotate(-3deg);
+      letter-spacing: 0.3px;
+      opacity: 0.55;
+      transform: rotate(-2deg);
     }
 
     .landmark-google span:nth-child(1) { color: #4285f4; }
@@ -512,10 +563,10 @@
     .landmark-google span:nth-child(5) { color: #34a853; }
     .landmark-google span:nth-child(6) { color: #ea4335; }
 
-    /* Oakland Port Cranes */
+    /* Oakland Port Cranes - on east side of bay */
     .landmark-cranes {
-      top: 34%;
-      left: 47%;
+      top: 36%;
+      left: 52%;
     }
 
     .landmark-cranes svg {
@@ -525,10 +576,10 @@
       opacity: 0.6;
     }
 
-    /* Transamerica Pyramid */
+    /* Transamerica Pyramid - downtown SF */
     .landmark-pyramid {
-      top: 26%;
-      left: 29%;
+      top: 28%;
+      left: 32%;
     }
 
     .landmark-pyramid svg {
@@ -540,14 +591,106 @@
 
     /* Mt. Tamalpais */
     .landmark-tamalpais {
-      top: 6%;
-      left: 24%;
+      top: 10%;
+      left: 28%;
       font-family: 'Source Serif 4', Georgia, serif;
-      font-size: 7px;
+      font-size: 6px;
       font-style: italic;
       color: var(--text-muted);
       opacity: 0.7;
-      transform: rotate(-8deg);
+      transform: rotate(-5deg);
+    }
+
+    /* Alcatraz Island */
+    .landmark-alcatraz {
+      top: 26%;
+      left: 36%;
+      width: 10px;
+      height: 8px;
+      background: var(--paper-dark);
+      border-radius: 50%;
+      border: 1px solid var(--contour-light);
+    }
+
+    /* Candlestick Point (historic) */
+    .landmark-candlestick {
+      top: 42%;
+      left: 32%;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 5px;
+      color: var(--text-muted);
+      opacity: 0.6;
+      white-space: nowrap;
+    }
+
+    /* In-N-Out (iconic Bay Area spots) */
+    .landmark-innout {
+      font-family: 'Arial', sans-serif;
+      font-size: 5px;
+      font-weight: 700;
+      color: #ff0000;
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    .landmark-innout-mv { top: 72%; left: 36%; }
+    .landmark-innout-sf { top: 38%; left: 20%; transform: rotate(-5deg); }
+
+    /* Stanford University */
+    .landmark-stanford {
+      top: 64%;
+      left: 30%;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 6px;
+      font-weight: 600;
+      color: #8C1515;
+      opacity: 0.6;
+    }
+
+    /* UC Berkeley */
+    .landmark-berkeley {
+      top: 26%;
+      left: 58%;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 6px;
+      font-weight: 600;
+      color: #003262;
+      opacity: 0.6;
+    }
+
+    /* SFO Airport */
+    .landmark-sfo {
+      top: 50%;
+      left: 24%;
+      font-family: 'Arial', sans-serif;
+      font-size: 5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    /* Golden Gate Park */
+    .landmark-ggpark {
+      top: 30%;
+      left: 18%;
+      width: 28px;
+      height: 8px;
+      background: var(--fairway);
+      opacity: 0.4;
+      border-radius: 2px;
+      transform: rotate(-5deg);
+    }
+
+    /* Presidio */
+    .landmark-presidio {
+      top: 24%;
+      left: 22%;
+      width: 18px;
+      height: 12px;
+      background: var(--fairway);
+      opacity: 0.35;
+      border-radius: 3px;
+      transform: rotate(-10deg);
     }
 
     /* Responsive */
@@ -601,51 +744,77 @@
       <div class="contour contour-sb-2"></div>
     </div>
 
-    <!-- Water bodies -->
+    <!-- Water bodies - more accurate Bay Area geography -->
     <div class="pacific"></div>
+    <div class="tomales-bay"></div>
+    <div class="golden-gate-strait"></div>
+    <div class="san-pablo-bay"></div>
     <div class="bay-water"></div>
+    <div class="south-bay"></div>
 
     <!-- Bay Area Landmarks -->
     <div class="landmarks">
+      <!-- Parks (background layer) -->
+      <div class="landmark landmark-presidio"></div>
+      <div class="landmark landmark-ggpark"></div>
+
       <!-- Golden Gate Bridge -->
       <div class="landmark landmark-ggb">
-        <svg viewBox="0 0 70 35">
-          <path d="M5,30 L12,8 L18,30 M52,30 L58,8 L64,30" stroke-linecap="round"/>
-          <path d="M12,8 L58,8" stroke-linecap="round"/>
-          <path d="M0,30 L70,30" stroke-width="2"/>
-          <path d="M12,14 L58,14" stroke-width="0.5"/>
-          <path d="M12,20 L58,20" stroke-width="0.5"/>
+        <svg viewBox="0 0 55 28">
+          <path d="M4,24 L10,6 L15,24 M40,24 L46,6 L51,24" stroke-linecap="round"/>
+          <path d="M10,6 L46,6" stroke-linecap="round"/>
+          <path d="M0,24 L55,24" stroke-width="2"/>
+          <path d="M10,12 L46,12" stroke-width="0.5"/>
+          <path d="M10,18 L46,18" stroke-width="0.5"/>
         </svg>
       </div>
 
-      <!-- Marin Redwoods -->
+      <!-- Marin Redwoods / Muir Woods -->
       <div class="landmark landmark-redwoods">
-        <svg width="45" height="55" viewBox="0 0 45 55">
-          <path d="M12,55 L12,35 L6,35 L12,22 L8,22 L12,10 L10,10 L12,0 L14,10 L12,10 L16,22 L12,22 L18,35 L12,35 L12,55"/>
-          <path d="M28,55 L28,40 L24,40 L28,28 L25,28 L28,18 L30,28 L27,28 L32,40 L28,40 L28,55"/>
-          <path d="M38,55 L38,42 L35,42 L38,32 L40,42 L37,42 L37,55"/>
+        <svg width="35" height="45" viewBox="0 0 35 45">
+          <path d="M10,45 L10,28 L5,28 L10,18 L7,18 L10,8 L8,8 L10,0 L12,8 L10,8 L13,18 L10,18 L15,28 L10,28 L10,45"/>
+          <path d="M22,45 L22,32 L19,32 L22,22 L20,22 L22,14 L24,22 L22,22 L25,32 L22,32 L22,45"/>
+          <path d="M30,45 L30,35 L28,35 L30,27 L32,35 L30,35 L30,45"/>
         </svg>
       </div>
 
-      <!-- Mt. Tamalpais label -->
+      <!-- Mt. Tamalpais -->
       <div class="landmark landmark-tamalpais">Mt. Tam</div>
+
+      <!-- Alcatraz Island -->
+      <div class="landmark landmark-alcatraz" title="Alcatraz"></div>
 
       <!-- Transamerica Pyramid -->
       <div class="landmark landmark-pyramid">
-        <svg width="12" height="24" viewBox="0 0 12 24">
-          <path d="M6,0 L11,24 L1,24 Z"/>
-          <line x1="3" y1="16" x2="9" y2="16"/>
-          <line x1="4" y1="12" x2="8" y2="12"/>
+        <svg width="10" height="20" viewBox="0 0 10 20">
+          <path d="M5,0 L9,20 L1,20 Z"/>
+          <line x1="2.5" y1="14" x2="7.5" y2="14"/>
         </svg>
       </div>
 
       <!-- Oakland Port Cranes -->
       <div class="landmark landmark-cranes">
-        <svg width="35" height="28" viewBox="0 0 35 28">
-          <path d="M5,28 L5,6 L18,6 M8,28 L8,8"/>
-          <path d="M20,28 L20,10 L32,10 M23,28 L23,12"/>
+        <svg width="30" height="24" viewBox="0 0 30 24">
+          <path d="M4,24 L4,5 L15,5 M7,24 L7,7"/>
+          <path d="M17,24 L17,8 L27,8 M20,24 L20,10"/>
         </svg>
       </div>
+
+      <!-- Candlestick Point -->
+      <div class="landmark landmark-candlestick">Candlestick Pt</div>
+
+      <!-- SFO Airport -->
+      <div class="landmark landmark-sfo">SFO</div>
+
+      <!-- Stanford University -->
+      <div class="landmark landmark-stanford">Stanford</div>
+
+      <!-- UC Berkeley -->
+      <div class="landmark landmark-berkeley">Berkeley</div>
+
+      <!-- In-N-Out locations -->
+      <div class="landmark landmark-innout landmark-innout-mv">In-N-Out</div>
+      <div class="landmark landmark-innout landmark-innout-sf">In-N-Out</div>
 
       <!-- Google Campus -->
       <div class="landmark landmark-google">
