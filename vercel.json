@@ -23,6 +23,10 @@
       "dest": "public/course.html"
     },
     {
+      "src": "/admin",
+      "dest": "public/admin.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "public/$1"
     }

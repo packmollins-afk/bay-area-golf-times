@@ -242,6 +242,99 @@
       border-color: var(--primary);
     }
 
+    /* Profile Edit Section */
+    .profile-picture-section {
+      margin-bottom: 24px;
+    }
+    .profile-picture-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      overflow: hidden;
+      border: 4px solid var(--border-light);
+    }
+    .profile-picture-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .profile-picture-preview span {
+      color: #fff;
+      font-size: 3rem;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+    }
+    .upload-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Playfair Display', Georgia, serif;
+      transition: all 0.2s;
+    }
+    .upload-btn:hover {
+      border-color: var(--primary);
+      background: white;
+    }
+    .profile-form {
+      text-align: left;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 2px solid var(--border-light);
+    }
+    .profile-form .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--bg-paper);
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+    .profile-form .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .save-profile-btn {
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px 32px;
+      background: var(--primary);
+      color: #f4f1e8;
+      border: 2px solid var(--primary-dark);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .save-profile-btn:hover {
+      background: var(--primary-light);
+    }
+    .save-profile-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .profile-saved-msg {
+      color: var(--primary);
+      font-size: 0.9rem;
+      margin-top: 12px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .profile-saved-msg.show {
+      opacity: 1;
+    }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -303,7 +396,18 @@
     <!-- User Profile (shown when logged in) -->
     <div class="auth-container hidden" id="profile-container">
       <div class="user-profile">
-        <div class="user-avatar" id="user-avatar">?</div>
+        <!-- Profile Picture -->
+        <div class="profile-picture-section">
+          <div class="profile-picture-preview" id="profile-picture-preview">
+            <img id="profile-img" src="" alt="Profile" style="display: none;">
+            <span id="profile-initial">?</span>
+          </div>
+          <label class="upload-btn">
+            Change Photo
+            <input type="file" accept="image/*" id="profile-picture-input" style="display: none;">
+          </label>
+        </div>
+
         <div class="user-name" id="user-name">Loading...</div>
         <div class="user-email" id="user-email"></div>
 
@@ -322,7 +426,23 @@
           </div>
         </div>
 
-        <button class="logout-btn" onclick="handleLogout()">Log Out</button>
+        <!-- Profile Edit Form -->
+        <div class="profile-form">
+          <div class="form-group">
+            <label for="home-course-select">Home Course</label>
+            <select id="home-course-select">
+              <option value="">Select your home course...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="handicap-input">Handicap</label>
+            <input type="number" id="handicap-input" min="0" max="54" step="0.1" placeholder="e.g. 12.5">
+          </div>
+          <button class="save-profile-btn" id="save-profile-btn" onclick="saveProfile()">Save Profile</button>
+          <div class="profile-saved-msg" id="profile-saved-msg">Profile saved!</div>
+        </div>
+
+        <button class="logout-btn" onclick="handleLogout()" style="margin-top: 24px;">Log Out</button>
       </div>
     </div>
   </main>
@@ -383,9 +503,27 @@
       document.getElementById('page-heading').textContent = 'My Account';
       document.getElementById('page-subtitle').textContent = 'Your Bay Area Golf journey';
 
-      document.getElementById('user-avatar').textContent = (user.displayName || user.email)[0].toUpperCase();
+      // Set profile picture or initial
+      if (user.profilePicture) {
+        document.getElementById('profile-img').src = user.profilePicture;
+        document.getElementById('profile-img').style.display = 'block';
+        document.getElementById('profile-initial').style.display = 'none';
+      } else {
+        document.getElementById('profile-initial').textContent = (user.displayName || user.email)[0].toUpperCase();
+        document.getElementById('profile-img').style.display = 'none';
+        document.getElementById('profile-initial').style.display = 'block';
+      }
+
       document.getElementById('user-name').textContent = user.displayName || user.email.split('@')[0];
       document.getElementById('user-email').textContent = user.email;
+
+      // Set handicap if exists
+      if (user.handicap) {
+        document.getElementById('handicap-input').value = user.handicap;
+      }
+
+      // Load courses for home course select
+      await loadCoursesForSelect(user.homeCourseId);
 
       // Load user stats
       try {
@@ -400,6 +538,97 @@
         }
       } catch (e) {
         console.error('Error loading stats:', e);
+      }
+    }
+
+    async function loadCoursesForSelect(selectedId) {
+      try {
+        const res = await fetch(`${API_BASE}/courses?all=true`);
+        const courses = await res.json();
+        const select = document.getElementById('home-course-select');
+        select.innerHTML = '<option value="">Select your home course...</option>' +
+          courses.map(c => `<option value="${c.id}" ${c.id == selectedId ? 'selected' : ''}>${c.name} - ${c.city}</option>`).join('');
+      } catch (e) {
+        console.error('Error loading courses:', e);
+      }
+    }
+
+    // Handle profile picture upload
+    document.getElementById('profile-picture-input').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      if (file.size > 1.5 * 1024 * 1024) {
+        alert('Image too large. Please select an image under 1.5MB');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target.result;
+
+        try {
+          const res = await fetch(`${API_BASE}/user/profile/picture`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({ image: base64 })
+          });
+
+          if (res.ok) {
+            document.getElementById('profile-img').src = base64;
+            document.getElementById('profile-img').style.display = 'block';
+            document.getElementById('profile-initial').style.display = 'none';
+          } else {
+            alert('Failed to upload image');
+          }
+        } catch (e) {
+          alert('Failed to upload image');
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    async function saveProfile() {
+      const btn = document.getElementById('save-profile-btn');
+      const msg = document.getElementById('profile-saved-msg');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      const homeCourseId = document.getElementById('home-course-select').value;
+      const handicap = document.getElementById('handicap-input').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/user/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+          },
+          body: JSON.stringify({
+            homeCourseId: homeCourseId || null,
+            handicap: handicap ? parseFloat(handicap) : null
+          })
+        });
+
+        if (res.ok) {
+          msg.classList.add('show');
+          setTimeout(() => msg.classList.remove('show'), 2000);
+        } else {
+          alert('Failed to save profile');
+        }
+      } catch (e) {
+        alert('Failed to save profile');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Profile';
       }
     }
 

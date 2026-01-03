@@ -368,6 +368,135 @@
       padding: 40px;
       color: var(--text-muted);
     }
+
+    /* Members Grid */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .member-card {
+      background: white;
+      border: 2px solid var(--border-light);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: all var(--anim-fast) var(--ease-out);
+      opacity: 0;
+      animation: fadeInUp var(--anim-normal) var(--ease-out) forwards;
+    }
+    .member-card:nth-child(1) { animation-delay: 100ms; }
+    .member-card:nth-child(2) { animation-delay: 150ms; }
+    .member-card:nth-child(3) { animation-delay: 200ms; }
+    .member-card:nth-child(4) { animation-delay: 250ms; }
+    .member-card:nth-child(5) { animation-delay: 300ms; }
+    .member-card:nth-child(6) { animation-delay: 350ms; }
+    .member-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(61, 41, 20, 0.12);
+    }
+    .member-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      overflow: hidden;
+      border: 3px solid var(--border-light);
+      transition: transform var(--anim-fast) var(--ease-spring);
+    }
+    .member-card:hover .member-avatar {
+      transform: scale(1.05);
+    }
+    .member-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .member-avatar span {
+      color: #fff;
+      font-size: 2rem;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+    }
+    .member-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .member-home-course {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .member-home-course a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .member-home-course a:hover {
+      text-decoration: underline;
+    }
+    .member-handicap {
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .member-stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+    .member-stat {
+      text-align: center;
+    }
+    .member-stat-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--primary);
+    }
+    .member-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Auth Required Overlay */
+    .auth-required-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(244, 241, 232, 0.97);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .auth-required-card {
+      background: white;
+      border: 2px solid var(--border-light);
+      border-radius: 12px;
+      padding: 48px;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 8px 40px rgba(61, 41, 20, 0.15);
+    }
+    .auth-required-card h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+    .auth-required-card p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
   </style>
 </head>
 <body>
@@ -388,12 +517,20 @@
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('leaderboard')">Leaderboard</button>
+      <button class="tab-btn active" onclick="showTab('members')">Members</button>
+      <button class="tab-btn" onclick="showTab('leaderboard')">Leaderboard</button>
       <button class="tab-btn" onclick="showTab('activity')">Activity</button>
     </div>
 
+    <!-- Members Tab -->
+    <div class="tab-content active" id="members-tab">
+      <div class="members-grid" id="members-content">
+        <div class="loading">Loading members...</div>
+      </div>
+    </div>
+
     <!-- Leaderboard Tab -->
-    <div class="tab-content active" id="leaderboard-tab">
+    <div class="tab-content" id="leaderboard-tab">
       <div class="leaderboard">
         <div class="leaderboard-header">
           <h3>Passport Collectors</h3>
@@ -419,8 +556,9 @@
 
   <script>
     const API_BASE = '/api';
+    let isLoggedIn = false;
 
-    // Check auth and update header
+    // Check auth - require login for this page
     async function checkAuth() {
       const token = localStorage.getItem('authToken');
       if (token) {
@@ -431,22 +569,103 @@
           if (res.ok) {
             const data = await res.json();
             document.getElementById('auth-link').textContent = data.user.displayName || 'Account';
+            isLoggedIn = true;
+            loadMembers(); // Load members on successful auth
+            return;
           }
         } catch (e) {}
       }
+      // Show auth required overlay
+      showAuthRequired();
+    }
+
+    function showAuthRequired() {
+      const overlay = document.createElement('div');
+      overlay.className = 'auth-required-overlay';
+      overlay.innerHTML = `
+        <div class="auth-required-card">
+          <h3>Members Only</h3>
+          <p>Sign in to view the community page and connect with other Bay Area golfers.</p>
+          <a href="/account.html" class="cta-btn">Sign In</a>
+        </div>
+      `;
+      document.body.appendChild(overlay);
     }
 
     function showTab(tab) {
       document.querySelectorAll('.tab-btn').forEach((btn, i) => {
         btn.classList.toggle('active',
-          (tab === 'leaderboard' && i === 0) ||
-          (tab === 'activity' && i === 1)
+          (tab === 'members' && i === 0) ||
+          (tab === 'leaderboard' && i === 1) ||
+          (tab === 'activity' && i === 2)
         );
       });
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       document.getElementById(`${tab}-tab`).classList.add('active');
 
+      if (tab === 'members') loadMembers();
+      if (tab === 'leaderboard') loadLeaderboard();
       if (tab === 'activity') loadActivity();
+    }
+
+    async function loadMembers() {
+      if (!isLoggedIn) return;
+
+      const container = document.getElementById('members-content');
+      container.innerHTML = '<div class="loading">Loading members...</div>';
+
+      try {
+        const token = localStorage.getItem('authToken');
+        const res = await fetch(`${API_BASE}/community/members`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const members = await res.json();
+
+        if (members.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              </div>
+              <h3>No Members Yet</h3>
+              <p>Be the first to set up your profile!</p>
+              <a href="/account.html" class="cta-btn">Set Up Profile</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = members.map(member => `
+          <div class="member-card">
+            <div class="member-avatar">
+              ${member.profile_picture
+                ? `<img src="${member.profile_picture}" alt="${member.display_name || 'Member'}">`
+                : `<span>${(member.display_name || 'U')[0].toUpperCase()}</span>`
+              }
+            </div>
+            <div class="member-name">${member.display_name || 'Anonymous'}</div>
+            <div class="member-home-course">
+              ${member.home_course_name
+                ? `<a href="/course/${member.home_course_slug}">${member.home_course_name}</a>`
+                : 'No home course set'
+              }
+            </div>
+            ${member.handicap ? `<div class="member-handicap">Handicap: ${member.handicap}</div>` : '<div class="member-handicap">&nbsp;</div>'}
+            <div class="member-stats">
+              <div class="member-stat">
+                <div class="member-stat-value">${member.rounds_played || 0}</div>
+                <div class="member-stat-label">Rounds</div>
+              </div>
+              <div class="member-stat">
+                <div class="member-stat-value">${member.avg_score || '--'}</div>
+                <div class="member-stat-label">Avg Score</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="loading">Error loading members</div>';
+      }
     }
 
     async function loadLeaderboard() {
@@ -541,7 +760,6 @@
 
     // Initialize
     checkAuth();
-    loadLeaderboard();
   </script>
 </body>
 </html>

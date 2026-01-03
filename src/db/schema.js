@@ -225,4 +225,29 @@ try {
   // Index already exists or column issues
 }
 
+// Migration: Add profile columns to users table
+try {
+  db.exec(`ALTER TABLE users ADD COLUMN profile_picture TEXT`);
+} catch (e) {
+  // Column already exists
+}
+
+try {
+  db.exec(`ALTER TABLE users ADD COLUMN home_course_id INTEGER`);
+} catch (e) {
+  // Column already exists
+}
+
+try {
+  db.exec(`ALTER TABLE users ADD COLUMN handicap REAL`);
+} catch (e) {
+  // Column already exists
+}
+
+try {
+  db.exec(`CREATE INDEX IF NOT EXISTS idx_users_home_course ON users(home_course_id)`);
+} catch (e) {
+  // Index already exists
+}
+
 module.exports = db;

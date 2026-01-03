@@ -31,13 +31,24 @@ const createSession = (userId) => {
 const getSession = (token) => {
   if (!token) return null;
   const session = db.prepare(`
-    SELECT s.*, u.email, u.display_name
+    SELECT s.*, u.email, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
+           c.name as home_course_name, c.slug as home_course_slug
     FROM sessions s
     JOIN users u ON s.user_id = u.id
+    LEFT JOIN courses c ON u.home_course_id = c.id
     WHERE s.token = ? AND (s.expires_at IS NULL OR s.expires_at > datetime('now'))
   `).get(token);
   if (!session) return null;
-  return { id: session.user_id, email: session.email, displayName: session.display_name };
+  return {
+    id: session.user_id,
+    email: session.email,
+    displayName: session.display_name,
+    profilePicture: session.profile_picture,
+    homeCourseId: session.home_course_id,
+    homeCourseName: session.home_course_name,
+    homeCourseSlug: session.home_course_slug,
+    handicap: session.handicap
+  };
 };
 
 const deleteSession = (token) => {
@@ -709,6 +720,74 @@ app.get('/api/user/passport', userAuth, (req, res) => {
   }
 });
 
+// ========== USER PROFILE ==========
+
+/**
+ * GET /api/user/profile
+ * Get current user's profile
+ */
+app.get('/api/user/profile', userAuth, (req, res) => {
+  try {
+    const user = db.prepare(`
+      SELECT u.id, u.email, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
+             c.name as home_course_name, c.city as home_course_city, c.slug as home_course_slug
+      FROM users u
+      LEFT JOIN courses c ON u.home_course_id = c.id
+      WHERE u.id = ?
+    `).get(req.user.id);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/user/profile
+ * Update profile (display name, home course, handicap)
+ */
+app.put('/api/user/profile', userAuth, (req, res) => {
+  try {
+    const { displayName, homeCourseId, handicap } = req.body;
+    db.prepare(`
+      UPDATE users
+      SET display_name = COALESCE(?, display_name),
+          home_course_id = ?,
+          handicap = ?,
+          updated_at = datetime('now')
+      WHERE id = ?
+    `).run(displayName, homeCourseId || null, handicap || null, req.user.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/user/profile/picture
+ * Upload profile picture (base64)
+ */
+app.post('/api/user/profile/picture', userAuth, (req, res) => {
+  try {
+    const { image } = req.body;
+
+    if (!image || !image.startsWith('data:image/')) {
+      return res.status(400).json({ error: 'Invalid image format' });
+    }
+
+    // Check size (base64 is ~33% larger than binary, so 2MB base64 ≈ 1.5MB image)
+    if (image.length > 2 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Image too large (max 1.5MB)' });
+    }
+
+    db.prepare('UPDATE users SET profile_picture = ?, updated_at = datetime("now") WHERE id = ?')
+      .run(image, req.user.id);
+
+    res.json({ success: true, profilePicture: image });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ========== COMMUNITY / LEADERBOARD ==========
 
 /**
@@ -766,6 +845,36 @@ app.get('/api/community/activity', (req, res) => {
     `).all();
 
     res.json(activity);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/community/members
+ * Get all members with profiles (requires auth)
+ */
+app.get('/api/community/members', userAuth, (req, res) => {
+  try {
+    const members = db.prepare(`
+      SELECT
+        u.id,
+        u.display_name,
+        u.profile_picture,
+        u.home_course_id,
+        u.handicap,
+        c.name as home_course_name,
+        c.slug as home_course_slug,
+        COUNT(r.id) as rounds_played,
+        ROUND(AVG(r.total_score), 1) as avg_score
+      FROM users u
+      LEFT JOIN courses c ON u.home_course_id = c.id
+      LEFT JOIN rounds r ON u.id = r.user_id
+      GROUP BY u.id
+      ORDER BY rounds_played DESC, u.display_name ASC
+    `).all();
+
+    res.json(members);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
