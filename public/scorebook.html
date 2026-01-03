@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Scorebook | Bay Area Golf</title>
+  <meta name="description" content="Track your rounds, log scores, and earn your Bay Area Golf Passport by playing all 50+ public courses.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2d5a27;
+      --primary-light: #4a7a3f;
+      --primary-dark: #1a3d17;
+      --bg: #f4f1e8;
+      --bg-paper: #f9f6ef;
+      --card-bg: #fffef9;
+      --text: #3d2914;
+      --text-muted: #6b5344;
+      --border: #c4a882;
+      --border-light: #ddd0bc;
+      --gold: #b8860b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #f4f1e8;
+      padding: 24px 0;
+      border-bottom: 4px solid var(--border);
+    }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .back-link {
+      color: #f4f1e8;
+      text-decoration: none;
+      font-family: 'Playfair Display', Georgia, serif;
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+    .page-title {
+      text-align: center;
+      padding: 40px 0;
+    }
+    .page-title h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    .page-title p { color: var(--text-muted); font-style: italic; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { border-color: var(--primary); }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #f4f1e8;
+      border-color: var(--primary-dark);
+    }
+
+    /* Coming Soon Card */
+    .coming-soon {
+      max-width: 600px;
+      margin: 0 auto 60px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 48px;
+      text-align: center;
+    }
+    .coming-soon-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .coming-soon-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+    }
+    .coming-soon h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+    .coming-soon p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .feature-list {
+      text-align: left;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .feature-list li:last-child { border-bottom: none; }
+    .feature-list svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--primary);
+      fill: none;
+      stroke-width: 2;
+      flex-shrink: 0;
+    }
+
+    /* Passport Preview */
+    .passport-preview {
+      max-width: 800px;
+      margin: 40px auto;
+    }
+    .passport-preview h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .passport-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 8px;
+    }
+    .passport-stamp {
+      aspect-ratio: 1;
+      background: var(--card-bg);
+      border: 2px dashed var(--border-light);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+    .passport-stamp.earned {
+      background: var(--primary);
+      border: 2px solid var(--primary-dark);
+      color: #fff;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Bay Area Golf</h1>
+      <a href="/" class="back-link">Back to Map</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-title">
+      <h2>Scorebook</h2>
+      <p>Track your rounds & earn your Bay Area Golf Passport</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active">Log Round</button>
+      <button class="tab-btn">My Rounds</button>
+      <button class="tab-btn">Passport</button>
+    </div>
+
+    <div class="coming-soon">
+      <div class="coming-soon-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </div>
+      <h3>Coming Soon</h3>
+      <p>Sign in to start tracking your Bay Area golf journey.</p>
+      <ul class="feature-list">
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Log rounds hole-by-hole
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Track scores, putts & stats
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Earn passport stamps
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          View your golf history
+        </li>
+      </ul>
+    </div>
+
+    <div class="passport-preview">
+      <h3>Bay Area Golf Passport - 50+ Courses</h3>
+      <div class="passport-grid" id="passport-grid">
+        <!-- Will be populated with course stamps -->
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Load courses for passport preview
+    async function loadPassportPreview() {
+      try {
+        const res = await fetch('/api/courses?all=true');
+        const courses = await res.json();
+        const grid = document.getElementById('passport-grid');
+        grid.innerHTML = courses.map(course => `
+          <div class="passport-stamp" title="${course.name}">
+            ${course.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('Error loading courses:', e);
+      }
+    }
+    loadPassportPreview();
+  </script>
+</body>
+</html>

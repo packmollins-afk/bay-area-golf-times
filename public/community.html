@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Community | Bay Area Golf</title>
+  <meta name="description" content="Connect with Bay Area golfers. Share photos, rate courses, and compete on leaderboards.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2d5a27;
+      --primary-light: #4a7a3f;
+      --primary-dark: #1a3d17;
+      --bg: #f4f1e8;
+      --bg-paper: #f9f6ef;
+      --card-bg: #fffef9;
+      --text: #3d2914;
+      --text-muted: #6b5344;
+      --border: #c4a882;
+      --border-light: #ddd0bc;
+      --gold: #b8860b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #f4f1e8;
+      padding: 24px 0;
+      border-bottom: 4px solid var(--border);
+    }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .back-link {
+      color: #f4f1e8;
+      text-decoration: none;
+      font-family: 'Playfair Display', Georgia, serif;
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+    .page-title {
+      text-align: center;
+      padding: 40px 0;
+    }
+    .page-title h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    .page-title p { color: var(--text-muted); font-style: italic; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { border-color: var(--primary); }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #f4f1e8;
+      border-color: var(--primary-dark);
+    }
+
+    /* Coming Soon Card */
+    .coming-soon {
+      max-width: 600px;
+      margin: 0 auto 60px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 48px;
+      text-align: center;
+    }
+    .coming-soon-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .coming-soon-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+    }
+    .coming-soon h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+    .coming-soon p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .feature-list {
+      text-align: left;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .feature-list li:last-child { border-bottom: none; }
+    .feature-list svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--primary);
+      fill: none;
+      stroke-width: 2;
+      flex-shrink: 0;
+    }
+
+    /* Leaderboard Preview */
+    .leaderboard-preview {
+      max-width: 500px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .leaderboard-header {
+      background: var(--bg-paper);
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .leaderboard-header h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+    }
+    .leaderboard-header span {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-light);
+      gap: 16px;
+    }
+    .leaderboard-row:last-child { border-bottom: none; }
+    .rank {
+      width: 28px;
+      height: 28px;
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .rank.gold { background: #ffd700; color: #3d2914; }
+    .rank.silver { background: #c0c0c0; color: #3d2914; }
+    .rank.bronze { background: #cd7f32; color: #fff; }
+    .player-info { flex: 1; }
+    .player-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .player-stat {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .player-score {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Bay Area Golf</h1>
+      <a href="/" class="back-link">Back to Map</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-title">
+      <h2>Community</h2>
+      <p>Connect with Bay Area golfers</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active">Leaderboard</button>
+      <button class="tab-btn">Activity</button>
+      <button class="tab-btn">Photos</button>
+    </div>
+
+    <div class="coming-soon">
+      <div class="coming-soon-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <h3>Coming Soon</h3>
+      <p>Join the Bay Area golf community.</p>
+      <ul class="feature-list">
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Weekly & monthly leaderboards
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Rate and review courses
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Share course photos
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          See recent community activity
+        </li>
+      </ul>
+    </div>
+
+    <div class="leaderboard-preview">
+      <div class="leaderboard-header">
+        <h3>Top Passport Collectors</h3>
+        <span>This Month</span>
+      </div>
+      <div class="leaderboard-row">
+        <div class="rank gold">1</div>
+        <div class="player-info">
+          <div class="player-name">Coming Soon</div>
+          <div class="player-stat">Be the first!</div>
+        </div>
+        <div class="player-score">--</div>
+      </div>
+      <div class="leaderboard-row">
+        <div class="rank silver">2</div>
+        <div class="player-info">
+          <div class="player-name">--</div>
+          <div class="player-stat">--</div>
+        </div>
+        <div class="player-score">--</div>
+      </div>
+      <div class="leaderboard-row">
+        <div class="rank bronze">3</div>
+        <div class="player-info">
+          <div class="player-name">--</div>
+          <div class="player-stat">--</div>
+        </div>
+        <div class="player-score">--</div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
