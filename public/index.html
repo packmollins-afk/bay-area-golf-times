@@ -7,20 +7,22 @@
   <meta name="description" content="Explore and book tee times at 50+ public golf courses across the San Francisco Bay Area. From SF to South Bay, East Bay to Marin.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap');
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green-dark: #1a3d2e;
-      --green-mid: #2d5a27;
-      --green-light: #4a8c3f;
-      --green-pale: #8fbc8f;
-      --sand: #d4c4a8;
-      --water: #6b9ac4;
-      --water-dark: #4a7a9c;
-      --text-light: #f5f5f0;
-      --gold: #c9a227;
+      --paper: #f4ebe0;
+      --paper-dark: #e8dcc8;
+      --contour: #8b7355;
+      --contour-light: rgba(139, 115, 85, 0.3);
+      --water: #a8c5d8;
+      --water-dark: #7ba3bd;
+      --fairway: #5a8f4a;
+      --fairway-light: #7cb86a;
+      --text-dark: #3d3225;
+      --text-muted: #6b5d4d;
+      --accent: #c4553a;
     }
 
     html, body {
@@ -29,348 +31,256 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--green-dark);
-      color: var(--text-light);
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--paper);
+      color: var(--text-dark);
     }
 
-    .landing-container {
+    .map-container {
       position: relative;
       width: 100%;
       height: 100vh;
       overflow: hidden;
+      background: var(--paper);
     }
 
-    /* Topographic Map Background */
-    .topo-map {
+    /* Aged paper texture */
+    .paper-texture {
       position: absolute;
       inset: 0;
       background:
-        /* Topographic contour lines */
-        repeating-radial-gradient(
-          ellipse at 30% 40%,
-          transparent 0px,
-          transparent 40px,
-          rgba(139, 169, 139, 0.08) 41px,
-          rgba(139, 169, 139, 0.08) 42px,
-          transparent 43px
-        ),
-        repeating-radial-gradient(
-          ellipse at 70% 60%,
-          transparent 0px,
-          transparent 60px,
-          rgba(139, 169, 139, 0.06) 61px,
-          rgba(139, 169, 139, 0.06) 62px,
-          transparent 63px
-        ),
-        repeating-radial-gradient(
-          ellipse at 50% 30%,
-          transparent 0px,
-          transparent 80px,
-          rgba(139, 169, 139, 0.05) 81px,
-          rgba(139, 169, 139, 0.05) 82px,
-          transparent 83px
-        ),
-        repeating-radial-gradient(
-          ellipse at 20% 70%,
-          transparent 0px,
-          transparent 50px,
-          rgba(139, 169, 139, 0.07) 51px,
-          rgba(139, 169, 139, 0.07) 52px,
-          transparent 53px
-        ),
-        repeating-radial-gradient(
-          ellipse at 80% 25%,
-          transparent 0px,
-          transparent 70px,
-          rgba(139, 169, 139, 0.05) 71px,
-          rgba(139, 169, 139, 0.05) 72px,
-          transparent 73px
-        ),
-        /* Base gradient representing terrain */
-        radial-gradient(ellipse at 30% 35%, #2a4a3a 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 65%, #1f3f2f 0%, transparent 45%),
-        radial-gradient(ellipse at 50% 50%, #243d33 0%, transparent 60%),
-        linear-gradient(180deg, #1a3328 0%, #162b22 50%, #0f1f18 100%);
+        /* Paper grain */
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
+        /* Aged spots */
+        radial-gradient(ellipse at 20% 30%, rgba(139, 115, 85, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(139, 115, 85, 0.06) 0%, transparent 40%),
+        radial-gradient(ellipse at 60% 20%, rgba(139, 115, 85, 0.05) 0%, transparent 35%),
+        /* Base paper color */
+        linear-gradient(180deg, #f6efe4 0%, #f4ebe0 50%, #efe5d8 100%);
+      opacity: 0.4;
+      pointer-events: none;
     }
 
-    /* San Francisco Bay water effect */
-    .bay-water {
+    /* USGS-style grid */
+    .map-grid {
       position: absolute;
-      top: 25%;
-      left: 35%;
-      width: 30%;
-      height: 50%;
+      inset: 0;
       background:
-        radial-gradient(ellipse at 50% 50%,
-          rgba(74, 122, 156, 0.3) 0%,
-          rgba(74, 122, 156, 0.15) 40%,
-          transparent 70%
-        );
-      filter: blur(30px);
-      transform: rotate(-15deg);
+        linear-gradient(rgba(139, 115, 85, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 115, 85, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
     }
 
-    /* Course markers container */
-    .course-markers {
+    /* Contour lines layer */
+    .contour-lines {
       position: absolute;
       inset: 0;
       pointer-events: none;
     }
 
-    .course-marker {
+    /* Individual contour shapes */
+    .contour {
       position: absolute;
-      width: 8px;
-      height: 8px;
-      background: var(--gold);
+      border: 1px solid var(--contour-light);
       border-radius: 50%;
-      box-shadow: 0 0 10px rgba(201, 162, 39, 0.6), 0 0 20px rgba(201, 162, 39, 0.3);
-      animation: pulse 3s ease-in-out infinite;
-      opacity: 0.7;
     }
 
-    .course-marker::after {
-      content: '';
+    /* SF Peninsula contours */
+    .contour-sf-1 { top: 20%; left: 15%; width: 25%; height: 40%; transform: rotate(-20deg); }
+    .contour-sf-2 { top: 25%; left: 18%; width: 20%; height: 32%; transform: rotate(-20deg); }
+    .contour-sf-3 { top: 30%; left: 21%; width: 15%; height: 24%; transform: rotate(-20deg); }
+
+    /* East Bay hills contours */
+    .contour-eb-1 { top: 15%; left: 55%; width: 35%; height: 55%; transform: rotate(10deg); border-radius: 60% 40% 50% 50%; }
+    .contour-eb-2 { top: 20%; left: 58%; width: 28%; height: 45%; transform: rotate(10deg); border-radius: 60% 40% 50% 50%; }
+    .contour-eb-3 { top: 25%; left: 61%; width: 21%; height: 35%; transform: rotate(10deg); border-radius: 60% 40% 50% 50%; }
+
+    /* Marin headlands contours */
+    .contour-ma-1 { top: 5%; left: 20%; width: 22%; height: 25%; transform: rotate(-35deg); border-radius: 45% 55% 50% 50%; }
+    .contour-ma-2 { top: 8%; left: 23%; width: 16%; height: 18%; transform: rotate(-35deg); border-radius: 45% 55% 50% 50%; }
+
+    /* South Bay contours */
+    .contour-sb-1 { top: 55%; left: 25%; width: 40%; height: 40%; transform: rotate(15deg); border-radius: 50% 50% 60% 40%; }
+    .contour-sb-2 { top: 60%; left: 30%; width: 30%; height: 30%; transform: rotate(15deg); border-radius: 50% 50% 60% 40%; }
+
+    /* San Francisco Bay - water */
+    .bay-water {
+      position: absolute;
+      top: 18%;
+      left: 32%;
+      width: 28%;
+      height: 48%;
+      background: var(--water);
+      border-radius: 30% 70% 60% 40% / 50% 40% 60% 50%;
+      transform: rotate(-8deg);
+      box-shadow: inset 0 0 30px rgba(123, 163, 189, 0.5);
+    }
+
+    /* Pacific Ocean */
+    .pacific {
+      position: absolute;
+      top: 0;
+      left: -10%;
+      width: 30%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--water) 0%, var(--water) 70%, transparent 100%);
+    }
+
+    /* Golf course fairway shapes */
+    .fairways {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .fairway {
+      position: absolute;
+      background: var(--fairway);
+      box-shadow: 0 0 8px rgba(90, 143, 74, 0.4);
+    }
+
+    /* SF Courses */
+    .fw-harding { top: 38%; left: 18%; width: 28px; height: 45px; border-radius: 40% 60% 55% 45%; transform: rotate(-30deg); }
+    .fw-lincoln { top: 28%; left: 14%; width: 20px; height: 35px; border-radius: 50% 50% 45% 55%; transform: rotate(-45deg); }
+    .fw-presidio { top: 22%; left: 22%; width: 24px; height: 38px; border-radius: 45% 55% 50% 50%; transform: rotate(-15deg); }
+    .fw-sharp { top: 48%; left: 12%; width: 26px; height: 42px; border-radius: 55% 45% 50% 50%; transform: rotate(-25deg); }
+    .fw-gleneagles { top: 42%; left: 21%; width: 18px; height: 30px; border-radius: 50%; transform: rotate(-20deg); }
+    .fw-olympic { top: 34%; left: 11%; width: 22px; height: 36px; border-radius: 48% 52% 50% 50%; transform: rotate(-40deg); }
+
+    /* South Bay Courses */
+    .fw-paloalto { top: 58%; left: 28%; width: 24px; height: 40px; border-radius: 45% 55% 52% 48%; transform: rotate(10deg); }
+    .fw-santateresa { top: 78%; left: 38%; width: 26px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(25deg); }
+    .fw-cinnabar { top: 82%; left: 46%; width: 30px; height: 48px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
+    .fw-coyote { top: 88%; left: 52%; width: 28px; height: 45px; border-radius: 52% 48% 50% 50%; transform: rotate(20deg); }
+    .fw-sunnyvale { top: 62%; left: 35%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(5deg); }
+    .fw-deepcliff { top: 66%; left: 30%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
+    .fw-sanjose { top: 72%; left: 42%; width: 22px; height: 36px; border-radius: 50%; transform: rotate(12deg); }
+
+    /* East Bay Courses */
+    .fw-corica { top: 35%; left: 52%; width: 30px; height: 48px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    .fw-tilden { top: 22%; left: 58%; width: 24px; height: 40px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
+    .fw-boundary { top: 28%; left: 68%; width: 26px; height: 42px; border-radius: 52% 48% 50% 50%; transform: rotate(8deg); }
+    .fw-metropolitan { top: 40%; left: 48%; width: 22px; height: 36px; border-radius: 50%; transform: rotate(-15deg); }
+    .fw-lakechabot { top: 45%; left: 55%; width: 24px; height: 38px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
+    .fw-poppy { top: 52%; left: 72%; width: 28px; height: 44px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
+    .fw-laspositas { top: 58%; left: 76%; width: 22px; height: 35px; border-radius: 50%; transform: rotate(18deg); }
+    .fw-diablo { top: 32%; left: 74%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
+
+    /* Marin Courses */
+    .fw-peacock { top: 15%; left: 35%; width: 24px; height: 40px; border-radius: 48% 52% 50% 50%; transform: rotate(-25deg); }
+    .fw-indian { top: 8%; left: 28%; width: 22px; height: 36px; border-radius: 50% 50% 45% 55%; transform: rotate(-35deg); }
+    .fw-stonetree { top: 5%; left: 32%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(-40deg); }
+    .fw-millvalley { top: 18%; left: 26%; width: 16px; height: 26px; border-radius: 50%; transform: rotate(-30deg); }
+    .fw-bodega { top: 2%; left: 8%; width: 26px; height: 42px; border-radius: 45% 55% 52% 48%; transform: rotate(-50deg); }
+
+    /* Map title cartouche */
+    .cartouche {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, rgba(201, 162, 39, 0.2) 0%, transparent 70%);
-      border-radius: 50%;
+      text-align: center;
+      z-index: 20;
+      padding: 2rem 3rem;
+      background: rgba(244, 235, 224, 0.95);
+      border: 3px double var(--contour);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.7; }
-      50% { transform: scale(1.3); opacity: 1; }
-    }
-
-    /* Stagger animations */
-    .course-marker:nth-child(odd) { animation-delay: 0.5s; }
-    .course-marker:nth-child(3n) { animation-delay: 1s; }
-    .course-marker:nth-child(5n) { animation-delay: 1.5s; }
-
-    /* San Francisco courses - center-left */
-    .marker-sf-1 { top: 32%; left: 28%; }
-    .marker-sf-2 { top: 35%; left: 25%; }
-    .marker-sf-3 { top: 38%; left: 30%; }
-    .marker-sf-4 { top: 30%; left: 32%; }
-
-    /* South Bay courses - bottom */
-    .marker-sb-1 { top: 65%; left: 40%; }
-    .marker-sb-2 { top: 70%; left: 35%; }
-    .marker-sb-3 { top: 72%; left: 45%; }
-    .marker-sb-4 { top: 68%; left: 50%; }
-    .marker-sb-5 { top: 75%; left: 42%; }
-    .marker-sb-6 { top: 78%; left: 38%; }
-    .marker-sb-7 { top: 62%; left: 48%; }
-    .marker-sb-8 { top: 80%; left: 52%; }
-
-    /* East Bay courses - right */
-    .marker-eb-1 { top: 40%; left: 58%; }
-    .marker-eb-2 { top: 45%; left: 62%; }
-    .marker-eb-3 { top: 38%; left: 65%; }
-    .marker-eb-4 { top: 50%; left: 60%; }
-    .marker-eb-5 { top: 55%; left: 68%; }
-    .marker-eb-6 { top: 42%; left: 70%; }
-    .marker-eb-7 { top: 35%; left: 72%; }
-    .marker-eb-8 { top: 58%; left: 75%; }
-
-    /* Marin courses - top-left */
-    .marker-ma-1 { top: 22%; left: 30%; }
-    .marker-ma-2 { top: 18%; left: 35%; }
-    .marker-ma-3 { top: 15%; left: 28%; }
-    .marker-ma-4 { top: 20%; left: 40%; }
-    .marker-ma-5 { top: 12%; left: 32%; }
-
-    /* Region labels */
-    .region-label {
+    .cartouche::before {
+      content: '';
       position: absolute;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(245, 245, 240, 0.4);
+      inset: 6px;
+      border: 1px solid var(--contour-light);
       pointer-events: none;
     }
 
-    .label-sf { top: 42%; left: 22%; }
-    .label-sb { top: 82%; left: 35%; }
-    .label-eb { top: 32%; left: 68%; }
-    .label-ma { top: 8%; left: 28%; }
-
-    /* Main content overlay */
-    .content-overlay {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      padding: 2rem;
-    }
-
-    /* Logo/Title */
-    .site-title {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    .site-title h1 {
-      font-size: clamp(2rem, 6vw, 4rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #fff 0%, #c9d4c9 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    .map-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: 0.05em;
       margin-bottom: 0.5rem;
     }
 
-    .site-title .subtitle {
-      font-size: clamp(0.9rem, 2vw, 1.1rem);
+    .map-subtitle {
+      font-size: clamp(0.85rem, 2vw, 1.1rem);
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
       font-weight: 400;
-      color: rgba(245, 245, 240, 0.7);
-      letter-spacing: 0.05em;
     }
 
-    /* Main navigation buttons */
-    .main-nav {
+    .map-year {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+
+    /* Navigation buttons */
+    .nav-buttons {
       display: flex;
       flex-direction: column;
+      gap: 1rem;
       align-items: center;
-      gap: 1.5rem;
-      margin-top: 2rem;
     }
 
     .play-now-btn {
-      position: relative;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 1.25rem 3rem;
-      font-size: 1.3rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      gap: 10px;
+      padding: 1rem 2.5rem;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      font-weight: 600;
       color: #fff;
-      background: linear-gradient(135deg, var(--green-mid) 0%, var(--green-light) 100%);
+      background: var(--fairway);
       border: none;
-      border-radius: 60px;
+      border-radius: 4px;
       cursor: pointer;
       text-decoration: none;
-      box-shadow:
-        0 4px 20px rgba(45, 90, 39, 0.4),
-        0 8px 40px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      box-shadow: 0 3px 12px rgba(90, 143, 74, 0.4);
       transition: all 0.3s ease;
-      overflow: hidden;
-    }
-
-    .play-now-btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-      border-radius: inherit;
-    }
-
-    .play-now-btn::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      letter-spacing: 0.05em;
     }
 
     .play-now-btn:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow:
-        0 8px 30px rgba(45, 90, 39, 0.5),
-        0 15px 50px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    }
-
-    .play-now-btn:hover::after {
-      opacity: 1;
-    }
-
-    .play-now-btn:active {
-      transform: translateY(-1px) scale(0.99);
+      background: var(--fairway-light);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(90, 143, 74, 0.5);
     }
 
     .play-now-btn svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       fill: none;
       stroke: currentColor;
-      stroke-width: 2.5;
-    }
-
-    /* Pulsing ring around Play Now */
-    .play-now-wrapper {
-      position: relative;
-    }
-
-    .play-now-wrapper::before,
-    .play-now-wrapper::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 60px;
-      border: 2px solid rgba(74, 140, 63, 0.3);
-      pointer-events: none;
-    }
-
-    .play-now-wrapper::before {
-      width: calc(100% + 20px);
-      height: calc(100% + 20px);
-      animation: ring-pulse 2s ease-out infinite;
-    }
-
-    .play-now-wrapper::after {
-      width: calc(100% + 40px);
-      height: calc(100% + 40px);
-      animation: ring-pulse 2s ease-out infinite 0.5s;
-    }
-
-    @keyframes ring-pulse {
-      0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
-      100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; }
+      stroke-width: 2;
     }
 
     .courses-btn {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 0.75rem 2rem;
+      padding: 0.75rem 1.5rem;
+      font-family: 'Source Serif 4', Georgia, serif;
       font-size: 1rem;
-      font-weight: 500;
-      color: rgba(245, 245, 240, 0.8);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 40px;
+      color: var(--text-dark);
+      background: transparent;
+      border: 2px solid var(--contour);
+      border-radius: 4px;
       cursor: pointer;
       text-decoration: none;
       transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
     }
 
     .courses-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-2px);
+      background: var(--contour);
+      color: var(--paper);
     }
 
     .courses-btn svg {
@@ -381,154 +291,230 @@
       stroke-width: 2;
     }
 
-    /* Stats bar */
-    .stats-bar {
-      display: flex;
-      gap: 3rem;
-      margin-top: 3rem;
-      padding: 1rem 2rem;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
+    /* Legend */
+    .legend {
+      position: absolute;
+      bottom: 2rem;
+      left: 2rem;
+      background: rgba(244, 235, 224, 0.95);
+      border: 2px solid var(--contour);
+      padding: 1rem 1.5rem;
+      font-size: 0.85rem;
+      z-index: 15;
     }
 
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--gold);
-    }
-
-    .stat-label {
-      font-size: 0.75rem;
+    .legend-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: rgba(245, 245, 240, 0.6);
+      font-size: 0.75rem;
     }
 
-    /* Footer */
-    .landing-footer {
-      position: absolute;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.8rem;
-      color: rgba(245, 245, 240, 0.4);
-      text-align: center;
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 0.5rem;
     }
 
-    /* Compass rose decoration */
-    .compass {
+    .legend-item:last-child { margin-bottom: 0; }
+
+    .legend-fairway {
+      width: 20px;
+      height: 12px;
+      background: var(--fairway);
+      border-radius: 40%;
+    }
+
+    .legend-water {
+      width: 20px;
+      height: 12px;
+      background: var(--water);
+      border-radius: 2px;
+    }
+
+    .legend-contour {
+      width: 20px;
+      height: 0;
+      border-top: 2px solid var(--contour-light);
+    }
+
+    /* Scale bar */
+    .scale-bar {
       position: absolute;
       bottom: 2rem;
       right: 2rem;
-      width: 60px;
-      height: 60px;
-      opacity: 0.3;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      z-index: 15;
     }
 
-    .compass svg {
+    .scale-bar-line {
+      display: flex;
+      margin-bottom: 4px;
+    }
+
+    .scale-bar-segment {
+      width: 30px;
+      height: 8px;
+      border: 1px solid var(--contour);
+    }
+
+    .scale-bar-segment:nth-child(odd) { background: var(--contour); }
+    .scale-bar-segment:nth-child(even) { background: var(--paper); }
+
+    /* Compass */
+    .compass-rose {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      width: 70px;
+      height: 70px;
+      z-index: 15;
+    }
+
+    .compass-rose svg {
       width: 100%;
       height: 100%;
     }
 
+    /* Region labels */
+    .region-label {
+      position: absolute;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .label-sf { top: 44%; left: 10%; transform: rotate(-15deg); }
+    .label-sb { top: 75%; left: 25%; }
+    .label-eb { top: 30%; left: 62%; }
+    .label-ma { top: 12%; left: 22%; transform: rotate(-10deg); }
+    .label-pacific { top: 50%; left: 2%; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.3em; color: var(--water-dark); }
+
     /* Responsive */
     @media (max-width: 768px) {
-      .stats-bar {
-        gap: 1.5rem;
-        padding: 0.75rem 1.5rem;
+      .cartouche {
+        padding: 1.5rem 2rem;
+        width: 90%;
+        max-width: 350px;
       }
 
-      .stat-value {
-        font-size: 1.2rem;
-      }
-
-      .play-now-btn {
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
-      }
-
-      .compass {
+      .legend, .scale-bar {
         display: none;
+      }
+
+      .compass-rose {
+        width: 50px;
+        height: 50px;
+        top: 1rem;
+        right: 1rem;
+      }
+
+      .fairway {
+        transform: scale(0.7);
       }
 
       .region-label {
-        display: none;
+        font-size: 0.6rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="landing-container">
-    <!-- Topographic map background -->
-    <div class="topo-map"></div>
+  <div class="map-container">
+    <!-- Paper texture overlay -->
+    <div class="paper-texture"></div>
 
-    <!-- Bay water effect -->
+    <!-- Grid lines -->
+    <div class="map-grid"></div>
+
+    <!-- Contour lines -->
+    <div class="contour-lines">
+      <div class="contour contour-sf-1"></div>
+      <div class="contour contour-sf-2"></div>
+      <div class="contour contour-sf-3"></div>
+      <div class="contour contour-eb-1"></div>
+      <div class="contour contour-eb-2"></div>
+      <div class="contour contour-eb-3"></div>
+      <div class="contour contour-ma-1"></div>
+      <div class="contour contour-ma-2"></div>
+      <div class="contour contour-sb-1"></div>
+      <div class="contour contour-sb-2"></div>
+    </div>
+
+    <!-- Water bodies -->
+    <div class="pacific"></div>
     <div class="bay-water"></div>
 
-    <!-- Course markers on map -->
-    <div class="course-markers">
+    <!-- Golf course fairways -->
+    <div class="fairways">
       <!-- San Francisco -->
-      <div class="course-marker marker-sf-1"></div>
-      <div class="course-marker marker-sf-2"></div>
-      <div class="course-marker marker-sf-3"></div>
-      <div class="course-marker marker-sf-4"></div>
+      <div class="fairway fw-harding"></div>
+      <div class="fairway fw-lincoln"></div>
+      <div class="fairway fw-presidio"></div>
+      <div class="fairway fw-sharp"></div>
+      <div class="fairway fw-gleneagles"></div>
+      <div class="fairway fw-olympic"></div>
 
       <!-- South Bay -->
-      <div class="course-marker marker-sb-1"></div>
-      <div class="course-marker marker-sb-2"></div>
-      <div class="course-marker marker-sb-3"></div>
-      <div class="course-marker marker-sb-4"></div>
-      <div class="course-marker marker-sb-5"></div>
-      <div class="course-marker marker-sb-6"></div>
-      <div class="course-marker marker-sb-7"></div>
-      <div class="course-marker marker-sb-8"></div>
+      <div class="fairway fw-paloalto"></div>
+      <div class="fairway fw-santateresa"></div>
+      <div class="fairway fw-cinnabar"></div>
+      <div class="fairway fw-coyote"></div>
+      <div class="fairway fw-sunnyvale"></div>
+      <div class="fairway fw-deepcliff"></div>
+      <div class="fairway fw-sanjose"></div>
 
       <!-- East Bay -->
-      <div class="course-marker marker-eb-1"></div>
-      <div class="course-marker marker-eb-2"></div>
-      <div class="course-marker marker-eb-3"></div>
-      <div class="course-marker marker-eb-4"></div>
-      <div class="course-marker marker-eb-5"></div>
-      <div class="course-marker marker-eb-6"></div>
-      <div class="course-marker marker-eb-7"></div>
-      <div class="course-marker marker-eb-8"></div>
+      <div class="fairway fw-corica"></div>
+      <div class="fairway fw-tilden"></div>
+      <div class="fairway fw-boundary"></div>
+      <div class="fairway fw-metropolitan"></div>
+      <div class="fairway fw-lakechabot"></div>
+      <div class="fairway fw-poppy"></div>
+      <div class="fairway fw-laspositas"></div>
+      <div class="fairway fw-diablo"></div>
 
       <!-- Marin -->
-      <div class="course-marker marker-ma-1"></div>
-      <div class="course-marker marker-ma-2"></div>
-      <div class="course-marker marker-ma-3"></div>
-      <div class="course-marker marker-ma-4"></div>
-      <div class="course-marker marker-ma-5"></div>
+      <div class="fairway fw-peacock"></div>
+      <div class="fairway fw-indian"></div>
+      <div class="fairway fw-stonetree"></div>
+      <div class="fairway fw-millvalley"></div>
+      <div class="fairway fw-bodega"></div>
     </div>
 
     <!-- Region labels -->
     <div class="region-label label-sf">San Francisco</div>
     <div class="region-label label-sb">South Bay</div>
     <div class="region-label label-eb">East Bay</div>
-    <div class="region-label label-ma">Marin</div>
+    <div class="region-label label-ma">Marin County</div>
+    <div class="region-label label-pacific">Pacific Ocean</div>
 
-    <!-- Main content -->
-    <div class="content-overlay">
-      <div class="site-title">
-        <h1>Bay Area Golf</h1>
-        <p class="subtitle">50+ Public Courses Across the San Francisco Bay Area</p>
-      </div>
+    <!-- Central cartouche with title and nav -->
+    <div class="cartouche">
+      <h1 class="map-title">Bay Area Golf</h1>
+      <p class="map-subtitle">San Francisco & Vicinity</p>
+      <p class="map-year">50+ Public Courses</p>
 
-      <nav class="main-nav">
-        <div class="play-now-wrapper">
-          <a href="/app.html" class="play-now-btn">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            Play Now
-          </a>
-        </div>
-
+      <nav class="nav-buttons">
+        <a href="/app.html" class="play-now-btn">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          Play Now
+        </a>
         <a href="/app.html#courses" class="courses-btn">
           <svg viewBox="0 0 24 24">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -537,40 +523,61 @@
           Explore Courses
         </a>
       </nav>
+    </div>
 
-      <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-value">50+</div>
-          <div class="stat-label">Courses</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">4</div>
-          <div class="stat-label">Regions</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">7</div>
-          <div class="stat-label">Days Ahead</div>
-        </div>
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-title">Legend</div>
+      <div class="legend-item">
+        <div class="legend-fairway"></div>
+        <span>Golf Course</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-water"></div>
+        <span>Water</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-contour"></div>
+        <span>Contour Line</span>
       </div>
     </div>
 
-    <!-- Compass decoration -->
-    <div class="compass">
-      <svg viewBox="0 0 100 100" fill="none" stroke="rgba(245,245,240,0.5)" stroke-width="1">
-        <circle cx="50" cy="50" r="45"/>
-        <circle cx="50" cy="50" r="35"/>
-        <line x1="50" y1="5" x2="50" y2="20"/>
-        <line x1="50" y1="80" x2="50" y2="95"/>
-        <line x1="5" y1="50" x2="20" y2="50"/>
-        <line x1="80" y1="50" x2="95" y2="50"/>
-        <text x="50" y="18" text-anchor="middle" fill="rgba(245,245,240,0.5)" font-size="10" font-weight="600">N</text>
-        <polygon points="50,25 45,40 50,35 55,40" fill="rgba(245,245,240,0.3)"/>
-      </svg>
+    <!-- Scale bar -->
+    <div class="scale-bar">
+      <div class="scale-bar-line">
+        <div class="scale-bar-segment"></div>
+        <div class="scale-bar-segment"></div>
+        <div class="scale-bar-segment"></div>
+        <div class="scale-bar-segment"></div>
+      </div>
+      <span>Approximate Scale</span>
     </div>
 
-    <footer class="landing-footer">
-      Northern California Golf
-    </footer>
+    <!-- Compass rose -->
+    <div class="compass-rose">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#8b7355" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="35" fill="none" stroke="#8b7355" stroke-width="0.5"/>
+        <!-- N -->
+        <polygon points="50,8 45,30 50,25 55,30" fill="#8b7355"/>
+        <text x="50" y="7" text-anchor="middle" fill="#3d3225" font-size="8" font-weight="600" font-family="Playfair Display, serif">N</text>
+        <!-- S -->
+        <line x1="50" y1="70" x2="50" y2="92" stroke="#8b7355" stroke-width="1"/>
+        <text x="50" y="99" text-anchor="middle" fill="#6b5d4d" font-size="6" font-family="serif">S</text>
+        <!-- E -->
+        <line x1="70" y1="50" x2="92" y2="50" stroke="#8b7355" stroke-width="1"/>
+        <text x="97" y="53" text-anchor="middle" fill="#6b5d4d" font-size="6" font-family="serif">E</text>
+        <!-- W -->
+        <line x1="8" y1="50" x2="30" y2="50" stroke="#8b7355" stroke-width="1"/>
+        <text x="4" y="53" text-anchor="middle" fill="#6b5d4d" font-size="6" font-family="serif">W</text>
+        <!-- Diagonal lines -->
+        <line x1="25" y1="25" x2="35" y2="35" stroke="#8b7355" stroke-width="0.5"/>
+        <line x1="75" y1="25" x2="65" y2="35" stroke="#8b7355" stroke-width="0.5"/>
+        <line x1="25" y1="75" x2="35" y2="65" stroke="#8b7355" stroke-width="0.5"/>
+        <line x1="75" y1="75" x2="65" y2="65" stroke="#8b7355" stroke-width="0.5"/>
+        <circle cx="50" cy="50" r="3" fill="#8b7355"/>
+      </svg>
+    </div>
   </div>
 </body>
 </html>
