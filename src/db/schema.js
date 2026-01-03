@@ -1,7 +1,21 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const db = new Database(path.join(__dirname, '../../data/golf.db'));
+// Handle both local and Vercel serverless environments
+const dbPath = process.env.VERCEL
+  ? '/tmp/golf.db'  // Vercel serverless has writable /tmp
+  : path.join(__dirname, '../../data/golf.db');
+
+// For Vercel, copy the bundled db to /tmp if it doesn't exist
+if (process.env.VERCEL) {
+  const fs = require('fs');
+  const bundledPath = path.join(__dirname, '../../data/golf.db');
+  if (fs.existsSync(bundledPath) && !fs.existsSync(dbPath)) {
+    fs.copyFileSync(bundledPath, dbPath);
+  }
+}
+
+const db = new Database(dbPath);
 
 // Create tables
 db.exec(`
