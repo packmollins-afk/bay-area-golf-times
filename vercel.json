@@ -48,6 +48,13 @@
       }
     },
     {
+      "src": "/app.html",
+      "dest": "public/app.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "public/$1",
       "headers": {
