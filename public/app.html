@@ -352,36 +352,52 @@
       .sort-control { align-self: center; }
     }
 
-    /* Tab Navigation */
-    .tab-nav {
-      display: flex;
-      gap: 0;
-      background: var(--card-bg);
-      border-radius: 4px;
-      padding: 6px;
-      margin: 24px 0;
-      border: 2px solid var(--border-light);
-      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
+    /* Page Title Bar */
+    .page-title-bar {
+      text-align: center;
+      padding: 24px 0;
+      margin-bottom: 16px;
     }
-    .tab-btn {
-      flex: 1;
-      padding: 14px 24px;
-      border: none;
-      background: transparent;
+    .page-title-bar h2 {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .page-title-bar p {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Quick Filters */
+    .quick-filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .quick-filter-btn {
+      padding: 10px 20px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      border-radius: 3px;
       transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       color: var(--text);
     }
-    .tab-btn:hover { background: var(--bg); }
-    .tab-btn.active { background: var(--primary); color: #f4f1e8; }
+    .quick-filter-btn:hover {
+      border-color: var(--primary);
+      background: #e8efe6;
+    }
+    .quick-filter-btn.active {
+      background: var(--primary);
+      color: #f4f1e8;
+      border-color: var(--primary-dark);
+    }
 
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -1070,26 +1086,27 @@
   </header>
 
   <main class="container" id="main-content" role="main">
-    <!-- Tab Navigation -->
-    <nav class="tab-nav" role="tablist" aria-label="Main navigation">
-      <button class="tab-btn active" onclick="switchTab('tee-times')" role="tab" aria-selected="true" aria-controls="tee-times-tab" id="tee-times-tab-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span>Tee Times</span>
-      </button>
-      <button class="tab-btn" onclick="switchTab('courses')" role="tab" aria-selected="false" aria-controls="courses-tab" id="courses-tab-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
-        </svg>
-        <span>Courses Directory</span>
-      </button>
-    </nav>
+    <!-- Page Title -->
+    <div class="page-title-bar">
+      <h2>Find Your Tee Time</h2>
+      <p>Starting from 7:00 AM daily</p>
+    </div>
 
-    <!-- Tee Times Tab -->
-    <section id="tee-times-tab" class="tab-content active" role="tabpanel" aria-labelledby="tee-times-tab-btn">
+    <!-- Quick Filters -->
+    <div class="quick-filters">
+      <button class="quick-filter-btn" id="filter-solo" onclick="applyQuickFilter('solo')">
+        Solo Round
+      </button>
+      <button class="quick-filter-btn" id="filter-cheapest" onclick="applyQuickFilter('cheapest')">
+        Cheapest First
+      </button>
+      <button class="quick-filter-btn" id="filter-closest" onclick="applyQuickFilter('closest')">
+        Soonest Available
+      </button>
+    </div>
+
+    <!-- Tee Times Section -->
+    <section id="tee-times-tab" class="tab-content active">
       <h2 class="sr-only">Available Golf Tee Times in Bay Area</h2>
       <div class="quick-actions">
         <div class="quick-actions-header">
@@ -1200,44 +1217,6 @@
       </div>
     </section>
 
-    <!-- Courses Directory Tab -->
-    <section id="courses-tab" class="tab-content" role="tabpanel" aria-labelledby="courses-tab-btn">
-      <div class="quick-actions">
-        <div class="quick-actions-header">
-          <h2 style="margin: 0; font-size: 1.3rem;">Bay Area Golf Courses Directory</h2>
-          <div class="directory-controls">
-            <div class="region-chips">
-              <button class="region-chip active" data-dir-region="" onclick="filterDirectoryByRegion('')">All</button>
-              <button class="region-chip favorites" data-dir-region="favorites" onclick="filterDirectoryByRegion('favorites')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                Favorites
-              </button>
-              <button class="region-chip" data-dir-region="San Francisco" onclick="filterDirectoryByRegion('San Francisco')">SF</button>
-              <button class="region-chip" data-dir-region="South Bay" onclick="filterDirectoryByRegion('South Bay')">South Bay</button>
-              <button class="region-chip" data-dir-region="East Bay" onclick="filterDirectoryByRegion('East Bay')">East Bay</button>
-              <button class="region-chip" data-dir-region="Marin" onclick="filterDirectoryByRegion('Marin')">Marin</button>
-            </div>
-            <div class="sort-control">
-              <label for="directory-sort">Sort:</label>
-              <select id="directory-sort" onchange="renderCoursesDirectory()">
-                <option value="name">Name (A-Z)</option>
-                <option value="rating">Rating (High-Low)</option>
-                <option value="holes">Holes (18 first)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="courses-directory" class="courses-grid" aria-live="polite" role="region" aria-label="Golf courses directory">
-        <div class="loading" role="status">
-          <div class="loading-spinner" aria-hidden="true"></div>
-          <p>Loading courses...</p>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer role="contentinfo">
@@ -1388,6 +1367,15 @@
       if (regionParam) {
         selectRegion(regionParam);
       }
+
+      // Handle course query param - open course detail modal
+      const courseParam = urlParams.get('course');
+      if (courseParam) {
+        setTimeout(() => openCourseDetail(parseInt(courseParam)), 500);
+      }
+
+      // Set default time to 7am
+      document.getElementById('min-time').value = '07:00';
     });
 
     // Handle browser back/forward for hash changes
@@ -1522,6 +1510,46 @@
           </article>
         `;
       }).join('');
+    }
+
+    let activeQuickFilter = null;
+
+    function applyQuickFilter(filter) {
+      // Toggle filter
+      if (activeQuickFilter === filter) {
+        activeQuickFilter = null;
+        // Reset to defaults
+        document.getElementById('players').value = '';
+        document.getElementById('sort-by').value = 'datetime';
+        document.getElementById('sort-order').value = 'ASC';
+      } else {
+        activeQuickFilter = filter;
+        // Apply filter settings
+        if (filter === 'solo') {
+          document.getElementById('players').value = '1';
+          document.getElementById('sort-by').value = 'datetime';
+          document.getElementById('sort-order').value = 'ASC';
+        } else if (filter === 'cheapest') {
+          document.getElementById('players').value = '';
+          document.getElementById('sort-by').value = 'price';
+          document.getElementById('sort-order').value = 'ASC';
+        } else if (filter === 'closest') {
+          document.getElementById('players').value = '';
+          document.getElementById('sort-by').value = 'datetime';
+          document.getElementById('sort-order').value = 'ASC';
+        }
+      }
+
+      // Update button states
+      document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      if (activeQuickFilter) {
+        document.getElementById('filter-' + activeQuickFilter).classList.add('active');
+      }
+
+      // Re-search
+      searchTeeTimes();
     }
 
     async function searchTeeTimes() {
