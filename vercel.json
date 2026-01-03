@@ -1,88 +1,26 @@
 {
   "version": 2,
-  "functions": {
-    "src/api/server.js": {
-      "includeFiles": "data/**"
-    }
-  },
-  "builds": [
-    {
-      "src": "src/api/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/src/api/server.js" }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "dest": "src/api/server.js",
-      "headers": {
-        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
-      }
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, max-age=0" }
+      ]
     },
     {
-      "src": "/robots.txt",
-      "dest": "public/robots.txt",
-      "headers": {
-        "Cache-Control": "public, max-age=86400"
-      }
+      "source": "/(.*).html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
     },
     {
-      "src": "/sitemap.xml",
-      "dest": "public/sitemap.xml",
-      "headers": {
-        "Cache-Control": "public, max-age=3600",
-        "Content-Type": "application/xml"
-      }
-    },
-    {
-      "src": "/favicon.svg",
-      "dest": "public/favicon.svg",
-      "headers": {
-        "Cache-Control": "public, max-age=604800"
-      }
-    },
-    {
-      "src": "/og-image.svg",
-      "dest": "public/og-image.svg",
-      "headers": {
-        "Cache-Control": "public, max-age=604800"
-      }
-    },
-    {
-      "src": "/app.html",
-      "dest": "public/app.html",
-      "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      }
-    },
-    {
-      "src": "/index.html",
-      "dest": "public/index.html",
-      "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      }
-    },
-    {
-      "src": "^/$",
-      "dest": "public/index.html",
-      "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "public/$1",
-      "headers": {
-        "X-Content-Type-Options": "nosniff",
-        "X-Frame-Options": "DENY",
-        "X-XSS-Protection": "1; mode=block",
-        "Referrer-Policy": "strict-origin-when-cross-origin",
-        "Permissions-Policy": "geolocation=(), microphone=(), camera=()"
-      }
+      "source": "/",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
     }
   ]
 }
