@@ -1,44 +1,89 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
-const db = require('../src/db/schema');
-const { seedCourses, getAllCourses, getCoursesByRegion, getTournamentHistory, getCourseBySlug, getStaffPicks, setStaffPick } = require('../src/db/courses');
-const { runScraper } = require('../src/scrapers/golfnow');
+const { createClient } = require('@libsql/client');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Turso database connection
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL || 'libsql://bay-area-golf-bayareagolfnow.aws-us-west-2.turso.io',
+  authToken: process.env.TURSO_AUTH_TOKEN
+});
+
+// Resend email client (optional - emails won't send if not configured)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Simple password hashing (in production, use bcrypt)
 const hashPassword = (password) => {
   return crypto.createHash('sha256').update(password + 'baygolf_salt_2024').digest('hex');
 };
 
+// Send verification email
+const sendVerificationEmail = async (email, token, displayName) => {
+  if (!resend) {
+    console.log('Resend not configured - skipping verification email');
+    return;
+  }
+
+  const verifyUrl = `https://bayareagolf.now/api/auth/verify?token=${token}`;
+
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || 'Bay Area Golf <onboarding@resend.dev>',
+    to: email,
+    subject: 'Verify your Bay Area Golf account',
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <h1 style="color: #2d5a27; font-size: 28px; margin-bottom: 24px;">Welcome to Bay Area Golf, ${displayName}!</h1>
+        <p style="color: #3d2914; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+          Thanks for signing up. Please verify your email address to complete your registration and start tracking your rounds.
+        </p>
+        <a href="${verifyUrl}" style="display: inline-block; background: #2d5a27; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">
+          Verify Email Address
+        </a>
+        <p style="color: #6b5344; font-size: 14px; margin-top: 32px;">
+          If you didn't create this account, you can safely ignore this email.
+        </p>
+        <hr style="border: none; border-top: 1px solid #ddd0bc; margin: 32px 0;">
+        <p style="color: #6b5344; font-size: 12px;">
+          Bay Area Golf - Track your rounds across the Bay
+        </p>
+      </div>
+    `
+  });
+};
+
 // Generate session token
 const generateToken = () => crypto.randomBytes(32).toString('hex');
 
-// Database session helpers
-const createSession = (userId) => {
+// Database session helpers (async)
+const createSession = async (userId) => {
   const token = generateToken();
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
-  db.prepare(`
-    INSERT INTO sessions (token, user_id, expires_at)
-    VALUES (?, ?, ?)
-  `).run(token, userId, expiresAt);
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  await db.execute({
+    sql: 'INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)',
+    args: [token, userId, expiresAt]
+  });
   return token;
 };
 
-const getSession = (token) => {
+const getSession = async (token) => {
   if (!token) return null;
-  const session = db.prepare(`
-    SELECT s.*, u.email, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
-           c.name as home_course_name, c.slug as home_course_slug
-    FROM sessions s
-    JOIN users u ON s.user_id = u.id
-    LEFT JOIN courses c ON u.home_course_id = c.id
-    WHERE s.token = ? AND (s.expires_at IS NULL OR s.expires_at > datetime('now'))
-  `).get(token);
-  if (!session) return null;
+  const result = await db.execute({
+    sql: `SELECT s.*, u.email, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
+          c.name as home_course_name, c.slug as home_course_slug
+          FROM sessions s
+          JOIN users u ON s.user_id = u.id
+          LEFT JOIN courses c ON u.home_course_id = c.id
+          WHERE s.token = ? AND (s.expires_at IS NULL OR s.expires_at > datetime('now'))`,
+    args: [token]
+  });
+  if (!result.rows.length) return null;
+  const session = result.rows[0];
   return {
     id: session.user_id,
     email: session.email,
@@ -51,26 +96,18 @@ const getSession = (token) => {
   };
 };
 
-const deleteSession = (token) => {
-  db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+const deleteSession = async (token) => {
+  await db.execute({ sql: 'DELETE FROM sessions WHERE token = ?', args: [token] });
 };
-
-// Clean up expired sessions periodically
-const cleanExpiredSessions = () => {
-  try {
-    db.prepare("DELETE FROM sessions WHERE expires_at < datetime('now')").run();
-  } catch (e) {}
-};
-setInterval(cleanExpiredSessions, 60 * 60 * 1000); // Every hour
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// User auth middleware
-const userAuth = (req, res, next) => {
+// Async user auth middleware
+const userAuth = async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  const user = getSession(token);
+  const user = await getSession(token);
   if (!user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -78,400 +115,223 @@ const userAuth = (req, res, next) => {
   next();
 };
 
-// Optional auth - doesn't fail, just adds user if logged in
-const optionalAuth = (req, res, next) => {
+// Async optional auth
+const optionalAuth = async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  const user = getSession(token);
-  if (user) {
-    req.user = user;
-  }
+  const user = await getSession(token);
+  if (user) req.user = user;
   next();
 };
 
-/**
- * GET /api/courses
- * Get all courses, optionally filtered by region or staff_picks
- * Query params: region, all, staff_picks
- */
-app.get('/api/courses', (req, res) => {
+// ========== COURSE ENDPOINTS ==========
+
+app.get('/api/courses', async (req, res) => {
   try {
     const { region, all, staff_picks } = req.query;
 
-    // Staff picks mode - return only staff picks
-    if (staff_picks === 'true' || staff_picks === '1') {
-      const picks = getStaffPicks();
-      return res.json(picks);
+    if (staff_picks === 'true') {
+      const result = await db.execute('SELECT * FROM courses WHERE is_staff_pick = 1 ORDER BY staff_pick_order ASC, name ASC');
+      return res.json(result.rows);
     }
 
-    // Return all courses if 'all' param is set
-    if (all === 'true' || all === '1') {
-      let sql = 'SELECT * FROM courses WHERE 1=1';
-      const params = [];
-
-      if (region) {
-        sql += ' AND region = ?';
-        params.push(region);
-      }
-
-      sql += ' ORDER BY region, city, name';
-      const courses = db.prepare(sql).all(...params);
-      return res.json(courses);
-    }
-
-    // Only return courses with upcoming tee times
-    let sql = `
-      SELECT DISTINCT c.* FROM courses c
-      INNER JOIN tee_times t ON c.id = t.course_id
-      WHERE t.datetime >= datetime('now', '-8 hours')
-    `;
-    const params = [];
-
-    if (region) {
-      sql += ' AND c.region = ?';
-      params.push(region);
-    }
-
-    sql += ' ORDER BY c.region, c.city, c.name';
-
-    const courses = db.prepare(sql).all(...params);
-    res.json(courses);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * GET /api/regions
- * Get all unique regions
- */
-app.get('/api/regions', (req, res) => {
-  try {
-    const regions = db.prepare('SELECT DISTINCT region FROM courses ORDER BY region').all();
-    res.json(regions.map(r => r.region));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * GET /api/tee-times
- * Get tee times with filters
- * Query params: date, region, course_id, min_time, max_time, max_price, holes, players, next_available
- */
-app.get('/api/tee-times', (req, res) => {
-  try {
-    const {
-      date,
-      region,
-      course_id,
-      min_time,
-      max_time,
-      max_price,
-      holes,
-      players,
-      next_available,
-      staff_picks,
-      sort_by = 'datetime',
-      sort_order = 'ASC',
-      limit = 100,
-      offset = 0
-    } = req.query;
-
-    let sql = `
-      SELECT
-        t.*,
-        c.name as course_name,
-        c.city,
-        c.region,
-        c.holes as course_holes,
-        c.avg_rating
-      FROM tee_times t
-      JOIN courses c ON t.course_id = c.id
-      WHERE 1=1
-    `;
-    const params = [];
-
-    // Always filter out past tee times (use Pacific time: UTC-8)
-    sql += " AND t.datetime >= datetime('now', '-8 hours')";
-
-    // Filter by staff picks
-    if (staff_picks === 'true' || staff_picks === '1') {
-      sql += ' AND c.is_staff_pick = 1';
-    }
-
-    // If not next_available mode, also filter by specific date
-    if (next_available !== 'true' && next_available !== '1' && date) {
-      sql += ' AND t.date = ?';
-      params.push(date);
+    if (all === 'true') {
+      const result = await db.execute('SELECT * FROM courses ORDER BY region, city, name');
+      return res.json(result.rows);
     }
 
     if (region) {
-      sql += ' AND c.region = ?';
-      params.push(region);
+      const result = await db.execute({ sql: 'SELECT * FROM courses WHERE region = ? ORDER BY city, name', args: [region] });
+      return res.json(result.rows);
     }
 
-    if (course_id) {
-      sql += ' AND t.course_id = ?';
-      params.push(course_id);
-    }
-
-    if (min_time) {
-      sql += ' AND t.time >= ?';
-      params.push(min_time);
-    }
-
-    if (max_time) {
-      sql += ' AND t.time <= ?';
-      params.push(max_time);
-    }
-
-    if (max_price) {
-      sql += ' AND t.price <= ?';
-      params.push(parseFloat(max_price));
-    }
-
-    if (holes) {
-      sql += ' AND t.holes = ?';
-      params.push(parseInt(holes));
-    }
-
-    // Filter by minimum available players (e.g., players=1 means at least 1 spot available)
-    if (players) {
-      sql += ' AND t.players >= ?';
-      params.push(parseInt(players));
-    }
-
-    // Validate sort parameters
-    const validSortFields = ['datetime', 'time', 'price', 'course_name', 'avg_rating'];
-    const validSortOrders = ['ASC', 'DESC'];
-
-    let sortField = validSortFields.includes(sort_by) ? sort_by : 'datetime';
-    const order = validSortOrders.includes(sort_order.toUpperCase()) ? sort_order.toUpperCase() : 'ASC';
-
-    // Map sort fields to proper column references
-    if (sortField === 'avg_rating') sortField = 'c.avg_rating';
-    if (sortField === 'course_name') sortField = 'c.name';
-
-    sql += ` ORDER BY ${sortField} ${order}`;
-    sql += ' LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
-
-    const teeTimes = db.prepare(sql).all(...params);
-    res.json(teeTimes);
+    // Default: courses with prices
+    const result = await db.execute(`
+      SELECT c.*,
+        (SELECT MIN(t.price) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= datetime('now')) as next_price,
+        (SELECT t.datetime FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= datetime('now') ORDER BY t.datetime LIMIT 1) as next_time
+      FROM courses c
+      ORDER BY c.region, c.city, c.name
+    `);
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/tee-times/dates
- * Get available dates with tee time counts
- */
-app.get('/api/tee-times/dates', (req, res) => {
+app.get('/api/courses/:idOrSlug', async (req, res) => {
   try {
-    const dates = db.prepare(`
-      SELECT date, COUNT(*) as count
-      FROM tee_times
-      WHERE date >= date('now')
-      GROUP BY date
-      ORDER BY date
-    `).all();
-    res.json(dates);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    const { idOrSlug } = req.params;
+    let result;
 
-/**
- * GET /api/tee-times/summary
- * Get summary stats
- */
-app.get('/api/tee-times/summary', (req, res) => {
-  try {
-    const stats = db.prepare(`
-      SELECT
-        COUNT(*) as total_tee_times,
-        COUNT(DISTINCT course_id) as courses_with_times,
-        COUNT(DISTINCT date) as days_available,
-        MIN(price) as min_price,
-        MAX(price) as max_price,
-        AVG(price) as avg_price
-      FROM tee_times
-      WHERE date >= date('now')
-    `).get();
+    if (/^\d+$/.test(idOrSlug)) {
+      result = await db.execute({ sql: 'SELECT * FROM courses WHERE id = ?', args: [parseInt(idOrSlug)] });
+    } else {
+      result = await db.execute({ sql: 'SELECT * FROM courses WHERE slug = ?', args: [idOrSlug] });
+    }
 
-    const byRegion = db.prepare(`
-      SELECT c.region, COUNT(*) as count
-      FROM tee_times t
-      JOIN courses c ON t.course_id = c.id
-      WHERE t.date >= date('now')
-      GROUP BY c.region
-    `).all();
-
-    res.json({ ...stats, by_region: byRegion });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * POST /api/scrape
- * Trigger a scrape (for manual refresh)
- */
-app.post('/api/scrape', async (req, res) => {
-  try {
-    const { days = 7 } = req.body;
-    res.json({ message: 'Scrape started', days });
-
-    // Run scraper in background
-    runScraper(days).catch(console.error);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * GET /api/courses/slug/:slug
- * Get course by URL slug
- */
-app.get('/api/courses/slug/:slug', (req, res) => {
-  try {
-    const { slug } = req.params;
-    const course = getCourseBySlug(slug);
-
-    if (!course) {
+    if (!result.rows.length) {
       return res.status(404).json({ error: 'Course not found' });
     }
 
-    // Get additional details like the ID-based endpoint
-    const reviews = db.prepare(`
-      SELECT * FROM reviews
-      WHERE course_id = ?
-      ORDER BY time DESC
-      LIMIT 10
-    `).all(course.id);
+    const course = result.rows[0];
 
-    const recentAvg = reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : null;
-
-    const photos = db.prepare(`
-      SELECT * FROM course_photos
-      WHERE course_id = ?
-      ORDER BY is_primary DESC, scraped_at DESC
-    `).all(course.id);
-
-    const topFood = db.prepare(`
-      SELECT * FROM food_items
-      WHERE course_id = ?
-      ORDER BY avg_rating DESC, mention_count DESC
-      LIMIT 1
-    `).get(course.id);
-
-    const teeTimeCount = db.prepare(`
-      SELECT COUNT(*) as count FROM tee_times
-      WHERE course_id = ? AND datetime >= datetime('now', 'localtime')
-    `).get(course.id);
-
-    const tournaments = getTournamentHistory(course.id);
-
-    res.json({
-      ...course,
-      recent_avg_rating: recentAvg,
-      reviews,
-      photos,
-      top_food: topFood,
-      upcoming_tee_times: teeTimeCount?.count || 0,
-      tournament_history: tournaments
+    // Get tee times
+    const teeTimesResult = await db.execute({
+      sql: `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now') ORDER BY datetime LIMIT 50`,
+      args: [course.id]
     });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * GET /api/courses/:id
- * Get detailed course info including reviews, photos, food, records
- */
-app.get('/api/courses/:id', (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Get course basic info
-    const course = db.prepare(`
-      SELECT * FROM courses WHERE id = ?
-    `).get(id);
-
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-
-    // Get 10 most recent reviews
-    const reviews = db.prepare(`
-      SELECT * FROM reviews
-      WHERE course_id = ?
-      ORDER BY time DESC
-      LIMIT 10
-    `).all(id);
-
-    // Calculate recent avg rating
-    const recentAvg = reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : null;
-
-    // Get course photos
-    const photos = db.prepare(`
-      SELECT * FROM course_photos
-      WHERE course_id = ?
-      ORDER BY is_primary DESC, scraped_at DESC
-    `).all(id);
-
-    // Get top-rated food item
-    const topFood = db.prepare(`
-      SELECT * FROM food_items
-      WHERE course_id = ?
-      ORDER BY avg_rating DESC, mention_count DESC
-      LIMIT 1
-    `).get(id);
-
-    // Get upcoming tee times count
-    const teeTimeCount = db.prepare(`
-      SELECT COUNT(*) as count FROM tee_times
-      WHERE course_id = ? AND datetime >= datetime('now', 'localtime')
-    `).get(id);
 
     // Get tournament history
-    const tournaments = getTournamentHistory(id);
+    const tournamentsResult = await db.execute({
+      sql: 'SELECT * FROM tournament_history WHERE course_id = ? ORDER BY year DESC LIMIT 5',
+      args: [course.id]
+    });
 
     res.json({
       ...course,
-      recent_avg_rating: recentAvg,
-      reviews,
-      photos,
-      top_food: topFood,
-      upcoming_tee_times: teeTimeCount?.count || 0,
-      tournament_history: tournaments
+      teeTimes: teeTimesResult.rows,
+      tournamentHistory: tournamentsResult.rows
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/health
- * Health check endpoint
- */
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/courses/:id/tee-times', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date, minPrice, maxPrice, time } = req.query;
+
+    let sql = `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now')`;
+    const args = [parseInt(id)];
+
+    if (date) {
+      sql += ' AND date = ?';
+      args.push(date);
+    }
+    if (minPrice) {
+      sql += ' AND price >= ?';
+      args.push(parseFloat(minPrice));
+    }
+    if (maxPrice) {
+      sql += ' AND price <= ?';
+      args.push(parseFloat(maxPrice));
+    }
+
+    sql += ' ORDER BY datetime LIMIT 100';
+
+    const result = await db.execute({ sql, args });
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/courses/compare', async (req, res) => {
+  try {
+    const { course1, course2 } = req.query;
+
+    if (!course1 || !course2) {
+      return res.status(400).json({ error: 'Two course IDs required' });
+    }
+
+    const [c1Result, c2Result] = await Promise.all([
+      db.execute({ sql: 'SELECT * FROM courses WHERE id = ?', args: [parseInt(course1)] }),
+      db.execute({ sql: 'SELECT * FROM courses WHERE id = ?', args: [parseInt(course2)] })
+    ]);
+
+    if (!c1Result.rows.length || !c2Result.rows.length) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    const [tt1Result, tt2Result] = await Promise.all([
+      db.execute({ sql: `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now') ORDER BY datetime LIMIT 20`, args: [parseInt(course1)] }),
+      db.execute({ sql: `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now') ORDER BY datetime LIMIT 20`, args: [parseInt(course2)] })
+    ]);
+
+    const getPriceStats = (teeTimes) => {
+      if (!teeTimes.length) return null;
+      const prices = teeTimes.map(t => t.price).filter(p => p);
+      if (!prices.length) return null;
+      return {
+        min: Math.min(...prices),
+        max: Math.max(...prices),
+        avg: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length)
+      };
+    };
+
+    res.json({
+      course1: { ...c1Result.rows[0], teeTimes: tt1Result.rows, priceStats: getPriceStats(tt1Result.rows) },
+      course2: { ...c2Result.rows[0], teeTimes: tt2Result.rows, priceStats: getPriceStats(tt2Result.rows) }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== TEE TIME ENDPOINTS ==========
+
+app.get('/api/tee-times', async (req, res) => {
+  try {
+    const { date, region, minPrice, maxPrice } = req.query;
+
+    let sql = `
+      SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug
+      FROM tee_times t
+      JOIN courses c ON t.course_id = c.id
+      WHERE t.datetime >= datetime('now')
+    `;
+    const args = [];
+
+    if (date) {
+      sql += ' AND t.date = ?';
+      args.push(date);
+    }
+    if (region) {
+      sql += ' AND c.region = ?';
+      args.push(region);
+    }
+    if (minPrice) {
+      sql += ' AND t.price >= ?';
+      args.push(parseFloat(minPrice));
+    }
+    if (maxPrice) {
+      sql += ' AND t.price <= ?';
+      args.push(parseFloat(maxPrice));
+    }
+
+    sql += ' ORDER BY t.datetime LIMIT 200';
+
+    const result = await db.execute({ sql, args });
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/tee-times/deals', async (req, res) => {
+  try {
+    const result = await db.execute(`
+      SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug,
+             (t.original_price - t.price) as savings,
+             ROUND((t.original_price - t.price) * 100.0 / t.original_price, 0) as discount_pct
+      FROM tee_times t
+      JOIN courses c ON t.course_id = c.id
+      WHERE t.datetime >= datetime('now')
+        AND t.original_price IS NOT NULL
+        AND t.price < t.original_price
+      ORDER BY discount_pct DESC
+      LIMIT 20
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ========== USER AUTH ENDPOINTS ==========
 
-/**
- * POST /api/auth/signup
- * Create a new user account
- */
-app.post('/api/auth/signup', (req, res) => {
+app.post('/api/auth/signup', async (req, res) => {
   try {
     const { email, password, displayName } = req.body;
 
@@ -484,33 +344,128 @@ app.post('/api/auth/signup', (req, res) => {
     }
 
     // Check if user exists
-    const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
-    if (existing) {
+    const existing = await db.execute({ sql: 'SELECT id FROM users WHERE email = ?', args: [email.toLowerCase()] });
+    if (existing.rows.length) {
       return res.status(400).json({ error: 'An account with this email already exists' });
     }
 
-    // Create user
+    // Create verification token
+    const verificationToken = generateToken();
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
+
+    // Create user with verification token
     const passwordHash = hashPassword(password);
-    const result = db.prepare(`
-      INSERT INTO users (email, password_hash, display_name)
-      VALUES (?, ?, ?)
-    `).run(email.toLowerCase(), passwordHash, displayName || email.split('@')[0]);
+    const name = displayName || email.split('@')[0];
+    const result = await db.execute({
+      sql: `INSERT INTO users (email, password_hash, display_name, email_verified, verification_token, verification_expires)
+            VALUES (?, ?, ?, 0, ?, ?)`,
+      args: [email.toLowerCase(), passwordHash, name, verificationToken, verificationExpires]
+    });
 
-    // Create session in database
-    const token = createSession(result.lastInsertRowid);
-    const user = { id: result.lastInsertRowid, email: email.toLowerCase(), displayName: displayName || email.split('@')[0] };
+    const userId = Number(result.lastInsertRowid);
 
-    res.json({ success: true, token, user });
+    // Send verification email
+    try {
+      await sendVerificationEmail(email.toLowerCase(), verificationToken, name);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Continue anyway - user can request resend
+    }
+
+    // Create session (user can use the app but some features may be limited)
+    const token = await createSession(userId);
+
+    res.json({
+      token,
+      user: { id: userId, email: email.toLowerCase(), displayName: name, emailVerified: false },
+      message: 'Account created! Please check your email to verify your account.'
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * POST /api/auth/login
- * Login with email and password
- */
-app.post('/api/auth/login', (req, res) => {
+// Email verification endpoint
+app.get('/api/auth/verify', async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.redirect('/account?error=missing_token');
+    }
+
+    // Find user with this verification token
+    const result = await db.execute({
+      sql: `SELECT id, email, display_name FROM users
+            WHERE verification_token = ? AND verification_expires > datetime('now')`,
+      args: [token]
+    });
+
+    if (!result.rows.length) {
+      return res.redirect('/account?error=invalid_token');
+    }
+
+    const user = result.rows[0];
+
+    // Mark email as verified
+    await db.execute({
+      sql: `UPDATE users SET email_verified = 1, verification_token = NULL, verification_expires = NULL, updated_at = datetime('now')
+            WHERE id = ?`,
+      args: [user.id]
+    });
+
+    // Redirect to account page with success message
+    res.redirect('/account?verified=true');
+  } catch (error) {
+    console.error('Verification error:', error);
+    res.redirect('/account?error=verification_failed');
+  }
+});
+
+// Resend verification email
+app.post('/api/auth/resend-verification', async (req, res) => {
+  try {
+    const authToken = req.headers.authorization?.replace('Bearer ', '');
+    const session = await getSession(authToken);
+    if (!session) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    // Get user
+    const result = await db.execute({
+      sql: 'SELECT id, email, display_name, email_verified FROM users WHERE id = ?',
+      args: [session.id]
+    });
+
+    if (!result.rows.length) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = result.rows[0];
+
+    if (user.email_verified) {
+      return res.status(400).json({ error: 'Email already verified' });
+    }
+
+    // Generate new verification token
+    const verificationToken = generateToken();
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+    await db.execute({
+      sql: 'UPDATE users SET verification_token = ?, verification_expires = ? WHERE id = ?',
+      args: [verificationToken, verificationExpires, user.id]
+    });
+
+    // Send verification email
+    await sendVerificationEmail(user.email, verificationToken, user.display_name);
+
+    res.json({ success: true, message: 'Verification email sent' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -518,86 +473,172 @@ app.post('/api/auth/login', (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+    const result = await db.execute({ sql: 'SELECT * FROM users WHERE email = ?', args: [email.toLowerCase()] });
+    const user = result.rows[0];
+
     if (!user || user.password_hash !== hashPassword(password)) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Create session in database
-    const token = createSession(user.id);
-    const userData = { id: user.id, email: user.email, displayName: user.display_name };
+    const token = await createSession(user.id);
 
-    res.json({ success: true, token, user: userData });
+    res.json({
+      token,
+      user: { id: user.id, email: user.email, displayName: user.display_name }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * POST /api/auth/logout
- * Logout current session
- */
-app.post('/api/auth/logout', userAuth, (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  deleteSession(token);
-  res.json({ success: true });
-});
-
-/**
- * GET /api/auth/me
- * Get current user info
- */
-app.get('/api/auth/me', userAuth, (req, res) => {
-  res.json({ user: req.user });
-});
-
-// ========== USER FAVORITES ==========
-
-/**
- * GET /api/user/favorites
- * Get user's favorite courses
- */
-app.get('/api/user/favorites', userAuth, (req, res) => {
+app.post('/api/auth/logout', async (req, res) => {
   try {
-    const favorites = db.prepare(`
-      SELECT c.* FROM courses c
-      INNER JOIN user_favorites uf ON c.id = uf.course_id
-      WHERE uf.user_id = ?
-      ORDER BY uf.created_at DESC
-    `).all(req.user.id);
-    res.json(favorites);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * POST /api/user/favorites/:courseId
- * Add course to favorites
- */
-app.post('/api/user/favorites/:courseId', userAuth, (req, res) => {
-  try {
-    const { courseId } = req.params;
-    db.prepare(`
-      INSERT OR IGNORE INTO user_favorites (user_id, course_id)
-      VALUES (?, ?)
-    `).run(req.user.id, courseId);
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (token) await deleteSession(token);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * DELETE /api/user/favorites/:courseId
- * Remove course from favorites
- */
-app.delete('/api/user/favorites/:courseId', userAuth, (req, res) => {
+app.get('/api/auth/me', async (req, res) => {
   try {
-    const { courseId } = req.params;
-    db.prepare(`
-      DELETE FROM user_favorites WHERE user_id = ? AND course_id = ?
-    `).run(req.user.id, courseId);
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== USER PROFILE ENDPOINTS ==========
+
+app.get('/api/user/profile', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const result = await db.execute({
+      sql: `SELECT u.id, u.email, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
+            c.name as home_course_name, c.city as home_course_city, c.slug as home_course_slug
+            FROM users u
+            LEFT JOIN courses c ON u.home_course_id = c.id
+            WHERE u.id = ?`,
+      args: [user.id]
+    });
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/user/profile', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const { displayName, homeCourseId, handicap } = req.body;
+    await db.execute({
+      sql: `UPDATE users SET display_name = COALESCE(?, display_name), home_course_id = ?, handicap = ?, updated_at = datetime('now') WHERE id = ?`,
+      args: [displayName, homeCourseId || null, handicap || null, user.id]
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/user/profile/picture', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const { image } = req.body;
+    if (!image || !image.startsWith('data:image/')) {
+      return res.status(400).json({ error: 'Invalid image data' });
+    }
+
+    if (image.length > 2 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Image too large (max 1.5MB)' });
+    }
+
+    await db.execute({
+      sql: 'UPDATE users SET profile_picture = ?, updated_at = datetime("now") WHERE id = ?',
+      args: [image, user.id]
+    });
+
+    res.json({ success: true, profilePicture: image });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/user/stats', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const result = await db.execute({
+      sql: `SELECT COUNT(*) as total_rounds, COUNT(DISTINCT course_id) as courses_played, AVG(total_score) as avg_score FROM rounds WHERE user_id = ?`,
+      args: [user.id]
+    });
+    res.json({ stats: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== USER FAVORITES ==========
+
+app.get('/api/user/favorites', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const result = await db.execute({
+      sql: `SELECT c.* FROM user_favorites f JOIN courses c ON f.course_id = c.id WHERE f.user_id = ? ORDER BY f.created_at DESC`,
+      args: [user.id]
+    });
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/user/favorites/:courseId', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    await db.execute({
+      sql: 'INSERT OR IGNORE INTO user_favorites (user_id, course_id) VALUES (?, ?)',
+      args: [user.id, parseInt(req.params.courseId)]
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/user/favorites/:courseId', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    await db.execute({
+      sql: 'DELETE FROM user_favorites WHERE user_id = ? AND course_id = ?',
+      args: [user.id, parseInt(req.params.courseId)]
+    });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -606,49 +647,45 @@ app.delete('/api/user/favorites/:courseId', userAuth, (req, res) => {
 
 // ========== ROUNDS / SCOREBOOK ==========
 
-/**
- * GET /api/user/rounds
- * Get user's round history
- */
-app.get('/api/user/rounds', userAuth, (req, res) => {
+app.get('/api/user/rounds', async (req, res) => {
   try {
-    const rounds = db.prepare(`
-      SELECT r.*, c.name as course_name, c.city, c.slug
-      FROM rounds r
-      INNER JOIN courses c ON r.course_id = c.id
-      WHERE r.user_id = ?
-      ORDER BY r.date DESC
-      LIMIT 50
-    `).all(req.user.id);
-    res.json(rounds);
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const result = await db.execute({
+      sql: `SELECT r.*, c.name as course_name, c.par as course_par, c.slug as course_slug
+            FROM rounds r JOIN courses c ON r.course_id = c.id
+            WHERE r.user_id = ? ORDER BY r.date DESC LIMIT 50`,
+      args: [user.id]
+    });
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * POST /api/user/rounds
- * Log a new round
- */
-app.post('/api/user/rounds', userAuth, (req, res) => {
+app.post('/api/user/rounds', async (req, res) => {
   try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
     const { courseId, date, totalScore, totalPutts, notes, holes } = req.body;
 
-    const result = db.prepare(`
-      INSERT INTO rounds (user_id, course_id, date, total_score, total_putts, notes)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(req.user.id, courseId, date, totalScore, totalPutts, notes);
+    const result = await db.execute({
+      sql: 'INSERT INTO rounds (user_id, course_id, date, total_score, total_putts, notes) VALUES (?, ?, ?, ?, ?, ?)',
+      args: [user.id, courseId, date, totalScore, totalPutts, notes]
+    });
 
-    const roundId = result.lastInsertRowid;
+    const roundId = Number(result.lastInsertRowid);
 
-    // Insert hole-by-hole data if provided
-    if (holes && holes.length > 0) {
-      const insertHole = db.prepare(`
-        INSERT INTO round_holes (round_id, hole_number, par, score, putts, fairway_hit, gir)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `);
+    if (holes && Array.isArray(holes)) {
       for (const hole of holes) {
-        insertHole.run(roundId, hole.number, hole.par, hole.score, hole.putts, hole.fairwayHit ? 1 : 0, hole.gir ? 1 : 0);
+        await db.execute({
+          sql: 'INSERT INTO round_holes (round_id, hole_number, par, score, putts, fairway_hit, gir) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          args: [roundId, hole.holeNumber, hole.par, hole.score, hole.putts, hole.fairwayHit ? 1 : 0, hole.gir ? 1 : 0]
+        });
       }
     }
 
@@ -658,235 +695,120 @@ app.post('/api/user/rounds', userAuth, (req, res) => {
   }
 });
 
-/**
- * GET /api/user/stats
- * Get user's golf stats
- */
-app.get('/api/user/stats', userAuth, (req, res) => {
+app.get('/api/user/rounds/:id', async (req, res) => {
   try {
-    const stats = db.prepare(`
-      SELECT
-        COUNT(*) as total_rounds,
-        COUNT(DISTINCT course_id) as courses_played,
-        AVG(total_score) as avg_score,
-        MIN(total_score) as best_score,
-        AVG(total_putts) as avg_putts
-      FROM rounds
-      WHERE user_id = ?
-    `).get(req.user.id);
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
 
-    const recentRounds = db.prepare(`
-      SELECT r.*, c.name as course_name
-      FROM rounds r
-      INNER JOIN courses c ON r.course_id = c.id
-      WHERE r.user_id = ?
-      ORDER BY r.date DESC
-      LIMIT 5
-    `).all(req.user.id);
-
-    res.json({ stats, recentRounds });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * GET /api/user/passport
- * Get user's passport progress (courses played)
- */
-app.get('/api/user/passport', userAuth, (req, res) => {
-  try {
-    const played = db.prepare(`
-      SELECT DISTINCT c.id, c.name, c.slug, c.city, c.region,
-        MIN(r.date) as first_played,
-        COUNT(r.id) as times_played,
-        MIN(r.total_score) as best_score
-      FROM courses c
-      INNER JOIN rounds r ON c.id = r.course_id
-      WHERE r.user_id = ?
-      GROUP BY c.id
-      ORDER BY c.region, c.name
-    `).all(req.user.id);
-
-    const total = db.prepare('SELECT COUNT(*) as count FROM courses').get();
-
-    res.json({
-      played,
-      totalCourses: total.count,
-      completionPercent: Math.round((played.length / total.count) * 100)
+    const roundResult = await db.execute({
+      sql: `SELECT r.*, c.name as course_name, c.par as course_par, c.slug as course_slug
+            FROM rounds r JOIN courses c ON r.course_id = c.id
+            WHERE r.id = ? AND r.user_id = ?`,
+      args: [parseInt(req.params.id), user.id]
     });
+
+    if (!roundResult.rows.length) {
+      return res.status(404).json({ error: 'Round not found' });
+    }
+
+    const holesResult = await db.execute({
+      sql: 'SELECT * FROM round_holes WHERE round_id = ? ORDER BY hole_number',
+      args: [parseInt(req.params.id)]
+    });
+
+    res.json({ ...roundResult.rows[0], holes: holesResult.rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ========== USER PROFILE ==========
-
-/**
- * GET /api/user/profile
- * Get current user's profile
- */
-app.get('/api/user/profile', userAuth, (req, res) => {
+app.delete('/api/user/rounds/:id', async (req, res) => {
   try {
-    const user = db.prepare(`
-      SELECT u.id, u.email, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
-             c.name as home_course_name, c.city as home_course_city, c.slug as home_course_slug
-      FROM users u
-      LEFT JOIN courses c ON u.home_course_id = c.id
-      WHERE u.id = ?
-    `).get(req.user.id);
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
 
-/**
- * PUT /api/user/profile
- * Update profile (display name, home course, handicap)
- */
-app.put('/api/user/profile', userAuth, (req, res) => {
-  try {
-    const { displayName, homeCourseId, handicap } = req.body;
-    db.prepare(`
-      UPDATE users
-      SET display_name = COALESCE(?, display_name),
-          home_course_id = ?,
-          handicap = ?,
-          updated_at = datetime('now')
-      WHERE id = ?
-    `).run(displayName, homeCourseId || null, handicap || null, req.user.id);
+    await db.execute({ sql: 'DELETE FROM round_holes WHERE round_id = ?', args: [parseInt(req.params.id)] });
+    await db.execute({ sql: 'DELETE FROM rounds WHERE id = ? AND user_id = ?', args: [parseInt(req.params.id), user.id] });
+
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * POST /api/user/profile/picture
- * Upload profile picture (base64)
- */
-app.post('/api/user/profile/picture', userAuth, (req, res) => {
-  try {
-    const { image } = req.body;
+// ========== COMMUNITY ENDPOINTS ==========
 
-    if (!image || !image.startsWith('data:image/')) {
-      return res.status(400).json({ error: 'Invalid image format' });
+app.get('/api/community/leaderboard', async (req, res) => {
+  try {
+    const { period } = req.query;
+    let dateFilter = '1=1';
+
+    if (period === 'month') {
+      dateFilter = "r.date >= date('now', '-30 days')";
+    } else if (period === 'week') {
+      dateFilter = "r.date >= date('now', '-7 days')";
     }
 
-    // Check size (base64 is ~33% larger than binary, so 2MB base64 ≈ 1.5MB image)
-    if (image.length > 2 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Image too large (max 1.5MB)' });
-    }
-
-    db.prepare('UPDATE users SET profile_picture = ?, updated_at = datetime("now") WHERE id = ?')
-      .run(image, req.user.id);
-
-    res.json({ success: true, profilePicture: image });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ========== COMMUNITY / LEADERBOARD ==========
-
-/**
- * GET /api/community/leaderboard
- * Get community leaderboard
- */
-app.get('/api/community/leaderboard', (req, res) => {
-  try {
-    const { period = 'month' } = req.query;
-
-    let dateFilter = "date >= date('now', '-30 days')";
-    if (period === 'week') dateFilter = "date >= date('now', '-7 days')";
-    if (period === 'all') dateFilter = '1=1';
-
-    const leaderboard = db.prepare(`
-      SELECT
-        u.id,
-        u.display_name,
-        COUNT(DISTINCT r.course_id) as courses_played,
-        COUNT(r.id) as total_rounds,
-        ROUND(AVG(r.total_score), 1) as avg_score
+    const result = await db.execute(`
+      SELECT u.id, u.display_name, COUNT(DISTINCT r.course_id) as courses_played,
+             COUNT(r.id) as total_rounds, ROUND(AVG(r.total_score), 1) as avg_score
       FROM users u
       INNER JOIN rounds r ON u.id = r.user_id
       WHERE ${dateFilter}
       GROUP BY u.id
       ORDER BY courses_played DESC, total_rounds DESC
       LIMIT 20
-    `).all();
-
-    res.json(leaderboard);
+    `);
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/community/activity
- * Get recent community activity
- */
-app.get('/api/community/activity', (req, res) => {
+app.get('/api/community/recent-rounds', async (req, res) => {
   try {
-    const activity = db.prepare(`
-      SELECT
-        r.id,
-        r.date,
-        r.total_score,
-        u.display_name,
-        c.name as course_name,
-        c.slug as course_slug
+    const result = await db.execute(`
+      SELECT r.id, r.date, r.total_score, u.display_name, c.name as course_name, c.slug as course_slug
       FROM rounds r
       INNER JOIN users u ON r.user_id = u.id
       INNER JOIN courses c ON r.course_id = c.id
       ORDER BY r.created_at DESC
       LIMIT 20
-    `).all();
-
-    res.json(activity);
+    `);
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * GET /api/community/members
- * Get all members with profiles (requires auth)
- */
-app.get('/api/community/members', userAuth, (req, res) => {
+app.get('/api/community/members', async (req, res) => {
   try {
-    const members = db.prepare(`
-      SELECT
-        u.id,
-        u.display_name,
-        u.profile_picture,
-        u.home_course_id,
-        u.handicap,
-        c.name as home_course_name,
-        c.slug as home_course_slug,
-        COUNT(r.id) as rounds_played,
-        ROUND(AVG(r.total_score), 1) as avg_score
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const result = await db.execute(`
+      SELECT u.id, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
+             c.name as home_course_name, c.slug as home_course_slug,
+             COUNT(r.id) as rounds_played, ROUND(AVG(r.total_score), 1) as avg_score
       FROM users u
       LEFT JOIN courses c ON u.home_course_id = c.id
       LEFT JOIN rounds r ON u.id = r.user_id
       GROUP BY u.id
       ORDER BY rounds_played DESC, u.display_name ASC
-    `).all();
-
-    res.json(members);
+    `);
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Admin endpoints
+// ========== ADMIN ENDPOINTS ==========
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baygolf2024';
 
-/**
- * POST /api/admin/login
- * Simple password auth for admin
- */
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
   if (password === ADMIN_PASSWORD) {
@@ -896,12 +818,9 @@ app.post('/api/admin/login', (req, res) => {
   }
 });
 
-// Simple auth middleware
 const adminAuth = (req, res, next) => {
   const auth = req.headers.authorization;
-  if (!auth) {
-    return res.status(401).json({ error: 'Authorization required' });
-  }
+  if (!auth) return res.status(401).json({ error: 'Authorization required' });
   const token = auth.replace('Bearer ', '');
   if (Buffer.from(token, 'base64').toString() !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: 'Invalid token' });
@@ -909,33 +828,38 @@ const adminAuth = (req, res, next) => {
   next();
 };
 
-/**
- * GET /api/admin/courses
- * Get all courses with staff pick status
- */
-app.get('/api/admin/courses', adminAuth, (req, res) => {
+app.get('/api/admin/courses', adminAuth, async (req, res) => {
   try {
-    const courses = db.prepare(`
-      SELECT id, name, city, region, slug, is_staff_pick, staff_pick_order
-      FROM courses
-      ORDER BY name
-    `).all();
-    res.json(courses);
+    const result = await db.execute('SELECT * FROM courses ORDER BY region, city, name');
+    res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * PATCH /api/admin/courses/:id
- * Update staff pick status for a course
- */
-app.patch('/api/admin/courses/:id', adminAuth, (req, res) => {
+app.put('/api/admin/courses/:id', adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { is_staff_pick, staff_pick_order } = req.body;
+    const updates = req.body;
 
-    setStaffPick(id, is_staff_pick, staff_pick_order);
+    const setClauses = [];
+    const args = [];
+
+    for (const [key, value] of Object.entries(updates)) {
+      const dbKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      setClauses.push(`${dbKey} = ?`);
+      args.push(value);
+    }
+
+    if (setClauses.length === 0) {
+      return res.status(400).json({ error: 'No updates provided' });
+    }
+
+    args.push(parseInt(id));
+    await db.execute({
+      sql: `UPDATE courses SET ${setClauses.join(', ')}, updated_at = datetime('now') WHERE id = ?`,
+      args
+    });
 
     res.json({ success: true });
   } catch (error) {
@@ -943,36 +867,60 @@ app.patch('/api/admin/courses/:id', adminAuth, (req, res) => {
   }
 });
 
-/**
- * PUT /api/admin/staff-picks
- * Bulk update staff picks order
- */
-app.put('/api/admin/staff-picks', adminAuth, (req, res) => {
+app.post('/api/admin/staff-picks', adminAuth, async (req, res) => {
   try {
-    const { picks } = req.body; // Array of { id, order }
+    const { courseIds } = req.body;
 
-    // Clear all staff picks first
-    db.prepare('UPDATE courses SET is_staff_pick = 0, staff_pick_order = NULL').run();
+    await db.execute('UPDATE courses SET is_staff_pick = 0, staff_pick_order = NULL');
 
-    // Set new picks with order
-    const updateStmt = db.prepare('UPDATE courses SET is_staff_pick = 1, staff_pick_order = ? WHERE id = ?');
-    for (const pick of picks) {
-      updateStmt.run(pick.order, pick.id);
+    for (let i = 0; i < courseIds.length; i++) {
+      await db.execute({
+        sql: 'UPDATE courses SET is_staff_pick = 1, staff_pick_order = ? WHERE id = ?',
+        args: [i + 1, courseIds[i]]
+      });
     }
 
-    res.json({ success: true, count: picks.length });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Serve frontend for all other routes (Express 5 syntax)
+// SPA fallback (Express 5 compatible)
 app.get('/{*splat}', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../public/index.html'));
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  const publicPath = path.join(__dirname, '../public');
+
+  if (req.path.startsWith('/course/')) {
+    return res.sendFile(path.join(publicPath, 'course.html'));
+  }
+  if (req.path === '/courses') {
+    return res.sendFile(path.join(publicPath, 'courses.html'));
+  }
+  if (req.path === '/scorebook') {
+    return res.sendFile(path.join(publicPath, 'scorebook.html'));
+  }
+  if (req.path === '/community') {
+    return res.sendFile(path.join(publicPath, 'community.html'));
+  }
+  if (req.path === '/account') {
+    return res.sendFile(path.join(publicPath, 'account.html'));
+  }
+  if (req.path === '/admin') {
+    return res.sendFile(path.join(publicPath, 'admin.html'));
+  }
+
+  res.sendFile(path.join(publicPath, 'app.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Bay Area Golf Tee Times API running on http://localhost:${PORT}`);
-});
+// Only start server if not being imported (for Vercel)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = app;

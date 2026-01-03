@@ -20,13 +20,15 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@libsql/client": "^0.15.15",
     "better-sqlite3": "^12.5.0",
     "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "node-cron": "^4.2.1",
-    "puppeteer-core": "^24.34.0"
+    "puppeteer-core": "^24.34.0",
+    "resend": "^6.6.0"
   },
   "devDependencies": {
     "vercel": "^50.1.3"
