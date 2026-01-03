@@ -193,6 +193,20 @@ const authorNames = [
   "Chris Martinez", "Nicole Anderson", "Kevin Lee", "Rachel Garcia", "Brian Thompson"
 ];
 
+// Clear existing data for clean regeneration
+console.log('Clearing existing data...');
+// Disable foreign key checks temporarily
+db.pragma('foreign_keys = OFF');
+db.exec('DELETE FROM tee_times');
+db.exec('DELETE FROM reviews');
+db.exec('DELETE FROM course_photos');
+db.exec('DELETE FROM food_items');
+db.exec('DELETE FROM user_favorites');
+db.exec('DELETE FROM rounds');
+db.exec('DELETE FROM courses');
+db.pragma('foreign_keys = ON');
+console.log('Cleared all tables');
+
 // Insert courses
 console.log('Seeding courses...');
 const insertCourse = db.prepare(`
@@ -441,8 +455,32 @@ const reviewCount = db.prepare('SELECT COUNT(*) as count FROM reviews').get();
 const photoCount = db.prepare('SELECT COUNT(*) as count FROM course_photos').get();
 const foodCount = db.prepare('SELECT COUNT(*) as count FROM food_items').get();
 
+// Initialize Staff Picks
+console.log('Setting up Staff Picks...');
+const staffPickCourseNames = [
+  "TPC Harding Park",
+  "Pasatiempo Golf Club",
+  "Presidio Golf Course",
+  "Half Moon Bay - Ocean Course",
+  "Corica Park - South Course",
+  "Cinnabar Hills Golf Club",
+  "Tilden Park Golf Course",
+  "The Links at Bodega Harbour"
+];
+
+const setStaffPickStmt = db.prepare(`
+  UPDATE courses SET is_staff_pick = 1, staff_pick_order = ?
+  WHERE name = ?
+`);
+
+for (let i = 0; i < staffPickCourseNames.length; i++) {
+  setStaffPickStmt.run(i + 1, staffPickCourseNames[i]);
+}
+console.log(`Set ${staffPickCourseNames.length} Staff Picks`);
+
 console.log('\nSummary:');
 console.log(`  Courses: ${Object.keys(courseMap).length}`);
+console.log(`  Staff Picks: ${staffPickCourseNames.length}`);
 console.log(`  Tee times: ${summary.total}`);
 console.log(`  Reviews: ${reviewCount.count}`);
 console.log(`  Photos: ${photoCount.count}`);

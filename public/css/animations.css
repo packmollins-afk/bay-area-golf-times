@@ -1,0 +1,499 @@
+/**
+ * Bay Area Golf - Unified Animation System
+ * Classic golf aesthetic with modern polish
+ *
+ * Timing tokens:
+ * - instant: 100ms (micro-interactions)
+ * - fast: 200ms (hovers, small transitions)
+ * - normal: 350ms (card animations, reveals)
+ * - slow: 500ms (page transitions, large elements)
+ * - stagger: 50ms (list item delays)
+ *
+ * Easing tokens:
+ * - ease-out: cubic-bezier(0.33, 1, 0.68, 1) - entrances
+ * - ease-in-out: cubic-bezier(0.65, 0, 0.35, 1) - interactions
+ * - spring: cubic-bezier(0.34, 1.56, 0.64, 1) - playful bounces
+ * - smooth: cubic-bezier(0.4, 0, 0.2, 1) - general purpose
+ */
+
+:root {
+  /* Animation timing */
+  --anim-instant: 100ms;
+  --anim-fast: 200ms;
+  --anim-normal: 350ms;
+  --anim-slow: 500ms;
+  --anim-stagger: 50ms;
+
+  /* Easing curves */
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Shadow levels */
+  --shadow-sm: 0 1px 3px rgba(61, 41, 20, 0.08);
+  --shadow-md: 0 4px 12px rgba(61, 41, 20, 0.12);
+  --shadow-lg: 0 8px 24px rgba(61, 41, 20, 0.16);
+  --shadow-xl: 0 16px 48px rgba(61, 41, 20, 0.2);
+
+  /* Glow effects for focus states */
+  --glow-primary: 0 0 0 3px rgba(45, 90, 39, 0.15);
+  --glow-gold: 0 0 0 3px rgba(184, 134, 11, 0.2);
+}
+
+/* ===== KEYFRAME ANIMATIONS ===== */
+
+/* Fade in from below - primary entrance */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in from above */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale in with fade */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Gentle pulse for loading states */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Shimmer effect for skeleton loading */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Subtle float for featured items */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Spin for loading indicators */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ripple effect for buttons */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Golf ball bounce */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Entrance animations */
+.anim-fade-in-up {
+  animation: fadeInUp var(--anim-normal) var(--ease-out) forwards;
+}
+
+.anim-fade-in-down {
+  animation: fadeInDown var(--anim-normal) var(--ease-out) forwards;
+}
+
+.anim-scale-in {
+  animation: scaleIn var(--anim-normal) var(--ease-out) forwards;
+}
+
+.anim-slide-left {
+  animation: slideInLeft var(--anim-normal) var(--ease-out) forwards;
+}
+
+.anim-slide-right {
+  animation: slideInRight var(--anim-normal) var(--ease-out) forwards;
+}
+
+/* Staggered children - apply to parent */
+.anim-stagger > * {
+  opacity: 0;
+  animation: fadeInUp var(--anim-normal) var(--ease-out) forwards;
+}
+
+.anim-stagger > *:nth-child(1) { animation-delay: calc(var(--anim-stagger) * 1); }
+.anim-stagger > *:nth-child(2) { animation-delay: calc(var(--anim-stagger) * 2); }
+.anim-stagger > *:nth-child(3) { animation-delay: calc(var(--anim-stagger) * 3); }
+.anim-stagger > *:nth-child(4) { animation-delay: calc(var(--anim-stagger) * 4); }
+.anim-stagger > *:nth-child(5) { animation-delay: calc(var(--anim-stagger) * 5); }
+.anim-stagger > *:nth-child(6) { animation-delay: calc(var(--anim-stagger) * 6); }
+.anim-stagger > *:nth-child(7) { animation-delay: calc(var(--anim-stagger) * 7); }
+.anim-stagger > *:nth-child(8) { animation-delay: calc(var(--anim-stagger) * 8); }
+.anim-stagger > *:nth-child(9) { animation-delay: calc(var(--anim-stagger) * 9); }
+.anim-stagger > *:nth-child(10) { animation-delay: calc(var(--anim-stagger) * 10); }
+.anim-stagger > *:nth-child(n+11) { animation-delay: calc(var(--anim-stagger) * 10); }
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform var(--anim-fast) var(--ease-out),
+              box-shadow var(--anim-fast) var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Hover glow */
+.hover-glow {
+  transition: box-shadow var(--anim-fast) var(--ease-out);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--glow-primary);
+}
+
+/* Button press effect */
+.press-effect {
+  transition: transform var(--anim-instant) var(--ease-out);
+}
+
+.press-effect:active {
+  transform: scale(0.97);
+}
+
+/* ===== COMPONENT ANIMATIONS ===== */
+
+/* Card hover states */
+.card-animated {
+  transition: transform var(--anim-fast) var(--ease-out),
+              box-shadow var(--anim-fast) var(--ease-out),
+              border-color var(--anim-fast) var(--ease-out);
+}
+
+.card-animated:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Button animations */
+.btn-animated {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--anim-fast) var(--ease-out);
+}
+
+.btn-animated::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  transition: transform var(--anim-slow) var(--ease-out);
+}
+
+.btn-animated:hover::after {
+  transform: translateX(100%);
+}
+
+.btn-animated:active {
+  transform: scale(0.97);
+}
+
+/* Tab/chip active state */
+.tab-animated {
+  position: relative;
+  transition: all var(--anim-fast) var(--ease-out);
+}
+
+.tab-animated::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: all var(--anim-fast) var(--ease-out);
+  transform: translateX(-50%);
+}
+
+.tab-animated.active::before,
+.tab-animated:hover::before {
+  width: 80%;
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border-light) 25%,
+    var(--bg-paper) 50%,
+    var(--border-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 4px;
+}
+
+/* Spinner */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Floating featured badge */
+.featured-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse notification */
+.pulse-dot {
+  position: relative;
+}
+
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--deal);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===== PAGE TRANSITIONS ===== */
+
+.page-enter {
+  animation: fadeInUp var(--anim-slow) var(--ease-out) forwards;
+}
+
+.section-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all var(--anim-slow) var(--ease-out);
+}
+
+.section-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== SPECIALIZED GOLF ELEMENTS ===== */
+
+/* Tee time slot entrance */
+.tee-slot-enter {
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  animation: fadeInUp var(--anim-normal) var(--ease-out) forwards;
+}
+
+/* Course chip hover */
+.course-chip-animated {
+  transition: all var(--anim-fast) var(--ease-out);
+  transform-origin: center;
+}
+
+.course-chip-animated:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--shadow-md);
+}
+
+/* Price pop */
+.price-animated {
+  transition: transform var(--anim-fast) var(--ease-spring);
+}
+
+.price-animated:hover {
+  transform: scale(1.1);
+}
+
+/* Staff pick badge */
+.staff-pick-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #b8860b, #daa520);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+  animation: float 4s ease-in-out infinite;
+}
+
+.staff-pick-badge svg {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+/* Leaderboard row animation */
+.leaderboard-row {
+  transition: all var(--anim-fast) var(--ease-out);
+}
+
+.leaderboard-row:hover {
+  background: rgba(45, 90, 39, 0.05);
+  transform: translateX(4px);
+}
+
+/* Activity feed item */
+.activity-item {
+  opacity: 0;
+  animation: slideInLeft var(--anim-normal) var(--ease-out) forwards;
+}
+
+/* Passport stamp effect */
+.passport-stamp {
+  transition: all var(--anim-fast) var(--ease-spring);
+}
+
+.passport-stamp:hover {
+  transform: rotate(-3deg) scale(1.05);
+}
+
+.passport-stamp.collected {
+  animation: scaleIn var(--anim-normal) var(--ease-spring) forwards;
+}
+
+/* Weather widget */
+.weather-animated {
+  transition: all var(--anim-fast) var(--ease-out);
+}
+
+.weather-animated:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Form input focus */
+.input-animated {
+  transition: all var(--anim-fast) var(--ease-out);
+}
+
+.input-animated:focus {
+  border-color: var(--primary);
+  box-shadow: var(--glow-primary);
+  transform: translateY(-1px);
+}
+
+/* Modal animations */
+.modal-backdrop {
+  opacity: 0;
+  transition: opacity var(--anim-normal) var(--ease-out);
+}
+
+.modal-backdrop.visible {
+  opacity: 1;
+}
+
+.modal-content {
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: all var(--anim-normal) var(--ease-out);
+}
+
+.modal-backdrop.visible .modal-content {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

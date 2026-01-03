@@ -129,6 +129,34 @@ function seedCourses() {
   console.log(`Seeded ${courses.length} courses`);
 }
 
+// Staff pick course names - these are the top courses
+const staffPickCourseNames = [
+  "TPC Harding Park",
+  "Pasatiempo Golf Club",
+  "Presidio Golf Course",
+  "Half Moon Bay - Ocean Course",
+  "Corica Park - South Course",
+  "Cinnabar Hills Golf Club",
+  "Tilden Park Golf Course",
+  "The Links at Bodega Harbour"
+];
+
+// Initialize staff picks from course names
+function initializeStaffPicks() {
+  const setStaffPickStmt = db.prepare(`
+    UPDATE courses SET is_staff_pick = 1, staff_pick_order = ?
+    WHERE name = ?
+  `);
+
+  const clearStaffPicks = db.prepare('UPDATE courses SET is_staff_pick = 0, staff_pick_order = NULL');
+  clearStaffPicks.run();
+
+  for (let i = 0; i < staffPickCourseNames.length; i++) {
+    setStaffPickStmt.run(i + 1, staffPickCourseNames[i]);
+  }
+  console.log(`Initialized ${staffPickCourseNames.length} staff picks`);
+}
+
 function getAllCourses() {
   return db.prepare('SELECT * FROM courses ORDER BY region, city, name').all();
 }
@@ -249,6 +277,7 @@ function setStaffPick(courseId, isPick, order = null) {
 module.exports = {
   seedCourses,
   seedTournamentHistory,
+  initializeStaffPicks,
   getAllCourses,
   getCoursesByRegion,
   getCoursesWithGolfNow,

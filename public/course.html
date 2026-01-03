@@ -9,7 +9,8 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/animations.css">
   <style>
     :root {
       --primary: #2d5a27;
@@ -23,12 +24,7 @@
       --border: #c4a882;
       --border-light: #ddd0bc;
       --gold: #b8860b;
-      /* Animation timing */
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-      --duration-fast: 0.2s;
-      --duration-normal: 0.4s;
-      --duration-slow: 0.6s;
+      --deal: #d32f2f;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -40,47 +36,28 @@
     }
     .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
 
-    /* Animation System */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes countUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* Hero-specific reveal animation */
     @keyframes heroReveal {
       from { opacity: 0; transform: scale(1.05); }
       to { opacity: 1; transform: scale(1); }
     }
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+
+    /* Section entrance - uses unified system */
+    .section-animate {
+      opacity: 0;
+      animation: fadeInUp var(--anim-normal) var(--ease-out) forwards;
     }
-    .animate-fade-up { animation: fadeInUp var(--duration-slow) var(--ease-out-expo) forwards; opacity: 0; }
-    .animate-fade { animation: fadeIn var(--duration-normal) var(--ease-out-quart) forwards; opacity: 0; }
-    .animate-scale { animation: scaleIn var(--duration-normal) var(--ease-out-expo) forwards; opacity: 0; }
-    .animate-slide { animation: slideInRight var(--duration-normal) var(--ease-out-expo) forwards; opacity: 0; }
-    .stagger-1 { animation-delay: 0.05s; }
-    .stagger-2 { animation-delay: 0.1s; }
-    .stagger-3 { animation-delay: 0.15s; }
-    .stagger-4 { animation-delay: 0.2s; }
-    .stagger-5 { animation-delay: 0.25s; }
-    .stagger-6 { animation-delay: 0.3s; }
-    .stagger-7 { animation-delay: 0.35s; }
-    .stagger-8 { animation-delay: 0.4s; }
+    .section-animate:nth-child(1) { animation-delay: calc(var(--anim-stagger) * 1); }
+    .section-animate:nth-child(2) { animation-delay: calc(var(--anim-stagger) * 2); }
+    .section-animate:nth-child(3) { animation-delay: calc(var(--anim-stagger) * 3); }
+    .section-animate:nth-child(4) { animation-delay: calc(var(--anim-stagger) * 4); }
+    .section-animate:nth-child(5) { animation-delay: calc(var(--anim-stagger) * 5); }
+    .section-animate:nth-child(6) { animation-delay: calc(var(--anim-stagger) * 6); }
+    .section-animate:nth-child(7) { animation-delay: calc(var(--anim-stagger) * 7); }
+    .section-animate:nth-child(8) { animation-delay: calc(var(--anim-stagger) * 8); }
+    .section-animate:nth-child(9) { animation-delay: calc(var(--anim-stagger) * 9); }
+    .section-animate:nth-child(10) { animation-delay: calc(var(--anim-stagger) * 10); }
+    .section-animate:nth-child(n+11) { animation-delay: calc(var(--anim-stagger) * 10); }
 
     /* Header */
     header {
@@ -119,13 +96,20 @@
       padding: 8px 14px;
       border: 2px solid rgba(255,255,255,0.5);
       border-radius: 4px;
-      transition: all var(--duration-fast) var(--ease-out-quart);
+      transition: all var(--anim-fast) var(--ease-out);
       font-size: 0.85rem;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: #fff;
+      transform: translateY(-1px);
+    }
+    .nav-btn:active {
+      transform: scale(0.97);
+    }
     .nav-btn svg { width: 16px; height: 16px; }
 
     /* Hero */
@@ -138,7 +122,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      animation: heroReveal 0.8s var(--ease-out-expo) forwards;
+      animation: heroReveal var(--anim-slow) var(--ease-out) forwards;
     }
     .hero-overlay {
       position: absolute;
@@ -152,13 +136,13 @@
       font-size: 2.2rem;
       margin-bottom: 6px;
       font-weight: 700;
-      animation: fadeInUp 0.6s var(--ease-out-expo) 0.2s forwards;
+      animation: fadeInUp var(--anim-normal) var(--ease-out) 0.15s forwards;
       opacity: 0;
     }
     .hero-overlay .subtitle {
       opacity: 0;
       font-style: italic;
-      animation: fadeInUp 0.6s var(--ease-out-expo) 0.3s forwards;
+      animation: fadeInUp var(--anim-normal) var(--ease-out) 0.25s forwards;
     }
 
     /* Region navigation */
@@ -178,10 +162,23 @@
       font-weight: 600;
       text-decoration: none;
       color: var(--text);
-      transition: all var(--duration-fast) var(--ease-out-quart);
+      transition: all var(--anim-fast) var(--ease-out);
     }
-    .region-chip:hover { background: #e8efe6; border-color: var(--primary); }
-    .region-chip.active { background: var(--primary); color: #f4f1e8; border-color: var(--primary-dark); }
+    .region-chip:hover {
+      background: #e8efe6;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    .region-chip:active {
+      transform: scale(0.97);
+    }
+    .region-chip.active {
+      background: var(--primary);
+      color: #f4f1e8;
+      border-color: var(--primary-dark);
+      box-shadow: var(--shadow-md);
+    }
 
     /* Nearby courses */
     .nearby-courses {
@@ -196,12 +193,16 @@
       border-radius: 8px;
       text-decoration: none;
       color: inherit;
-      transition: all var(--duration-fast) var(--ease-out-quart);
+      transition: all var(--anim-fast) var(--ease-out);
     }
     .nearby-course:hover {
       border-color: var(--primary);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(61,41,20,0.1);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      background: var(--card-bg);
+    }
+    .nearby-course:active {
+      transform: translateY(-2px) scale(0.98);
     }
     .nearby-course .name {
       font-family: 'Playfair Display', Georgia, serif;
@@ -221,9 +222,13 @@
     .section {
       background: var(--card-bg);
       border: 2px solid var(--border-light);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 24px;
       margin-bottom: 24px;
+      transition: box-shadow var(--anim-fast) var(--ease-out);
+    }
+    .section:hover {
+      box-shadow: var(--shadow-sm);
     }
     .section h3 {
       font-family: 'Playfair Display', Georgia, serif;
@@ -245,13 +250,19 @@
       text-align: center;
       padding: 16px 12px;
       background: var(--bg-paper);
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid var(--border-light);
+      transition: all var(--anim-fast) var(--ease-out);
+    }
+    .course-stat:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+      border-color: var(--primary);
     }
     .course-stat .value {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: 'DM Mono', 'Courier New', monospace;
       font-size: 1.5rem;
-      font-weight: 700;
+      font-weight: 500;
       color: var(--primary);
     }
     .course-stat .label { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
@@ -267,26 +278,51 @@
       align-items: center;
       gap: 8px;
       padding: 14px 24px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 1rem;
       font-weight: 600;
       text-decoration: none;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all var(--anim-fast) var(--ease-out);
       border: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform var(--anim-slow) var(--ease-out);
+    }
+    .btn:hover::after {
+      transform: translateX(100%);
+    }
+    .btn:active {
+      transform: scale(0.97);
     }
     .btn-primary {
-      background: var(--primary);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: #fff;
+      box-shadow: 0 2px 8px rgba(45, 90, 39, 0.25);
     }
-    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:hover {
+      box-shadow: 0 4px 16px rgba(45, 90, 39, 0.35);
+      transform: translateY(-2px);
+    }
     .btn-secondary {
       background: var(--bg-paper);
       color: var(--text);
       border: 2px solid var(--border);
     }
-    .btn-secondary:hover { background: var(--bg); border-color: var(--primary); }
+    .btn-secondary:hover {
+      background: var(--bg);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
 
     /* Contact info */
     .contact-info { display: flex; flex-wrap: wrap; gap: 16px; }
@@ -296,12 +332,18 @@
       gap: 12px;
       padding: 12px 16px;
       background: var(--bg-paper);
-      border-radius: 8px;
+      border-radius: 10px;
       text-decoration: none;
       color: inherit;
-      transition: background 0.2s;
+      border: 1px solid transparent;
+      transition: all var(--anim-fast) var(--ease-out);
     }
-    .contact-item:hover { background: var(--bg); }
+    .contact-item:hover {
+      background: var(--card-bg);
+      border-color: var(--border-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
     .contact-item svg { stroke: var(--primary); flex-shrink: 0; }
     .contact-item .label { font-size: 0.8rem; color: var(--text-muted); }
     .contact-item .value { font-weight: 600; }
@@ -316,8 +358,16 @@
       border-radius: 20px;
       font-size: 0.9rem;
       font-weight: 500;
+      transition: all var(--anim-fast) var(--ease-out);
     }
-    .facility-badge.available { background: #e8f5e9; color: #2e7d32; }
+    .facility-badge.available {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .facility-badge.available:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(46, 125, 50, 0.15);
+    }
     .facility-badge.unavailable { background: #fafafa; color: #999; text-decoration: line-through; }
 
     /* Weather link */
@@ -327,24 +377,35 @@
       gap: 16px;
       padding: 16px;
       background: var(--bg-paper);
-      border-radius: 8px;
+      border-radius: 10px;
       text-decoration: none;
       color: inherit;
-      transition: background 0.2s;
+      transition: all var(--anim-fast) var(--ease-out);
     }
-    .weather-link:hover { background: var(--bg); }
+    .weather-link:hover {
+      background: var(--card-bg);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
     .weather-link svg:first-child { stroke: var(--gold); }
     .weather-text { flex: 1; }
     .weather-text strong { display: block; }
     .weather-text span { font-size: 0.85rem; color: var(--text-muted); }
 
     /* Course record */
-    .course-record { text-align: center; padding: 20px; background: var(--bg-paper); border-radius: 8px; }
+    .course-record {
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(135deg, var(--bg-paper), #f5f2e9);
+      border-radius: 12px;
+      border: 2px solid var(--border-light);
+    }
     .course-record .score {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 3rem;
-      font-weight: 700;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 3.5rem;
+      font-weight: 500;
       color: var(--primary);
+      text-shadow: 0 2px 4px rgba(45, 90, 39, 0.1);
     }
     .course-record .holder { font-weight: 600; margin-top: 8px; }
     .course-record .details { font-size: 0.9rem; color: var(--text-muted); margin-top: 6px; }
@@ -353,16 +414,30 @@
     .tournament-item {
       padding: 16px;
       background: var(--bg-paper);
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 12px;
+      border-left: 3px solid var(--gold);
+      transition: all var(--anim-fast) var(--ease-out);
+    }
+    .tournament-item:hover {
+      transform: translateX(4px);
+      background: var(--card-bg);
     }
     .tournament-item:last-child { margin-bottom: 0; }
     .tournament-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
     .tournament-name { font-weight: 600; }
-    .tournament-year { color: var(--gold); font-weight: 600; }
+    .tournament-year {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      color: var(--gold);
+      font-weight: 500;
+    }
     .tournament-winner { display: flex; justify-content: space-between; }
     .winner-name { color: var(--text-muted); }
-    .winner-score { font-weight: 700; color: var(--primary); }
+    .winner-score {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-weight: 500;
+      color: var(--primary);
+    }
     .tournament-notes { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; font-style: italic; }
 
     /* Reviews */
@@ -373,7 +448,7 @@
       align-items: center;
       padding: 16px;
       background: var(--bg-paper);
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 20px;
     }
     .rating-box {
@@ -381,8 +456,17 @@
       padding: 12px 20px;
       background: var(--card-bg);
       border-radius: 8px;
+      transition: all var(--anim-fast) var(--ease-out);
     }
-    .rating-box .value { font-size: 1.8rem; font-weight: 700; color: var(--gold); }
+    .rating-box:hover {
+      transform: scale(1.05);
+    }
+    .rating-box .value {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: var(--gold);
+    }
     .rating-box .label { font-size: 0.8rem; color: var(--text-muted); }
     .rating-trend { flex: 1; font-size: 0.9rem; color: var(--text-muted); }
     .rating-trend .up { color: #2e7d32; }
@@ -391,8 +475,16 @@
     .review-card {
       padding: 16px;
       background: var(--bg-paper);
-      border-radius: 8px;
+      border-radius: 10px;
       margin-bottom: 12px;
+      border: 1px solid transparent;
+      transition: all var(--anim-fast) var(--ease-out);
+    }
+    .review-card:hover {
+      background: var(--card-bg);
+      border-color: var(--border-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
     }
     .review-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
     .review-author { font-weight: 600; }
@@ -404,11 +496,24 @@
     .photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
     .photo-card {
       position: relative;
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
       aspect-ratio: 4/3;
+      transition: all var(--anim-fast) var(--ease-out);
     }
-    .photo-card img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-card:hover {
+      transform: scale(1.02);
+      box-shadow: var(--shadow-md);
+    }
+    .photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--anim-slow) var(--ease-out);
+    }
+    .photo-card:hover img {
+      transform: scale(1.1);
+    }
     .photo-card .year {
       position: absolute;
       bottom: 8px;
@@ -418,6 +523,7 @@
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 0.75rem;
+      font-family: 'DM Mono', 'Courier New', monospace;
     }
 
     /* Food highlight */
@@ -427,13 +533,22 @@
       gap: 20px;
       padding: 16px;
       background: var(--bg-paper);
-      border-radius: 8px;
+      border-radius: 10px;
+      transition: all var(--anim-fast) var(--ease-out);
+    }
+    .food-highlight:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
     }
     .food-highlight img {
       width: 80px;
       height: 80px;
       border-radius: 8px;
       object-fit: cover;
+      transition: transform var(--anim-fast) var(--ease-out);
+    }
+    .food-highlight:hover img {
+      transform: scale(1.05);
     }
     .food-info h4 { font-family: 'Playfair Display', Georgia, serif; margin-bottom: 4px; }
     .food-info .rating { color: var(--gold); font-weight: 600; }
@@ -497,20 +612,34 @@
     .fun-fact {
       background: var(--bg-paper);
       border: 2px solid var(--border-light);
-      border-radius: 8px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 20px 16px;
       text-align: center;
+      transition: all var(--anim-fast) var(--ease-out);
     }
-    .fun-fact-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .fun-fact:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+    .fun-fact-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      transition: transform var(--anim-fast) var(--ease-spring);
+    }
+    .fun-fact:hover .fun-fact-icon {
+      transform: scale(1.2);
+    }
     .fun-fact-value {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 1.4rem;
+      font-weight: 500;
       color: var(--primary);
     }
     .fun-fact-label {
       font-size: 0.8rem;
       color: var(--text-muted);
+      margin-top: 4px;
     }
 
     /* Loading */
@@ -672,7 +801,7 @@
       // Region navigation
       const regions = getAllRegions();
       html += `
-        <div class="region-nav animate-fade-up stagger-1">
+        <div class="region-nav section-animate">
           ${regions.map(r => `
             <a href="/courses.html?region=${encodeURIComponent(r)}" class="region-chip ${r === course.region ? 'active' : ''}">${r}</a>
           `).join('')}
@@ -681,7 +810,7 @@
 
       // Quick Stats
       html += `
-        <div class="section animate-fade-up stagger-2">
+        <div class="section section-animate">
           <h3>Course Stats</h3>
           <div class="course-stats">
             <div class="course-stat"><div class="value">${course.par || '-'}</div><div class="label">Par</div></div>
@@ -695,7 +824,7 @@
 
       // Action buttons
       html += `
-        <div class="section animate-fade-up stagger-3" style="text-align: center;">
+        <div class="section section-animate" style="text-align: center;">
           <div class="action-buttons" style="justify-content: center;">
             ${course.booking_url ? `<a href="${course.booking_url}" target="_blank" class="btn btn-primary">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -716,7 +845,7 @@
       // Contact info
       if (course.phone_number || course.website_url) {
         html += `
-          <div class="section animate-fade-up stagger-4">
+          <div class="section section-animate">
             <h3>Contact & Info</h3>
             <div class="contact-info">
               ${course.phone_number ? `
@@ -735,7 +864,7 @@
       // Weather (embedded)
       if (course.latitude && course.longitude) {
         html += `
-          <div class="section animate-fade-up stagger-5">
+          <div class="section section-animate">
             <h3>Today's Weather</h3>
             <div id="weather-widget" class="weather-widget">
               <div class="loading">Loading weather...</div>
@@ -748,7 +877,7 @@
 
       // Facilities
       html += `
-        <div class="section animate-fade-up stagger-6">
+        <div class="section section-animate">
           <h3>Practice Facilities</h3>
           <div class="facilities-grid">
             <div class="facility-badge ${course.has_driving_range ? 'available' : 'unavailable'}">
@@ -776,7 +905,7 @@
       // Course record
       if (course.course_record_score) {
         html += `
-          <div class="section animate-fade-up stagger-7">
+          <div class="section section-animate">
             <h3>Course Record</h3>
             <div class="course-record">
               <div class="score">${course.course_record_score}</div>
@@ -790,7 +919,7 @@
       // Tournament history
       if (course.tournament_history?.length > 0) {
         html += `
-          <div class="section animate-fade-up stagger-8">
+          <div class="section section-animate">
             <h3>PGA Tour History</h3>
             ${course.tournament_history.map(t => `
               <div class="tournament-item">
@@ -811,7 +940,7 @@
 
       // Course Fun Facts (placeholder for future community data)
       html += `
-        <div class="section animate-fade-up">
+        <div class="section section-animate">
           <h3>Course Facts</h3>
           <div class="fun-facts">
             <div class="fun-fact">
@@ -841,7 +970,7 @@
       // Photos
       if (course.photos?.length > 0) {
         html += `
-          <div class="section animate-fade-up">
+          <div class="section section-animate">
             <h3>Photos</h3>
             <div class="photos-grid">
               ${course.photos.map(p => `
@@ -858,7 +987,7 @@
       // Food highlight
       if (course.top_food) {
         html += `
-          <div class="section animate-fade-up">
+          <div class="section section-animate">
             <h3>Food & Beverage</h3>
             <div class="food-highlight">
               ${course.top_food.photo_url ? `<img src="${course.top_food.photo_url}" alt="${course.top_food.name}">` : ''}
@@ -876,7 +1005,7 @@
       const nearbyCourses = getNearbyCourses(course);
       if (nearbyCourses.length > 0) {
         html += `
-          <div class="section animate-fade-up">
+          <div class="section section-animate">
             <h3>More in ${course.region}</h3>
             <div class="nearby-courses">
               ${nearbyCourses.map(c => `

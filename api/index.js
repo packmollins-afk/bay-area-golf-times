@@ -159,6 +159,7 @@ app.get('/api/tee-times', (req, res) => {
       holes,
       players,
       next_available,
+      staff_picks,
       sort_by = 'datetime',
       sort_order = 'ASC',
       limit = 100,
@@ -181,6 +182,11 @@ app.get('/api/tee-times', (req, res) => {
 
     // Always filter out past tee times (use Pacific time: UTC-8)
     sql += " AND t.datetime >= datetime('now', '-8 hours')";
+
+    // Filter by staff picks
+    if (staff_picks === 'true' || staff_picks === '1') {
+      sql += ' AND c.is_staff_pick = 1';
+    }
 
     // If not next_available mode, also filter by specific date
     if (next_available !== 'true' && next_available !== '1' && date) {

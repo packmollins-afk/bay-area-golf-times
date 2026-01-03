@@ -223,7 +223,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/animations.css">
 
   <style>
     :root {
@@ -242,6 +243,14 @@
       --gold: #b8860b;
       --contour: #8b7355;
       --water: #5d8aa8;
+
+      /* Animation tokens */
+      --anim-instant: 100ms;
+      --anim-fast: 200ms;
+      --anim-normal: 350ms;
+      --anim-slow: 500ms;
+      --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -277,40 +286,99 @@
       font-style: italic;
     }
 
-    .quick-actions {
-      background: var(--card-bg);
-      padding: 20px 24px;
-      border-radius: 4px;
-      margin: 24px 0 16px;
-      border: 2px solid var(--border-light);
-      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
-    }
-    .quick-actions-header {
+    /* Filter Tabs */
+    .filter-tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
-      gap: 12px;
     }
-    .next-available-btn {
-      padding: 12px 24px;
-      background: var(--primary);
-      color: #f4f1e8;
-      border: 2px solid var(--primary-dark);
-      border-radius: 4px;
+    .filter-tab {
+      padding: 14px 28px;
+      background: white;
+      border: 2px solid var(--border-light);
+      border-radius: 30px;
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      gap: 10px;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+      transition: all var(--anim-fast) var(--ease-out);
+      box-shadow: 0 2px 8px rgba(61, 41, 20, 0.06);
     }
-    .next-available-btn:hover { background: var(--primary-light); }
-    .next-available-btn.active { background: var(--primary-dark); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    .filter-tab::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.5));
+      opacity: 0;
+      transition: opacity var(--anim-fast) var(--ease-out);
+    }
+    .filter-tab:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(61, 41, 20, 0.12);
+    }
+    .filter-tab:hover::before {
+      opacity: 1;
+    }
+    .filter-tab:active {
+      transform: translateY(-1px);
+    }
+    .filter-tab.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #f4f1e8;
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(45, 90, 39, 0.3);
+    }
+    .filter-tab.active svg {
+      fill: #f4f1e8;
+      stroke: #f4f1e8;
+    }
+    .filter-tab[data-filter="staff_picks"] {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border-color: var(--gold);
+      color: #92650a;
+    }
+    .filter-tab[data-filter="staff_picks"] svg {
+      fill: var(--gold);
+    }
+    .filter-tab[data-filter="staff_picks"]:hover {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      box-shadow: 0 6px 20px rgba(184, 134, 11, 0.2);
+    }
+    .filter-tab[data-filter="staff_picks"].active {
+      background: linear-gradient(135deg, var(--gold), #92650a);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(184, 134, 11, 0.4);
+    }
+    .filter-tab[data-filter="staff_picks"].active svg {
+      fill: #fff;
+    }
+    .filter-tab[data-filter="favorites"] {
+      background: linear-gradient(135deg, #fdf5f5, #fce4ec);
+      border-color: #e91e63;
+      color: #c2185b;
+    }
+    .filter-tab[data-filter="favorites"]:hover {
+      background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+      box-shadow: 0 6px 20px rgba(233, 30, 99, 0.15);
+    }
+    .filter-tab[data-filter="favorites"].active {
+      background: linear-gradient(135deg, #e91e63, #c2185b);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(233, 30, 99, 0.4);
+    }
+    .filter-tab[data-filter="favorites"].active svg {
+      stroke: #fff;
+      fill: none;
+    }
 
     .region-chips { display: flex; gap: 10px; flex-wrap: wrap; }
     .region-chip {
@@ -540,108 +608,194 @@
     .sort-controls select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
 
     /* Grouped Time Slots */
-    .tee-times-grid { display: grid; gap: 16px; }
+    .tee-times-grid {
+      display: grid;
+      gap: 20px;
+    }
 
     .time-slot-card {
       background: var(--card-bg);
-      border-radius: 4px;
+      border-radius: 8px;
       overflow: hidden;
       border: 2px solid var(--border-light);
-      box-shadow: 0 3px 10px rgba(61, 41, 20, 0.08);
+      box-shadow: 0 4px 16px rgba(61, 41, 20, 0.08);
+      opacity: 0;
+      animation: fadeInUp var(--anim-normal) var(--ease-out) forwards;
+      transition: box-shadow var(--anim-fast) var(--ease-out),
+                  transform var(--anim-fast) var(--ease-out);
+    }
+
+    .time-slot-card:hover {
+      box-shadow: 0 8px 32px rgba(61, 41, 20, 0.12);
+      transform: translateY(-2px);
     }
 
     .time-slot-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 24px;
-      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      padding: 20px 28px;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
       color: #f4f1e8;
       border-bottom: 3px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .time-slot-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 200%; }
     }
 
     .time-slot-time {
       display: flex;
       align-items: baseline;
-      gap: 12px;
+      gap: 16px;
     }
 
     .time-slot-time .time {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.6rem;
-      font-weight: 700;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: 1.8rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     .time-slot-time .date {
-      font-size: 0.9rem;
-      opacity: 0.9;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 0.95rem;
+      opacity: 0.85;
       font-style: italic;
+      background: rgba(255,255,255,0.15);
+      padding: 4px 12px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
     }
 
     .time-slot-meta {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       font-size: 0.9rem;
     }
 
     .time-slot-meta .course-count {
       background: rgba(255,255,255,0.2);
-      padding: 4px 10px;
-      border-radius: 12px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+      transition: all var(--anim-fast) var(--ease-out);
+    }
+
+    .time-slot-meta .course-count:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
     }
 
     .time-slot-meta .price-range {
-      font-weight: 600;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      background: rgba(0,0,0,0.15);
+      padding: 6px 14px;
+      border-radius: 20px;
     }
 
     .time-slot-meta .deals-badge {
-      background: var(--deal);
-      padding: 4px 8px;
-      border-radius: 4px;
+      background: linear-gradient(135deg, var(--deal), #a83200);
+      padding: 6px 12px;
+      border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 2px 8px rgba(139, 37, 0, 0.4);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.02); }
     }
 
     .time-slot-courses {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 12px;
-      padding: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(244, 241, 232, 0.5) 0%, transparent 100%);
     }
 
     .course-chip {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg-paper);
-      border-radius: 4px;
+      gap: 14px;
+      padding: 16px 18px;
+      background: white;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
       border: 2px solid var(--border-light);
+      transition: all var(--anim-fast) var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .course-chip::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 60%, rgba(45, 90, 39, 0.03) 100%);
+      opacity: 0;
+      transition: opacity var(--anim-fast) var(--ease-out);
     }
 
     .course-chip:hover {
-      background: #e8efe6;
+      background: white;
       border-color: var(--primary);
-      transform: translateY(-2px);
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 8px 24px rgba(45, 90, 39, 0.15);
+    }
+
+    .course-chip:hover::before {
+      opacity: 1;
+    }
+
+    .course-chip:active {
+      transform: translateY(-2px) scale(0.99);
     }
 
     .course-chip-main {
       flex: 1;
       min-width: 0;
+      position: relative;
+      z-index: 1;
     }
 
     .course-chip-name {
       display: block;
       font-family: 'Playfair Display', Georgia, serif;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      transition: color var(--anim-fast) var(--ease-out);
+    }
+
+    .course-chip:hover .course-chip-name {
+      color: var(--primary-dark);
     }
 
     .course-chip-location {
@@ -649,29 +803,42 @@
       font-size: 0.8rem;
       color: var(--text-muted);
       font-style: italic;
+      margin-top: 2px;
     }
 
     .course-chip-details {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       font-size: 0.75rem;
       color: var(--text-muted);
+      margin-top: 6px;
     }
 
     .course-chip-details span {
+      background: var(--bg);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+      transition: all var(--anim-fast) var(--ease-out);
+    }
+
+    .course-chip:hover .course-chip-details span {
       background: white;
-      padding: 2px 6px;
-      border-radius: 4px;
+      border-color: var(--border);
     }
 
     .chip-rating {
       color: var(--gold) !important;
       font-weight: 600;
+      background: linear-gradient(135deg, #fffbeb, #fef3c7) !important;
+      border-color: var(--gold) !important;
     }
 
     .course-chip-price {
       text-align: right;
-      min-width: 50px;
+      min-width: 60px;
+      position: relative;
+      z-index: 1;
     }
 
     .course-chip-price .chip-original {
@@ -682,33 +849,79 @@
     }
 
     .course-chip-price .chip-price {
-      font-weight: 700;
-      font-size: 1rem;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      font-size: 1.15rem;
       color: var(--text);
+      transition: all var(--anim-fast) var(--ease-spring);
+    }
+
+    .course-chip:hover .course-chip-price .chip-price {
+      transform: scale(1.08);
     }
 
     .course-chip-price.has-deal .chip-price {
       color: var(--deal);
     }
 
+    .course-chip-price.has-deal::after {
+      content: 'DEAL';
+      display: block;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: white;
+      background: var(--deal);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
     .chip-book {
-      padding: 8px 16px;
-      background: var(--primary);
+      padding: 10px 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: #f4f1e8;
       text-decoration: none;
-      border-radius: 4px;
+      border-radius: 6px;
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 0.85rem;
       font-weight: 600;
-      transition: background 0.2s;
       white-space: nowrap;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border: 2px solid var(--primary-dark);
+      letter-spacing: 0.06em;
+      border: none;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--anim-fast) var(--ease-out);
+      box-shadow: 0 2px 8px rgba(45, 90, 39, 0.3);
+      z-index: 1;
+    }
+
+    .chip-book::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      opacity: 0;
+      transition: opacity var(--anim-fast) var(--ease-out);
     }
 
     .chip-book:hover {
-      background: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(45, 90, 39, 0.4);
+    }
+
+    .chip-book:hover::before {
+      opacity: 1;
+    }
+
+    .chip-book:active {
+      transform: translateY(0);
+    }
+
+    .chip-book span {
+      position: relative;
+      z-index: 1;
     }
 
     @media (max-width: 768px) {
@@ -1091,38 +1304,25 @@
     <!-- Tee Times Section -->
     <section id="tee-times-tab" class="tab-content active">
       <h2 class="sr-only">Available Golf Tee Times in Bay Area</h2>
-      <div class="quick-actions">
-        <div class="quick-actions-header">
-          <button class="next-available-btn" id="next-available-btn" onclick="toggleNextAvailable()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            Next Available Tee Times
-          </button>
-          <div class="region-chips">
-            <button class="region-chip active" data-region="" onclick="selectRegion('')">All Courses</button>
-            <button class="region-chip staff-picks" data-region="staff_picks" onclick="selectRegion('staff_picks')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right: 4px;">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-              Staff Picks
-            </button>
-            <button class="region-chip favorites" data-region="favorites" onclick="selectRegion('favorites')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-              Favorites
-            </button>
-            <button class="region-chip" data-region="San Francisco" onclick="selectRegion('San Francisco')">SF</button>
-            <button class="region-chip" data-region="South Bay" onclick="selectRegion('South Bay')">South Bay</button>
-            <button class="region-chip" data-region="East Bay" onclick="selectRegion('East Bay')">East Bay</button>
-            <button class="region-chip" data-region="North Bay" onclick="selectRegion('North Bay')">North Bay</button>
-          </div>
-        </div>
-      </div>
 
-      <div class="filters">
+      <div class="filters" style="margin-top: 24px;">
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="staff_picks" onclick="selectFilterTab('staff_picks')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Staff Picks
+        </button>
+        <button class="filter-tab" data-filter="favorites" onclick="selectFilterTab('favorites')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          My Favorites
+        </button>
+        <button class="filter-tab" data-filter="all" onclick="selectFilterTab('all')">
+          All Courses
+        </button>
+      </div>
       <div class="filters-grid">
         <div class="filter-group">
           <label for="date">Date</label>
@@ -1342,6 +1542,9 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('date').value = today;
       loadCourses();
+
+      // Default to Staff Picks
+      selectedRegion = 'staff_picks';
       searchTeeTimes();
 
       // Handle URL hash for deep linking (SEO)
@@ -1354,7 +1557,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const regionParam = urlParams.get('region');
       if (regionParam) {
-        selectRegion(regionParam);
+        selectFilterTab(regionParam === 'favorites' ? 'favorites' : regionParam === 'staff_picks' ? 'staff_picks' : 'all');
       }
 
       // Handle course query param - open course detail modal
@@ -1416,6 +1619,16 @@
         btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Next Available Tee Times`;
         dateInput.disabled = false;
       }
+      searchTeeTimes();
+    }
+
+    // New filter tab function
+    function selectFilterTab(filter) {
+      selectedRegion = filter === 'all' ? '' : filter;
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.filter === filter);
+      });
+      updateCourseDropdown();
       searchTeeTimes();
     }
 
@@ -1586,8 +1799,10 @@
         document.getElementById('results-count').textContent = `${teeTimes.length} ${modeText}tee times found${regionText}`;
 
         if (teeTimes.length === 0) {
-          const noFavsMsg = selectedRegion === 'favorites' ? 'Add some courses to your favorites first!' : 'Try adjusting your filters.';
-          resultsEl.innerHTML = `<div class="no-results"><h3>No tee times found</h3><p>${noFavsMsg}</p></div>`;
+          let noResultsMsg = 'Try adjusting your filters.';
+          if (selectedRegion === 'favorites') noResultsMsg = 'Add some courses to your favorites first!';
+          else if (selectedRegion === 'staff_picks') noResultsMsg = 'No Staff Pick courses have tee times available. Try "All Courses" instead.';
+          resultsEl.innerHTML = `<div class="no-results"><h3>No tee times found</h3><p>${noResultsMsg}</p></div>`;
           resultsEl.setAttribute('aria-busy', 'false');
           return;
         }
