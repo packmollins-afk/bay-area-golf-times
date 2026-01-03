@@ -295,6 +295,65 @@
     /* Additional East Bay Course */
     .fw-corica-n { top: 36%; left: 56%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-8deg); }
 
+    /* Price tags under fairways */
+    .fairway .price-tag {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) rotate(var(--counter-rotate, 0deg));
+      background: rgba(45, 90, 39, 0.95);
+      color: #fff;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 9px;
+      font-weight: 700;
+      white-space: nowrap;
+      margin-top: 2px;
+      z-index: 50;
+      pointer-events: none;
+      letter-spacing: -0.02em;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .fairway .price-tag.loading {
+      background: rgba(139, 115, 85, 0.7);
+      font-size: 7px;
+    }
+    .fairway:hover .price-tag {
+      background: rgba(45, 90, 39, 1);
+      transform: translateX(-50%) rotate(var(--counter-rotate, 0deg)) scale(1.1);
+    }
+    /* Counter-rotate to keep price tags upright */
+    .fw-harding .price-tag { --counter-rotate: 30deg; }
+    .fw-lincoln .price-tag { --counter-rotate: 25deg; }
+    .fw-presidio .price-tag { --counter-rotate: 15deg; }
+    .fw-sharp .price-tag { --counter-rotate: 25deg; }
+    .fw-gleneagles .price-tag { --counter-rotate: 20deg; }
+    .fw-olympic .price-tag { --counter-rotate: 40deg; }
+    .fw-paloalto .price-tag { --counter-rotate: -10deg; }
+    .fw-santateresa .price-tag { --counter-rotate: -25deg; }
+    .fw-cinnabar .price-tag { --counter-rotate: -15deg; }
+    .fw-deepcliff .price-tag { --counter-rotate: 5deg; }
+    .fw-sanjose .price-tag { --counter-rotate: -12deg; }
+    .fw-pasatiempo .price-tag { --counter-rotate: -5deg; }
+    .fw-corica .price-tag { --counter-rotate: 10deg; }
+    .fw-corica-n .price-tag { --counter-rotate: 8deg; }
+    .fw-tilden .price-tag { --counter-rotate: 5deg; }
+    .fw-boundary .price-tag { --counter-rotate: -8deg; }
+    .fw-metropolitan .price-tag { --counter-rotate: 15deg; }
+    .fw-poppy .price-tag { --counter-rotate: -12deg; }
+    .fw-diablo .price-tag { --counter-rotate: 8deg; }
+    .fw-peacock .price-tag { --counter-rotate: 25deg; }
+    .fw-indian .price-tag { --counter-rotate: 20deg; }
+    .fw-stonetree .price-tag { --counter-rotate: 15deg; }
+    .fw-millvalley .price-tag { --counter-rotate: 30deg; }
+    .fw-bodega .price-tag { --counter-rotate: 35deg; }
+    .fw-northwood .price-tag { --counter-rotate: 40deg; }
+    .fw-fleming .price-tag { --counter-rotate: 28deg; }
+    .fw-crystal .price-tag { --counter-rotate: 12deg; }
+    .fw-hmb-old .price-tag { --counter-rotate: 20deg; }
+    .fw-hmb-ocean .price-tag { --counter-rotate: 25deg; }
+
     /* Map title cartouche - more transparent */
     .cartouche {
       position: absolute;
@@ -838,40 +897,40 @@
     <!-- Golf course fairways -->
     <div class="fairways">
       <!-- San Francisco -->
-      <a href="/course/tpc-harding-park" class="fairway fw-harding" data-course="TPC Harding Park" data-initial="H"></a>
-      <a href="/course/tpc-harding-park-fleming-9" class="fairway fw-fleming" data-course="Fleming 9" data-initial="F"></a>
-      <a href="/course/lincoln-park-golf-course" class="fairway fw-lincoln" data-course="Lincoln Park" data-initial="L"></a>
-      <a href="/course/presidio-golf-course" class="fairway fw-presidio" data-course="Presidio" data-initial="P"></a>
-      <a href="/course/sharp-park-golf-course" class="fairway fw-sharp" data-course="Sharp Park" data-initial="S"></a>
-      <a href="/course/golden-gate-park-golf-course" class="fairway fw-gleneagles" data-course="Golden Gate Park" data-initial="G"></a>
-      <a href="/course/crystal-springs-golf-course" class="fairway fw-crystal" data-course="Crystal Springs" data-initial="CS"></a>
-      <a href="/course/half-moon-bay-old-course" class="fairway fw-hmb-old" data-course="Half Moon Bay Old" data-initial="HO"></a>
-      <a href="/course/half-moon-bay-ocean-course" class="fairway fw-hmb-ocean" data-course="Half Moon Bay Ocean" data-initial="HM"></a>
+      <a href="/course/tpc-harding-park" class="fairway fw-harding" data-course="TPC Harding Park" data-initial="H"><span class="price-tag loading">...</span></a>
+      <a href="/course/tpc-harding-park-fleming-9" class="fairway fw-fleming" data-course="Fleming 9" data-initial="F"><span class="price-tag loading">...</span></a>
+      <a href="/course/lincoln-park-golf-course" class="fairway fw-lincoln" data-course="Lincoln Park" data-initial="L"><span class="price-tag loading">...</span></a>
+      <a href="/course/presidio-golf-course" class="fairway fw-presidio" data-course="Presidio" data-initial="P"><span class="price-tag loading">...</span></a>
+      <a href="/course/sharp-park-golf-course" class="fairway fw-sharp" data-course="Sharp Park" data-initial="S"><span class="price-tag loading">...</span></a>
+      <a href="/course/golden-gate-park-golf-course" class="fairway fw-gleneagles" data-course="Golden Gate Park" data-initial="G"><span class="price-tag loading">...</span></a>
+      <a href="/course/crystal-springs-golf-course" class="fairway fw-crystal" data-course="Crystal Springs" data-initial="CS"><span class="price-tag loading">...</span></a>
+      <a href="/course/half-moon-bay-old-course" class="fairway fw-hmb-old" data-course="Half Moon Bay Old" data-initial="HO"><span class="price-tag loading">...</span></a>
+      <a href="/course/half-moon-bay-ocean-course" class="fairway fw-hmb-ocean" data-course="Half Moon Bay Ocean" data-initial="HM"><span class="price-tag loading">...</span></a>
 
       <!-- South Bay -->
-      <a href="/course/palo-alto-golf-course" class="fairway fw-paloalto" data-course="Palo Alto" data-initial="PA"></a>
-      <a href="/course/santa-teresa-golf-club" class="fairway fw-santateresa" data-course="Santa Teresa" data-initial="ST"></a>
-      <a href="/course/cinnabar-hills-golf-club" class="fairway fw-cinnabar" data-course="Cinnabar Hills" data-initial="C"></a>
-      <a href="/course/deep-cliff-golf-course" class="fairway fw-deepcliff" data-course="Deep Cliff" data-initial="D"></a>
-      <a href="/course/san-jose-municipal-golf-course" class="fairway fw-sanjose" data-course="San Jose Municipal" data-initial="SJ"></a>
-      <a href="/course/pasatiempo-golf-club" class="fairway fw-pasatiempo" data-course="Pasatiempo" data-initial="PT"></a>
+      <a href="/course/palo-alto-golf-course" class="fairway fw-paloalto" data-course="Palo Alto" data-initial="PA"><span class="price-tag loading">...</span></a>
+      <a href="/course/santa-teresa-golf-club" class="fairway fw-santateresa" data-course="Santa Teresa" data-initial="ST"><span class="price-tag loading">...</span></a>
+      <a href="/course/cinnabar-hills-golf-club" class="fairway fw-cinnabar" data-course="Cinnabar Hills" data-initial="C"><span class="price-tag loading">...</span></a>
+      <a href="/course/deep-cliff-golf-course" class="fairway fw-deepcliff" data-course="Deep Cliff" data-initial="D"><span class="price-tag loading">...</span></a>
+      <a href="/course/san-jose-municipal-golf-course" class="fairway fw-sanjose" data-course="San Jose Municipal" data-initial="SJ"><span class="price-tag loading">...</span></a>
+      <a href="/course/pasatiempo-golf-club" class="fairway fw-pasatiempo" data-course="Pasatiempo" data-initial="PT"><span class="price-tag loading">...</span></a>
 
       <!-- East Bay -->
-      <a href="/course/corica-park-south-course" class="fairway fw-corica" data-course="Corica Park South" data-initial="CS"></a>
-      <a href="/course/corica-park-north-course" class="fairway fw-corica-n" data-course="Corica Park North" data-initial="CN"></a>
-      <a href="/course/tilden-park-golf-course" class="fairway fw-tilden" data-course="Tilden Park" data-initial="T"></a>
-      <a href="/course/boundary-oak-golf-course" class="fairway fw-boundary" data-course="Boundary Oak" data-initial="B"></a>
-      <a href="/course/metropolitan-golf-links" class="fairway fw-metropolitan" data-course="Metropolitan" data-initial="M"></a>
-      <a href="/course/poppy-ridge-golf-course" class="fairway fw-poppy" data-course="Poppy Ridge" data-initial="PR"></a>
-      <a href="/course/diablo-creek-golf-course" class="fairway fw-diablo" data-course="Diablo Creek" data-initial="DC"></a>
+      <a href="/course/corica-park-south-course" class="fairway fw-corica" data-course="Corica Park South" data-initial="CS"><span class="price-tag loading">...</span></a>
+      <a href="/course/corica-park-north-course" class="fairway fw-corica-n" data-course="Corica Park North" data-initial="CN"><span class="price-tag loading">...</span></a>
+      <a href="/course/tilden-park-golf-course" class="fairway fw-tilden" data-course="Tilden Park" data-initial="T"><span class="price-tag loading">...</span></a>
+      <a href="/course/boundary-oak-golf-course" class="fairway fw-boundary" data-course="Boundary Oak" data-initial="B"><span class="price-tag loading">...</span></a>
+      <a href="/course/metropolitan-golf-links" class="fairway fw-metropolitan" data-course="Metropolitan" data-initial="M"><span class="price-tag loading">...</span></a>
+      <a href="/course/poppy-ridge-golf-course" class="fairway fw-poppy" data-course="Poppy Ridge" data-initial="PR"><span class="price-tag loading">...</span></a>
+      <a href="/course/diablo-creek-golf-course" class="fairway fw-diablo" data-course="Diablo Creek" data-initial="DC"><span class="price-tag loading">...</span></a>
 
       <!-- North Bay -->
-      <a href="/course/peacock-gap-golf-club" class="fairway fw-peacock" data-course="Peacock Gap" data-initial="PG"></a>
-      <a href="/course/indian-valley-golf-club" class="fairway fw-indian" data-course="Indian Valley" data-initial="IV"></a>
-      <a href="/course/stonetree-golf-club" class="fairway fw-stonetree" data-course="StoneTree" data-initial="ST"></a>
-      <a href="/course/mill-valley-golf-course" class="fairway fw-millvalley" data-course="Mill Valley" data-initial="MV"></a>
-      <a href="/course/the-links-at-bodega-harbour" class="fairway fw-bodega" data-course="Bodega Harbour" data-initial="BH"></a>
-      <a href="/course/northwood-golf-club" class="fairway fw-northwood" data-course="Northwood" data-initial="NW"></a>
+      <a href="/course/peacock-gap-golf-club" class="fairway fw-peacock" data-course="Peacock Gap" data-initial="PG"><span class="price-tag loading">...</span></a>
+      <a href="/course/indian-valley-golf-club" class="fairway fw-indian" data-course="Indian Valley" data-initial="IV"><span class="price-tag loading">...</span></a>
+      <a href="/course/stonetree-golf-club" class="fairway fw-stonetree" data-course="StoneTree" data-initial="ST"><span class="price-tag loading">...</span></a>
+      <a href="/course/mill-valley-golf-course" class="fairway fw-millvalley" data-course="Mill Valley" data-initial="MV"><span class="price-tag loading">...</span></a>
+      <a href="/course/the-links-at-bodega-harbour" class="fairway fw-bodega" data-course="Bodega Harbour" data-initial="BH"><span class="price-tag loading">...</span></a>
+      <a href="/course/northwood-golf-club" class="fairway fw-northwood" data-course="Northwood" data-initial="NW"><span class="price-tag loading">...</span></a>
     </div>
 
     <!-- Region labels -->
@@ -978,5 +1037,58 @@
       </svg>
     </div>
   </div>
+
+  <script>
+    // Load next available tee time prices for each course
+    async function loadPrices() {
+      try {
+        const res = await fetch('/api/tee-times?next_available=true&limit=200');
+        const teeTimes = await res.json();
+
+        // Group by course, get lowest price for each
+        const coursePrices = {};
+        teeTimes.forEach(tt => {
+          if (!coursePrices[tt.course_name] || tt.price < coursePrices[tt.course_name].price) {
+            coursePrices[tt.course_name] = { price: tt.price, time: tt.time };
+          }
+        });
+
+        // Update price tags
+        document.querySelectorAll('.fairway').forEach(fairway => {
+          const courseName = fairway.dataset.course;
+          const priceTag = fairway.querySelector('.price-tag');
+          if (!priceTag) return;
+
+          const data = coursePrices[courseName];
+          if (data && data.price) {
+            const shortTime = formatShortTime(data.time);
+            priceTag.textContent = `$${Math.round(data.price)}`;
+            priceTag.title = `Next: ${shortTime}`;
+            priceTag.classList.remove('loading');
+          } else {
+            priceTag.textContent = '--';
+            priceTag.classList.remove('loading');
+          }
+        });
+      } catch (e) {
+        console.error('Error loading prices:', e);
+        document.querySelectorAll('.price-tag').forEach(tag => {
+          tag.textContent = '--';
+          tag.classList.remove('loading');
+        });
+      }
+    }
+
+    function formatShortTime(time) {
+      if (!time) return '';
+      const [h, m] = time.split(':').map(Number);
+      const ampm = h >= 12 ? 'p' : 'a';
+      const hour = h % 12 || 12;
+      return `${hour}:${m.toString().padStart(2, '0')}${ampm}`;
+    }
+
+    // Load prices on page load
+    document.addEventListener('DOMContentLoaded', loadPrices);
+  </script>
 </body>
 </html>
