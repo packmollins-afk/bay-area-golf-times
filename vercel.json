@@ -60,6 +60,20 @@
       }
     },
     {
+      "src": "/index.html",
+      "dest": "public/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "^/$",
+      "dest": "public/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "public/$1",
       "headers": {
