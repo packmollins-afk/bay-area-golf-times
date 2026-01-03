@@ -543,12 +543,18 @@ app.put('/api/user/profile', async (req, res) => {
     if (!user) return res.status(401).json({ error: 'Not authenticated' });
 
     const { displayName, homeCourseId, handicap } = req.body;
+
+    // Parse values properly - handle empty strings
+    const courseId = homeCourseId ? parseInt(homeCourseId) : null;
+    const hcap = handicap !== '' && handicap != null ? parseFloat(handicap) : null;
+
     await db.execute({
       sql: `UPDATE users SET display_name = COALESCE(?, display_name), home_course_id = ?, handicap = ?, updated_at = datetime('now') WHERE id = ?`,
-      args: [displayName, homeCourseId || null, handicap || null, user.id]
+      args: [displayName || null, courseId, hcap, user.id]
     });
     res.json({ success: true });
   } catch (error) {
+    console.error('Profile update error:', error);
     res.status(500).json({ error: error.message });
   }
 });
