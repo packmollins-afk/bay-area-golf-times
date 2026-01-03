@@ -151,6 +151,65 @@ function getTournamentHistory(courseId) {
   `).all(courseId);
 }
 
+// Generate URL-friendly slug from course name
+function generateSlug(name) {
+  return name
+    .toLowerCase()
+    .replace(/['']/g, '')           // Remove apostrophes
+    .replace(/[^a-z0-9\s-]/g, '')   // Remove special chars
+    .replace(/\s+/g, '-')           // Replace spaces with hyphens
+    .replace(/-+/g, '-')            // Collapse multiple hyphens
+    .replace(/^-|-$/g, '');         // Trim leading/trailing hyphens
+}
+
+// Generate unique slugs for all courses
+function generateAllSlugs() {
+  const allCourses = db.prepare('SELECT id, name, city FROM courses').all();
+  const slugCounts = {};
+
+  const updateSlug = db.prepare('UPDATE courses SET slug = ? WHERE id = ?');
+
+  const updateAll = db.transaction(() => {
+    for (const course of allCourses) {
+      let slug = generateSlug(course.name);
+
+      // Handle duplicates by adding city
+      if (slugCounts[slug]) {
+        slug = `${slug}-${generateSlug(course.city)}`;
+      }
+      slugCounts[slug] = true;
+
+      updateSlug.run(slug, course.id);
+    }
+  });
+
+  updateAll();
+  console.log(`Generated slugs for ${allCourses.length} courses`);
+}
+
+// Get course by slug
+function getCourseBySlug(slug) {
+  return db.prepare('SELECT * FROM courses WHERE slug = ?').get(slug);
+}
+
+// Get staff picks
+function getStaffPicks() {
+  return db.prepare(`
+    SELECT * FROM courses
+    WHERE is_staff_pick = 1
+    ORDER BY staff_pick_order ASC, name ASC
+  `).all();
+}
+
+// Update staff pick status
+function setStaffPick(courseId, isPick, order = null) {
+  db.prepare(`
+    UPDATE courses
+    SET is_staff_pick = ?, staff_pick_order = ?
+    WHERE id = ?
+  `).run(isPick ? 1 : 0, order, courseId);
+}
+
 module.exports = {
   seedCourses,
   seedTournamentHistory,
@@ -158,5 +217,10 @@ module.exports = {
   getCoursesByRegion,
   getCoursesWithGolfNow,
   getTournamentHistory,
+  generateSlug,
+  generateAllSlugs,
+  getCourseBySlug,
+  getStaffPicks,
+  setStaffPick,
   courses
 };

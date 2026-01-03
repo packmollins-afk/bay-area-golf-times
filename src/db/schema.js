@@ -49,6 +49,9 @@ db.exec(`
     has_practice_green INTEGER DEFAULT 0,
     has_pro_shop INTEGER DEFAULT 0,
     photo_url TEXT,
+    slug TEXT UNIQUE,
+    is_staff_pick INTEGER DEFAULT 0,
+    staff_pick_order INTEGER,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
@@ -136,5 +139,31 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_food_course ON food_items(course_id);
   CREATE INDEX IF NOT EXISTS idx_tournament_course ON tournament_history(course_id);
 `);
+
+// Migration: Add new columns to existing courses table
+try {
+  db.exec(`ALTER TABLE courses ADD COLUMN slug TEXT`);
+} catch (e) {
+  // Column already exists
+}
+
+try {
+  db.exec(`ALTER TABLE courses ADD COLUMN is_staff_pick INTEGER DEFAULT 0`);
+} catch (e) {
+  // Column already exists
+}
+
+try {
+  db.exec(`ALTER TABLE courses ADD COLUMN staff_pick_order INTEGER`);
+} catch (e) {
+  // Column already exists
+}
+
+// Create unique slug index after migration ensures column exists
+try {
+  db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_courses_slug ON courses(slug)`);
+} catch (e) {
+  // Index already exists or column issues
+}
 
 module.exports = db;

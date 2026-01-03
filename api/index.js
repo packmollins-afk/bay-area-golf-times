@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const db = require('../src/db/schema');
-const { seedCourses, getAllCourses, getCoursesByRegion, getTournamentHistory } = require('../src/db/courses');
+const { seedCourses, getAllCourses, getCoursesByRegion, getTournamentHistory, getCourseBySlug, getStaffPicks, setStaffPick } = require('../src/db/courses');
 const { runScraper } = require('../src/scrapers/golfnow');
 
 const app = express();
@@ -14,14 +14,35 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 /**
  * GET /api/courses
- * Get all courses, optionally filtered by region
- * Only returns courses that have tee times available
+ * Get all courses, optionally filtered by region or staff_picks
+ * Query params: region, all, staff_picks
  */
 app.get('/api/courses', (req, res) => {
   try {
-    const { region, all } = req.query;
+    const { region, all, staff_picks } = req.query;
 
-    // Only return courses with tee times unless 'all' param is set
+    // Staff picks mode - return only staff picks
+    if (staff_picks === 'true' || staff_picks === '1') {
+      const picks = getStaffPicks();
+      return res.json(picks);
+    }
+
+    // Return all courses if 'all' param is set
+    if (all === 'true' || all === '1') {
+      let sql = 'SELECT * FROM courses WHERE 1=1';
+      const params = [];
+
+      if (region) {
+        sql += ' AND region = ?';
+        params.push(region);
+      }
+
+      sql += ' ORDER BY region, city, name';
+      const courses = db.prepare(sql).all(...params);
+      return res.json(courses);
+    }
+
+    // Only return courses with upcoming tee times
     let sql = `
       SELECT DISTINCT c.* FROM courses c
       INNER JOIN tee_times t ON c.id = t.course_id
@@ -228,6 +249,65 @@ app.post('/api/scrape', async (req, res) => {
 });
 
 /**
+ * GET /api/courses/slug/:slug
+ * Get course by URL slug
+ */
+app.get('/api/courses/slug/:slug', (req, res) => {
+  try {
+    const { slug } = req.params;
+    const course = getCourseBySlug(slug);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Get additional details like the ID-based endpoint
+    const reviews = db.prepare(`
+      SELECT * FROM reviews
+      WHERE course_id = ?
+      ORDER BY time DESC
+      LIMIT 10
+    `).all(course.id);
+
+    const recentAvg = reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : null;
+
+    const photos = db.prepare(`
+      SELECT * FROM course_photos
+      WHERE course_id = ?
+      ORDER BY is_primary DESC, scraped_at DESC
+    `).all(course.id);
+
+    const topFood = db.prepare(`
+      SELECT * FROM food_items
+      WHERE course_id = ?
+      ORDER BY avg_rating DESC, mention_count DESC
+      LIMIT 1
+    `).get(course.id);
+
+    const teeTimeCount = db.prepare(`
+      SELECT COUNT(*) as count FROM tee_times
+      WHERE course_id = ? AND datetime >= datetime('now', 'localtime')
+    `).get(course.id);
+
+    const tournaments = getTournamentHistory(course.id);
+
+    res.json({
+      ...course,
+      recent_avg_rating: recentAvg,
+      reviews,
+      photos,
+      top_food: topFood,
+      upcoming_tee_times: teeTimeCount?.count || 0,
+      tournament_history: tournaments
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * GET /api/courses/:id
  * Get detailed course info including reviews, photos, food, records
  */
@@ -301,6 +381,92 @@ app.get('/api/courses/:id', (req, res) => {
  */
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Admin endpoints
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baygolf2024';
+
+/**
+ * POST /api/admin/login
+ * Simple password auth for admin
+ */
+app.post('/api/admin/login', (req, res) => {
+  const { password } = req.body;
+  if (password === ADMIN_PASSWORD) {
+    res.json({ success: true, token: Buffer.from(ADMIN_PASSWORD).toString('base64') });
+  } else {
+    res.status(401).json({ error: 'Invalid password' });
+  }
+});
+
+// Simple auth middleware
+const adminAuth = (req, res, next) => {
+  const auth = req.headers.authorization;
+  if (!auth) {
+    return res.status(401).json({ error: 'Authorization required' });
+  }
+  const token = auth.replace('Bearer ', '');
+  if (Buffer.from(token, 'base64').toString() !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+  next();
+};
+
+/**
+ * GET /api/admin/courses
+ * Get all courses with staff pick status
+ */
+app.get('/api/admin/courses', adminAuth, (req, res) => {
+  try {
+    const courses = db.prepare(`
+      SELECT id, name, city, region, slug, is_staff_pick, staff_pick_order
+      FROM courses
+      ORDER BY name
+    `).all();
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PATCH /api/admin/courses/:id
+ * Update staff pick status for a course
+ */
+app.patch('/api/admin/courses/:id', adminAuth, (req, res) => {
+  try {
+    const { id } = req.params;
+    const { is_staff_pick, staff_pick_order } = req.body;
+
+    setStaffPick(id, is_staff_pick, staff_pick_order);
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/admin/staff-picks
+ * Bulk update staff picks order
+ */
+app.put('/api/admin/staff-picks', adminAuth, (req, res) => {
+  try {
+    const { picks } = req.body; // Array of { id, order }
+
+    // Clear all staff picks first
+    db.prepare('UPDATE courses SET is_staff_pick = 0, staff_pick_order = NULL').run();
+
+    // Set new picks with order
+    const updateStmt = db.prepare('UPDATE courses SET is_staff_pick = 1, staff_pick_order = ? WHERE id = ?');
+    for (const pick of picks) {
+      updateStmt.run(pick.order, pick.id);
+    }
+
+    res.json({ success: true, count: picks.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Serve frontend for all other routes (Express 5 syntax)

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Bay Area Golf</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2d5a27;
+      --primary-light: #4a7a3f;
+      --primary-dark: #1a3d17;
+      --bg: #f4f1e8;
+      --bg-paper: #f9f6ef;
+      --card-bg: #fffef9;
+      --text: #3d2914;
+      --text-muted: #6b5344;
+      --border: #c4a882;
+      --border-light: #ddd0bc;
+      --gold: #b8860b;
+      --error: #c62828;
+      --success: #2e7d32;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #f4f1e8;
+      padding: 24px 0;
+      border-bottom: 4px solid var(--border);
+    }
+    header .container { display: flex; justify-content: space-between; align-items: center; }
+    header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .back-link {
+      color: #f4f1e8;
+      text-decoration: none;
+      font-family: 'Playfair Display', Georgia, serif;
+      padding: 8px 16px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+    /* Login form */
+    .login-container {
+      max-width: 400px;
+      margin: 80px auto;
+      padding: 40px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .login-container h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      margin-bottom: 24px;
+    }
+    .login-form { display: flex; flex-direction: column; gap: 16px; }
+    .login-form input {
+      padding: 14px 16px;
+      border: 2px solid var(--border-light);
+      border-radius: 6px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 1rem;
+      background: var(--bg-paper);
+    }
+    .login-form input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .login-form button {
+      padding: 14px 24px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .login-form button:hover { background: var(--primary-dark); }
+    .error-msg {
+      color: var(--error);
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    /* Admin panel */
+    .admin-panel { padding: 32px 0; }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .admin-header h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.8rem;
+    }
+    .logout-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: var(--bg-paper); }
+
+    /* Staff picks section */
+    .section {
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .section h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .picks-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: var(--bg-paper);
+      border-radius: 6px;
+    }
+    .picks-count {
+      font-weight: 600;
+    }
+    .save-btn {
+      padding: 10px 20px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .save-btn:hover { background: var(--primary-dark); }
+    .save-btn:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+
+    .course-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .course-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-paper);
+      border: 2px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .course-item:hover { background: #e8efe6; }
+    .course-item.selected {
+      background: #fff8e6;
+      border-color: var(--gold);
+    }
+
+    .course-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--gold);
+    }
+
+    .course-item .order-badge {
+      width: 28px;
+      height: 28px;
+      background: var(--gold);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .course-item .order-badge.hidden { visibility: hidden; }
+
+    .course-info { flex: 1; }
+    .course-name { font-weight: 600; }
+    .course-location { font-size: 0.85rem; color: var(--text-muted); }
+
+    .order-controls {
+      display: flex;
+      gap: 4px;
+    }
+    .order-btn {
+      width: 28px;
+      height: 28px;
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .order-btn:hover { background: #e8efe6; }
+    .order-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    .status-msg.success { background: #e8f5e9; color: var(--success); }
+    .status-msg.error { background: #ffebee; color: var(--error); }
+
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Bay Area Golf Admin</h1>
+      <a href="/" class="back-link">Back to Site</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Login form -->
+    <div id="login-view" class="login-container">
+      <h2>Admin Login</h2>
+      <form class="login-form" onsubmit="login(event)">
+        <input type="password" id="password" placeholder="Enter admin password" required>
+        <button type="submit">Login</button>
+      </form>
+      <div id="login-error" class="error-msg" style="display: none;"></div>
+    </div>
+
+    <!-- Admin panel -->
+    <div id="admin-view" class="admin-panel" style="display: none;">
+      <div class="admin-header">
+        <h2>Admin Panel</h2>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+
+      <div id="status-msg" class="status-msg" style="display: none;"></div>
+
+      <div class="section">
+        <h3>Staff Picks</h3>
+        <p style="color: var(--text-muted); margin-bottom: 16px;">
+          Select courses to feature as Staff Picks. They will appear highlighted in the directory.
+        </p>
+
+        <div class="picks-info">
+          <span class="picks-count"><span id="picks-count">0</span> courses selected</span>
+          <button class="save-btn" id="save-btn" onclick="savePicks()" disabled>Save Changes</button>
+        </div>
+
+        <div id="course-list" class="course-list">
+          <div class="loading">Loading courses...</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = '/api';
+    let authToken = null;
+    let courses = [];
+    let selectedPicks = []; // Array of course IDs in order
+    let hasChanges = false;
+
+    // Check for existing session
+    function checkSession() {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        authToken = token;
+        showAdminPanel();
+      }
+    }
+
+    async function login(e) {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('login-error');
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          authToken = data.token;
+          localStorage.setItem('adminToken', authToken);
+          errorEl.style.display = 'none';
+          showAdminPanel();
+        } else {
+          errorEl.textContent = 'Invalid password';
+          errorEl.style.display = 'block';
+        }
+      } catch (e) {
+        errorEl.textContent = 'Connection error. Please try again.';
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function logout() {
+      authToken = null;
+      localStorage.removeItem('adminToken');
+      document.getElementById('login-view').style.display = 'block';
+      document.getElementById('admin-view').style.display = 'none';
+      document.getElementById('password').value = '';
+    }
+
+    async function showAdminPanel() {
+      document.getElementById('login-view').style.display = 'none';
+      document.getElementById('admin-view').style.display = 'block';
+      await loadCourses();
+    }
+
+    async function loadCourses() {
+      try {
+        const res = await fetch(`${API_BASE}/admin/courses`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+
+        courses = await res.json();
+
+        // Initialize selected picks from current staff picks
+        selectedPicks = courses
+          .filter(c => c.is_staff_pick)
+          .sort((a, b) => (a.staff_pick_order || 999) - (b.staff_pick_order || 999))
+          .map(c => c.id);
+
+        renderCourses();
+      } catch (e) {
+        document.getElementById('course-list').innerHTML = '<div class="loading">Error loading courses</div>';
+      }
+    }
+
+    function renderCourses() {
+      const listEl = document.getElementById('course-list');
+
+      // Sort: selected picks first (in order), then rest alphabetically
+      const sortedCourses = [...courses].sort((a, b) => {
+        const aIndex = selectedPicks.indexOf(a.id);
+        const bIndex = selectedPicks.indexOf(b.id);
+
+        if (aIndex >= 0 && bIndex >= 0) return aIndex - bIndex;
+        if (aIndex >= 0) return -1;
+        if (bIndex >= 0) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      listEl.innerHTML = sortedCourses.map(course => {
+        const pickIndex = selectedPicks.indexOf(course.id);
+        const isSelected = pickIndex >= 0;
+
+        return `
+          <div class="course-item ${isSelected ? 'selected' : ''}" data-id="${course.id}">
+            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="togglePick(${course.id})">
+            <div class="order-badge ${isSelected ? '' : 'hidden'}">${isSelected ? pickIndex + 1 : ''}</div>
+            <div class="course-info">
+              <div class="course-name">${course.name}</div>
+              <div class="course-location">${course.city}, ${course.region}</div>
+            </div>
+            ${isSelected ? `
+              <div class="order-controls">
+                <button class="order-btn" onclick="movePick(${course.id}, -1)" ${pickIndex === 0 ? 'disabled' : ''}>↑</button>
+                <button class="order-btn" onclick="movePick(${course.id}, 1)" ${pickIndex === selectedPicks.length - 1 ? 'disabled' : ''}>↓</button>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('picks-count').textContent = selectedPicks.length;
+      document.getElementById('save-btn').disabled = !hasChanges;
+    }
+
+    function togglePick(courseId) {
+      const index = selectedPicks.indexOf(courseId);
+      if (index >= 0) {
+        selectedPicks.splice(index, 1);
+      } else {
+        selectedPicks.push(courseId);
+      }
+      hasChanges = true;
+      renderCourses();
+    }
+
+    function movePick(courseId, direction) {
+      const index = selectedPicks.indexOf(courseId);
+      if (index < 0) return;
+
+      const newIndex = index + direction;
+      if (newIndex < 0 || newIndex >= selectedPicks.length) return;
+
+      // Swap
+      [selectedPicks[index], selectedPicks[newIndex]] = [selectedPicks[newIndex], selectedPicks[index]];
+      hasChanges = true;
+      renderCourses();
+    }
+
+    async function savePicks() {
+      const statusEl = document.getElementById('status-msg');
+      const saveBtn = document.getElementById('save-btn');
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+
+      try {
+        const picks = selectedPicks.map((id, index) => ({ id, order: index + 1 }));
+
+        const res = await fetch(`${API_BASE}/admin/staff-picks`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ picks })
+        });
+
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+
+        if (res.ok) {
+          hasChanges = false;
+          statusEl.className = 'status-msg success';
+          statusEl.textContent = 'Staff Picks saved successfully!';
+          statusEl.style.display = 'block';
+
+          // Update local course data
+          courses.forEach(c => {
+            const pickIndex = selectedPicks.indexOf(c.id);
+            c.is_staff_pick = pickIndex >= 0 ? 1 : 0;
+            c.staff_pick_order = pickIndex >= 0 ? pickIndex + 1 : null;
+          });
+
+          setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+        } else {
+          throw new Error('Save failed');
+        }
+      } catch (e) {
+        statusEl.className = 'status-msg error';
+        statusEl.textContent = 'Error saving. Please try again.';
+        statusEl.style.display = 'block';
+      }
+
+      saveBtn.disabled = !hasChanges;
+      saveBtn.textContent = 'Save Changes';
+      renderCourses();
+    }
+
+    checkSession();
+  </script>
+</body>
+</html>
