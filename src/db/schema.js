@@ -100,12 +100,27 @@ db.exec(`
     FOREIGN KEY (course_id) REFERENCES courses(id)
   );
 
+  CREATE TABLE IF NOT EXISTS tournament_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    course_id INTEGER NOT NULL,
+    tournament_name TEXT NOT NULL,
+    tournament_type TEXT,
+    year INTEGER NOT NULL,
+    winner_name TEXT NOT NULL,
+    winning_score TEXT,
+    score_to_par TEXT,
+    runner_up TEXT,
+    notes TEXT,
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+  );
+
   CREATE INDEX IF NOT EXISTS idx_tee_times_datetime ON tee_times(datetime);
   CREATE INDEX IF NOT EXISTS idx_tee_times_date ON tee_times(date);
   CREATE INDEX IF NOT EXISTS idx_tee_times_course ON tee_times(course_id);
   CREATE INDEX IF NOT EXISTS idx_reviews_course ON reviews(course_id);
   CREATE INDEX IF NOT EXISTS idx_photos_course ON course_photos(course_id);
   CREATE INDEX IF NOT EXISTS idx_food_course ON food_items(course_id);
+  CREATE INDEX IF NOT EXISTS idx_tournament_course ON tournament_history(course_id);
 `);
 
 module.exports = db;

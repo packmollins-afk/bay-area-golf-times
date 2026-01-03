@@ -303,6 +303,28 @@
     .region-chip.favorites:hover { background: #fce4ec; }
     .region-chip.favorites.active { background: #e91e63; color: white; }
 
+    .directory-controls { display: flex; flex-direction: column; gap: 12px; }
+    .sort-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-start;
+    }
+    .sort-control label { font-size: 0.9rem; color: var(--text-muted); }
+    .sort-control select {
+      padding: 6px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .sort-control select:hover { border-color: var(--primary); }
+    @media (min-width: 768px) {
+      .directory-controls { flex-direction: row; justify-content: space-between; align-items: center; }
+      .sort-control { align-self: center; }
+    }
+
     /* Tab Navigation */
     .tab-nav {
       display: flex;
@@ -837,6 +859,21 @@
     .course-record .holder { font-weight: 600; margin-top: 4px; }
     .course-record .details { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
 
+    .tournament-history { display: flex; flex-direction: column; gap: 12px; }
+    .tournament-item {
+      background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+      padding: 14px 16px;
+      border-radius: 10px;
+      border-left: 4px solid var(--primary);
+    }
+    .tournament-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .tournament-name { font-weight: 700; color: var(--primary-dark); font-size: 0.95rem; }
+    .tournament-year { background: var(--primary); color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+    .tournament-winner { display: flex; justify-content: space-between; align-items: center; }
+    .winner-name { font-weight: 600; font-size: 1.1rem; }
+    .winner-score { font-weight: 800; color: var(--gold); font-size: 1.1rem; }
+    .tournament-notes { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+
     .photos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -1110,18 +1147,28 @@
       <div class="quick-actions">
         <div class="quick-actions-header">
           <h2 style="margin: 0; font-size: 1.3rem;">Bay Area Golf Courses Directory</h2>
-          <div class="region-chips">
-            <button class="region-chip active" data-dir-region="" onclick="filterDirectoryByRegion('')">All</button>
-            <button class="region-chip favorites" data-dir-region="favorites" onclick="filterDirectoryByRegion('favorites')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-              Favorites
-            </button>
-            <button class="region-chip" data-dir-region="San Francisco" onclick="filterDirectoryByRegion('San Francisco')">SF</button>
-            <button class="region-chip" data-dir-region="South Bay" onclick="filterDirectoryByRegion('South Bay')">South Bay</button>
-            <button class="region-chip" data-dir-region="East Bay" onclick="filterDirectoryByRegion('East Bay')">East Bay</button>
-            <button class="region-chip" data-dir-region="Marin" onclick="filterDirectoryByRegion('Marin')">Marin</button>
+          <div class="directory-controls">
+            <div class="region-chips">
+              <button class="region-chip active" data-dir-region="" onclick="filterDirectoryByRegion('')">All</button>
+              <button class="region-chip favorites" data-dir-region="favorites" onclick="filterDirectoryByRegion('favorites')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Favorites
+              </button>
+              <button class="region-chip" data-dir-region="San Francisco" onclick="filterDirectoryByRegion('San Francisco')">SF</button>
+              <button class="region-chip" data-dir-region="South Bay" onclick="filterDirectoryByRegion('South Bay')">South Bay</button>
+              <button class="region-chip" data-dir-region="East Bay" onclick="filterDirectoryByRegion('East Bay')">East Bay</button>
+              <button class="region-chip" data-dir-region="Marin" onclick="filterDirectoryByRegion('Marin')">Marin</button>
+            </div>
+            <div class="sort-control">
+              <label for="directory-sort">Sort:</label>
+              <select id="directory-sort" onchange="renderCoursesDirectory()">
+                <option value="name">Name (A-Z)</option>
+                <option value="rating">Rating (High-Low)</option>
+                <option value="holes">Holes (18 first)</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -1361,6 +1408,16 @@
         filtered = filtered.filter(c => favs.includes(c.id));
       } else if (directoryRegion) {
         filtered = filtered.filter(c => c.region === directoryRegion);
+      }
+
+      // Sort based on dropdown selection
+      const sortBy = document.getElementById('directory-sort')?.value || 'name';
+      if (sortBy === 'rating') {
+        filtered.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
+      } else if (sortBy === 'holes') {
+        filtered.sort((a, b) => (b.holes || 0) - (a.holes || 0));
+      } else {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
       }
 
       if (filtered.length === 0) {
@@ -1698,6 +1755,29 @@
               <div class="score">${course.course_record_score}</div>
               <div class="holder">${course.course_record_holder} (${course.course_record_date})</div>
               <div class="details">${course.course_record_details || ''}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (course.tournament_history?.length > 0) {
+        html += `
+          <div class="modal-section">
+            <h3>🏌️ PGA Tour History</h3>
+            <div class="tournament-history">
+              ${course.tournament_history.map(t => `
+                <div class="tournament-item">
+                  <div class="tournament-header">
+                    <span class="tournament-name">${t.tournament_name}</span>
+                    <span class="tournament-year">${t.year}</span>
+                  </div>
+                  <div class="tournament-winner">
+                    <span class="winner-name">${t.winner_name}</span>
+                    <span class="winner-score">${t.score_to_par !== 'N/A' && t.score_to_par !== 'Match Play' ? t.score_to_par : t.winning_score}</span>
+                  </div>
+                  ${t.notes ? `<div class="tournament-notes">${t.notes}</div>` : ''}
+                </div>
+              `).join('')}
             </div>
           </div>
         `;

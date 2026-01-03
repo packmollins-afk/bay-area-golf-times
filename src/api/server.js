@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const db = require('../db/schema');
-const { seedCourses, getAllCourses, getCoursesByRegion } = require('../db/courses');
+const { seedCourses, getAllCourses, getCoursesByRegion, getTournamentHistory } = require('../db/courses');
 const { runScraper } = require('../scrapers/golfnow');
 
 const app = express();
@@ -278,13 +278,17 @@ app.get('/api/courses/:id', (req, res) => {
       WHERE course_id = ? AND datetime >= datetime('now', 'localtime')
     `).get(id);
 
+    // Get tournament history
+    const tournaments = getTournamentHistory(id);
+
     res.json({
       ...course,
       recent_avg_rating: recentAvg,
       reviews,
       photos,
       top_food: topFood,
-      upcoming_tee_times: teeTimeCount?.count || 0
+      upcoming_tee_times: teeTimeCount?.count || 0,
+      tournament_history: tournaments
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
