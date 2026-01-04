@@ -10,491 +10,1388 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #2d5a27;
-      --primary-light: #4a7a3f;
-      --primary-dark: #1a3d17;
-      --bg: #f4f1e8;
-      --bg-paper: #f9f6ef;
-      --card-bg: #fffef9;
-      --text: #3d2914;
-      --text-muted: #6b5344;
-      --border: #c4a882;
-      --border-light: #ddd0bc;
-      --gold: #b8860b;
-      --error: #c62828;
-      --success: #2e7d32;
-    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #2d5a27;
+      --green-light: #e8efe6;
+      --cream: #f4f1e8;
+      --brown: #3d2914;
+      --brown-light: #6b5344;
+      --gold: #c9a227;
+      --red: #c0392b;
+      --blue: #2980b9;
+    }
     body {
       font-family: 'Source Serif 4', Georgia, serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
+      background: var(--cream);
+      color: var(--brown);
       min-height: 100vh;
     }
-    .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; }
 
-    /* Header */
-    header {
-      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-      color: #f4f1e8;
-      padding: 24px 0;
-      border-bottom: 4px solid var(--border);
-    }
-    header .container { display: flex; justify-content: space-between; align-items: center; }
-    header h1 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-    .back-link {
-      color: #f4f1e8;
-      text-decoration: none;
-      font-family: 'Playfair Display', Georgia, serif;
-      padding: 8px 16px;
-      border: 2px solid rgba(255,255,255,0.5);
-      border-radius: 4px;
-      transition: all 0.2s;
-    }
-    .back-link:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
-
-    /* Login form */
-    .login-container {
-      max-width: 400px;
-      margin: 80px auto;
-      padding: 40px;
-      background: var(--card-bg);
-      border: 2px solid var(--border-light);
-      border-radius: 8px;
-      text-align: center;
-    }
-    .login-container h2 {
-      font-family: 'Playfair Display', Georgia, serif;
-      margin-bottom: 24px;
-    }
-    .login-form { display: flex; flex-direction: column; gap: 16px; }
-    .login-form input {
-      padding: 14px 16px;
-      border: 2px solid var(--border-light);
-      border-radius: 6px;
-      font-family: 'Source Serif 4', Georgia, serif;
-      font-size: 1rem;
-      background: var(--bg-paper);
-    }
-    .login-form input:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-    .login-form button {
-      padding: 14px 24px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .login-form button:hover { background: var(--primary-dark); }
-    .error-msg {
-      color: var(--error);
-      font-size: 0.9rem;
-      margin-top: 8px;
-    }
-
-    /* Admin panel */
-    .admin-panel { padding: 32px 0; }
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    .admin-header h2 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.8rem;
-    }
-    .logout-btn {
-      padding: 8px 16px;
-      background: transparent;
-      border: 2px solid var(--border);
-      border-radius: 4px;
-      font-family: 'Playfair Display', Georgia, serif;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .logout-btn:hover { background: var(--bg-paper); }
-
-    /* Staff picks section */
-    .section {
-      background: var(--card-bg);
-      border: 2px solid var(--border-light);
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-    .section h3 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.25rem;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid var(--border-light);
-    }
-
-    .picks-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding: 12px 16px;
-      background: var(--bg-paper);
-      border-radius: 6px;
-    }
-    .picks-count {
-      font-weight: 600;
-    }
-    .save-btn {
-      padding: 10px 20px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      font-family: 'Playfair Display', Georgia, serif;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .save-btn:hover { background: var(--primary-dark); }
-    .save-btn:disabled {
-      background: var(--border);
-      cursor: not-allowed;
-    }
-
-    .course-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .course-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg-paper);
-      border: 2px solid transparent;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .course-item:hover { background: #e8efe6; }
-    .course-item.selected {
-      background: #fff8e6;
-      border-color: var(--gold);
-    }
-
-    .course-item input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      accent-color: var(--gold);
-    }
-
-    .course-item .order-badge {
-      width: 28px;
-      height: 28px;
-      background: var(--gold);
-      color: #fff;
-      border-radius: 50%;
+    /* Login Screen */
+    .login-screen {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Playfair Display', Georgia, serif;
-      font-weight: 700;
-      font-size: 0.9rem;
+      min-height: 100vh;
+      padding: 20px;
     }
-    .course-item .order-badge.hidden { visibility: hidden; }
-
-    .course-info { flex: 1; }
-    .course-name { font-weight: 600; }
-    .course-location { font-size: 0.85rem; color: var(--text-muted); }
-
-    .order-controls {
-      display: flex;
-      gap: 4px;
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
     }
-    .order-btn {
-      width: 28px;
-      height: 28px;
-      background: var(--bg);
-      border: 1px solid var(--border-light);
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.2s;
+    .login-box h1 {
+      color: var(--green);
+      margin-bottom: 24px;
+      text-align: center;
     }
-    .order-btn:hover { background: #e8efe6; }
-    .order-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    .status-msg {
+    .login-box input {
+      width: 100%;
       padding: 12px 16px;
-      border-radius: 6px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
       margin-bottom: 16px;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .login-box button:hover { background: #234a1f; }
+    .error-msg { color: var(--red); font-size: 14px; margin-bottom: 12px; }
+
+    /* Admin Layout */
+    .admin-container { display: none; }
+    .admin-container.active { display: block; }
+
+    .admin-header {
+      background: var(--green);
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .admin-header h1 { font-size: 24px; }
+    .admin-header .logout-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      background: white;
+      border-bottom: 2px solid var(--green-light);
+      overflow-x: auto;
+    }
+    .nav-tab {
+      padding: 16px 24px;
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--brown-light);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+    }
+    .nav-tab:hover { color: var(--green); }
+    .nav-tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+
+    /* Content Panels */
+    .panel { display: none; padding: 24px; }
+    .panel.active { display: block; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .card h2 {
+      color: var(--green);
+      font-size: 20px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--green-light);
+    }
+    .card h3 {
+      font-size: 16px;
+      color: var(--brown);
+      margin-bottom: 12px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .stat-card .value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--green);
+      font-family: 'Playfair Display', serif;
+    }
+    .stat-card .label {
+      font-size: 14px;
+      color: var(--brown-light);
+      margin-top: 4px;
+    }
+    .stat-card .sub {
+      font-size: 12px;
+      color: var(--brown-light);
+      margin-top: 8px;
+    }
+    .stat-card .sub span { color: var(--green); font-weight: 600; }
+
+    /* Tables */
+    .table-container { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--green-light);
+    }
+    th {
+      background: var(--green-light);
+      font-weight: 600;
+      color: var(--green);
+    }
+    tr:hover { background: #fafaf8; }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
       font-weight: 500;
     }
-    .status-msg.success { background: #e8f5e9; color: var(--success); }
-    .status-msg.error { background: #ffebee; color: var(--error); }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-primary:hover { background: #234a1f; }
+    .btn-secondary { background: var(--green-light); color: var(--green); }
+    .btn-danger { background: var(--red); color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
 
-    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+    /* Forms */
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--brown);
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .modal h2 { margin-bottom: 20px; }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+
+    /* Chart placeholder */
+    .chart-container {
+      height: 200px;
+      background: var(--green-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+      gap: 4px;
+    }
+    .chart-bar {
+      flex: 1;
+      background: var(--green);
+      border-radius: 4px 4px 0 0;
+      min-height: 10px;
+      transition: height 0.3s;
+    }
+
+    /* Funnel */
+    .funnel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .funnel-stage {
+      background: var(--green-light);
+      padding: 12px 16px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .funnel-stage .name { font-weight: 600; }
+    .funnel-stage .count { color: var(--green); font-weight: 700; }
+    .funnel-bar {
+      height: 8px;
+      background: var(--green);
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-success { background: #d4edda; color: #155724; }
+    .badge-warning { background: #fff3cd; color: #856404; }
+    .badge-danger { background: #f8d7da; color: #721c24; }
+    .badge-info { background: #d1ecf1; color: #0c5460; }
+
+    /* Tabs sub-navigation */
+    .sub-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .sub-tab {
+      padding: 8px 16px;
+      background: var(--green-light);
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .sub-tab.active { background: var(--green); color: white; }
+
+    /* Search box */
+    .search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 10px 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .nav-tab { padding: 12px 16px; font-size: 14px; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="container">
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <h1>Admin Login</h1>
+      <div class="error-msg" id="loginError"></div>
+      <input type="password" id="passwordInput" placeholder="Enter admin password" onkeypress="if(event.key==='Enter')login()">
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div class="admin-container" id="adminContainer">
+    <header class="admin-header">
       <h1>Bay Area Golf Admin</h1>
-      <a href="/" class="back-link">Back to Site</a>
-    </div>
-  </header>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </header>
 
-  <main class="container">
-    <!-- Login form -->
-    <div id="login-view" class="login-container">
-      <h2>Admin Login</h2>
-      <form class="login-form" onsubmit="login(event)">
-        <input type="password" id="password" placeholder="Enter admin password" required>
-        <button type="submit">Login</button>
-      </form>
-      <div id="login-error" class="error-msg" style="display: none;"></div>
-    </div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="showPanel('dashboard')">Dashboard</button>
+      <button class="nav-tab" onclick="showPanel('courses')">Popular Courses</button>
+      <button class="nav-tab" onclick="showPanel('searches')">Search Analytics</button>
+      <button class="nav-tab" onclick="showPanel('conversions')">Conversions</button>
+      <button class="nav-tab" onclick="showPanel('content')">Content</button>
+      <button class="nav-tab" onclick="showPanel('users')">Users</button>
+      <button class="nav-tab" onclick="showPanel('reviews')">Reviews</button>
+      <button class="nav-tab" onclick="showPanel('email')">Email</button>
+    </nav>
 
-    <!-- Admin panel -->
-    <div id="admin-view" class="admin-panel" style="display: none;">
-      <div class="admin-header">
-        <h2>Admin Panel</h2>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+    <!-- Dashboard Panel -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="stats-grid" id="dashboardStats">
+        <div class="stat-card">
+          <div class="value" id="stat-users-total">-</div>
+          <div class="label">Total Users</div>
+          <div class="sub"><span id="stat-users-week">-</span> this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="stat-rounds-total">-</div>
+          <div class="label">Total Rounds</div>
+          <div class="sub"><span id="stat-rounds-week">-</span> this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="stat-views-today">-</div>
+          <div class="label">Page Views Today</div>
+          <div class="sub"><span id="stat-views-week">-</span> this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="stat-clicks-today">-</div>
+          <div class="label">Booking Clicks Today</div>
+          <div class="sub"><span id="stat-clicks-week">-</span> this week</div>
+        </div>
       </div>
 
-      <div id="status-msg" class="status-msg" style="display: none;"></div>
+      <div class="card">
+        <h2>Daily Signups (Last 14 Days)</h2>
+        <div class="chart-container" id="signupsChart"></div>
+      </div>
 
-      <div class="section">
-        <h3>Staff Picks</h3>
-        <p style="color: var(--text-muted); margin-bottom: 16px;">
-          Select courses to feature as Staff Picks. They will appear highlighted in the directory.
-        </p>
+      <div class="card">
+        <h2>Staff Picks</h2>
+        <p style="margin-bottom: 16px; color: var(--brown-light);">Drag to reorder. These appear on the homepage.</p>
+        <div id="staffPicksList"></div>
+        <button class="btn btn-primary" onclick="saveStaffPicks()" style="margin-top: 16px;">Save Staff Picks</button>
+      </div>
+    </div>
 
-        <div class="picks-info">
-          <span class="picks-count"><span id="picks-count">0</span> courses selected</span>
-          <button class="save-btn" id="save-btn" onclick="savePicks()" disabled>Save Changes</button>
-        </div>
-
-        <div id="course-list" class="course-list">
-          <div class="loading">Loading courses...</div>
+    <!-- Popular Courses Panel -->
+    <div class="panel" id="panel-courses">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showCoursesTab('viewed')">Most Viewed</button>
+        <button class="sub-tab" onclick="showCoursesTab('clicked')">Most Clicked</button>
+        <button class="sub-tab" onclick="showCoursesTab('favorited')">Most Favorited</button>
+        <button class="sub-tab" onclick="showCoursesTab('played')">Most Played</button>
+      </div>
+      <div class="card">
+        <div class="table-container">
+          <table id="coursesTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Course</th>
+                <th>Location</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
-  </main>
+
+    <!-- Search Analytics Panel -->
+    <div class="panel" id="panel-searches">
+      <div class="card">
+        <h2>Top Searches (Last 30 Days)</h2>
+        <div class="table-container">
+          <table id="topSearchesTable">
+            <thead>
+              <tr>
+                <th>Query</th>
+                <th>Count</th>
+                <th>Avg Results</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Failed Searches (0 Results)</h2>
+        <p style="margin-bottom: 16px; color: var(--brown-light);">Consider adding content for these queries</p>
+        <div class="table-container">
+          <table id="failedSearchesTable">
+            <thead>
+              <tr>
+                <th>Query</th>
+                <th>Times Searched</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversions Panel -->
+    <div class="panel" id="panel-conversions">
+      <div class="card">
+        <h2>Conversion Funnel</h2>
+        <div class="sub-tabs" style="margin-bottom: 20px;">
+          <button class="sub-tab active" onclick="loadConversions(7)">7 Days</button>
+          <button class="sub-tab" onclick="loadConversions(30)">30 Days</button>
+          <button class="sub-tab" onclick="loadConversions(90)">90 Days</button>
+        </div>
+        <div class="funnel" id="conversionFunnel"></div>
+      </div>
+    </div>
+
+    <!-- Content Management Panel -->
+    <div class="panel" id="panel-content">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showContentTab('editor')">Course Editor</button>
+        <button class="sub-tab" onclick="showContentTab('announcements')">Announcements</button>
+        <button class="sub-tab" onclick="showContentTab('deals')">Featured Deals</button>
+        <button class="sub-tab" onclick="showContentTab('scraper')">Scraper Status</button>
+      </div>
+
+      <!-- Course Editor -->
+      <div id="content-editor" class="card">
+        <h2>Edit Course</h2>
+        <div class="form-group">
+          <label>Select Course</label>
+          <select id="courseSelect" onchange="loadCourseDetails()">
+            <option value="">-- Select a course --</option>
+          </select>
+        </div>
+        <div id="courseEditForm" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" id="edit-name">
+            </div>
+            <div class="form-group">
+              <label>Slug</label>
+              <input type="text" id="edit-slug">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>City</label>
+              <input type="text" id="edit-city">
+            </div>
+            <div class="form-group">
+              <label>Region</label>
+              <select id="edit-region">
+                <option value="San Francisco">San Francisco</option>
+                <option value="South Bay">South Bay</option>
+                <option value="East Bay">East Bay</option>
+                <option value="North Bay">North Bay</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Holes</label>
+              <input type="number" id="edit-holes">
+            </div>
+            <div class="form-group">
+              <label>Par</label>
+              <input type="number" id="edit-par">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Yardage</label>
+              <input type="number" id="edit-yardage">
+            </div>
+            <div class="form-group">
+              <label>Slope Rating</label>
+              <input type="number" id="edit-slope_rating">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="edit-phone_number">
+          </div>
+          <div class="form-group">
+            <label>Booking URL</label>
+            <input type="url" id="edit-booking_url">
+          </div>
+          <div class="form-group">
+            <label>Photo URL</label>
+            <input type="url" id="edit-photo_url">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="edit-description"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="saveCourse()">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Announcements -->
+      <div id="content-announcements" class="card" style="display: none;">
+        <h2>Announcements</h2>
+        <button class="btn btn-primary" onclick="openAnnouncementModal()" style="margin-bottom: 16px;">+ New Announcement</button>
+        <div class="table-container">
+          <table id="announcementsTable">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Featured Deals -->
+      <div id="content-deals" class="card" style="display: none;">
+        <h2>Featured Deals</h2>
+        <button class="btn btn-primary" onclick="openDealModal()" style="margin-bottom: 16px;">+ New Deal</button>
+        <div class="table-container">
+          <table id="dealsTable">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Course</th>
+                <th>Discount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Scraper Status -->
+      <div id="content-scraper" class="card" style="display: none;">
+        <h2>Tee Time Data Status</h2>
+        <p style="margin-bottom: 16px; color: var(--brown-light);">Shows freshness of tee time data per course</p>
+        <div class="table-container">
+          <table id="scraperTable">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Tee Times</th>
+                <th>Last Updated</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Panel -->
+    <div class="panel" id="panel-users">
+      <div class="card">
+        <h2>User Management</h2>
+        <div class="search-box">
+          <input type="text" id="userSearch" placeholder="Search by email or name..." onkeypress="if(event.key==='Enter')searchUsers()">
+          <button class="btn btn-primary" onclick="searchUsers()">Search</button>
+        </div>
+        <div class="table-container">
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Rounds</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="usersPagination" style="margin-top: 16px; display: flex; gap: 8px;"></div>
+      </div>
+    </div>
+
+    <!-- Reviews Panel -->
+    <div class="panel" id="panel-reviews">
+      <div class="card">
+        <h2>Review Moderation</h2>
+        <div class="sub-tabs" style="margin-bottom: 16px;">
+          <button class="sub-tab active" onclick="loadReviews(false)">All Reviews</button>
+          <button class="sub-tab" onclick="loadReviews(true)">Flagged Only</button>
+        </div>
+        <div class="table-container">
+          <table id="reviewsTable">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>User</th>
+                <th>Rating</th>
+                <th>Content</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Panel -->
+    <div class="panel" id="panel-email">
+      <div class="card">
+        <h2>Email Broadcast</h2>
+        <div class="stats-grid" id="emailSegments" style="margin-bottom: 24px;">
+          <div class="stat-card">
+            <div class="value" id="seg-all">-</div>
+            <div class="label">Total Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="seg-verified">-</div>
+            <div class="label">Verified Emails</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="seg-active">-</div>
+            <div class="label">Active (30 days)</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="seg-inactive">-</div>
+            <div class="label">Inactive</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Recipient Segment</label>
+          <select id="emailSegment">
+            <option value="all">All Verified Users</option>
+            <option value="active">Active Users (played in last 30 days)</option>
+            <option value="inactive">Inactive Users</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <input type="text" id="emailSubject" placeholder="Email subject line...">
+        </div>
+        <div class="form-group">
+          <label>HTML Content</label>
+          <textarea id="emailContent" style="min-height: 200px; font-family: monospace;" placeholder="HTML email content... Use {{name}} for personalization"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="sendBroadcast()">Send Broadcast</button>
+        <p style="margin-top: 12px; font-size: 13px; color: var(--brown-light);">Warning: This will send to all users in the selected segment.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Announcement Modal -->
+  <div class="modal-overlay" id="announcementModal">
+    <div class="modal">
+      <h2 id="announcementModalTitle">New Announcement</h2>
+      <input type="hidden" id="ann-id">
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="ann-title">
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="ann-message"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Type</label>
+          <select id="ann-type">
+            <option value="info">Info (Blue)</option>
+            <option value="success">Success (Green)</option>
+            <option value="warning">Warning (Yellow)</option>
+            <option value="promo">Promo (Gold)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Active</label>
+          <select id="ann-active">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Link URL (optional)</label>
+          <input type="url" id="ann-link-url">
+        </div>
+        <div class="form-group">
+          <label>Link Text</label>
+          <input type="text" id="ann-link-text" placeholder="Learn more">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('announcementModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveAnnouncement()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deal Modal -->
+  <div class="modal-overlay" id="dealModal">
+    <div class="modal">
+      <h2 id="dealModalTitle">New Featured Deal</h2>
+      <input type="hidden" id="deal-id">
+      <div class="form-group">
+        <label>Course</label>
+        <select id="deal-course"></select>
+      </div>
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="deal-title" placeholder="Weekend Special">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="deal-description"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Discount Text</label>
+          <input type="text" id="deal-discount" placeholder="20% off">
+        </div>
+        <div class="form-group">
+          <label>Promo Code (optional)</label>
+          <input type="text" id="deal-promo">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Link URL (optional)</label>
+        <input type="url" id="deal-link">
+      </div>
+      <div class="form-group">
+        <label>Active</label>
+        <select id="deal-active">
+          <option value="1">Yes</option>
+          <option value="0">No</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('dealModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDeal()">Save</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const API_BASE = '/api';
-    let authToken = null;
-    let courses = [];
-    let selectedPicks = []; // Array of course IDs in order
-    let hasChanges = false;
+    let adminToken = localStorage.getItem('adminToken');
+    let allCourses = [];
+    let currentCourseData = {};
+    let staffPicks = [];
 
-    // Check for existing session
-    function checkSession() {
-      const token = localStorage.getItem('adminToken');
-      if (token) {
-        authToken = token;
-        showAdminPanel();
-      }
-    }
-
-    async function login(e) {
-      e.preventDefault();
-      const password = document.getElementById('password').value;
-      const errorEl = document.getElementById('login-error');
-
+    // Auth
+    async function login() {
+      const password = document.getElementById('passwordInput').value;
       try {
-        const res = await fetch(`${API_BASE}/admin/login`, {
+        const res = await fetch('/api/admin/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ password })
         });
-
-        if (res.ok) {
-          const data = await res.json();
-          authToken = data.token;
-          localStorage.setItem('adminToken', authToken);
-          errorEl.style.display = 'none';
-          showAdminPanel();
+        const data = await res.json();
+        if (data.token) {
+          adminToken = data.token;
+          localStorage.setItem('adminToken', adminToken);
+          showAdmin();
         } else {
-          errorEl.textContent = 'Invalid password';
-          errorEl.style.display = 'block';
+          document.getElementById('loginError').textContent = 'Invalid password';
         }
       } catch (e) {
-        errorEl.textContent = 'Connection error. Please try again.';
-        errorEl.style.display = 'block';
+        document.getElementById('loginError').textContent = 'Login failed';
       }
     }
 
     function logout() {
-      authToken = null;
       localStorage.removeItem('adminToken');
-      document.getElementById('login-view').style.display = 'block';
-      document.getElementById('admin-view').style.display = 'none';
-      document.getElementById('password').value = '';
+      location.reload();
     }
 
-    async function showAdminPanel() {
-      document.getElementById('login-view').style.display = 'none';
-      document.getElementById('admin-view').style.display = 'block';
-      await loadCourses();
+    function showAdmin() {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminContainer').classList.add('active');
+      loadDashboard();
+      loadCourses();
     }
 
-    async function loadCourses() {
-      try {
-        const res = await fetch(`${API_BASE}/admin/courses`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-
-        if (res.status === 401) {
-          logout();
-          return;
+    // API helper
+    async function api(endpoint, method = 'GET', body = null) {
+      const opts = {
+        method,
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
         }
-
-        courses = await res.json();
-
-        // Initialize selected picks from current staff picks
-        selectedPicks = courses
-          .filter(c => c.is_staff_pick)
-          .sort((a, b) => (a.staff_pick_order || 999) - (b.staff_pick_order || 999))
-          .map(c => c.id);
-
-        renderCourses();
-      } catch (e) {
-        document.getElementById('course-list').innerHTML = '<div class="loading">Error loading courses</div>';
+      };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(endpoint, opts);
+      if (res.status === 401) {
+        logout();
+        return null;
       }
+      return res.json();
     }
 
-    function renderCourses() {
-      const listEl = document.getElementById('course-list');
+    // Navigation
+    function showPanel(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`panel-${name}`).classList.add('active');
+      event.target.classList.add('active');
 
-      // Sort: selected picks first (in order), then rest alphabetically
-      const sortedCourses = [...courses].sort((a, b) => {
-        const aIndex = selectedPicks.indexOf(a.id);
-        const bIndex = selectedPicks.indexOf(b.id);
+      // Load data for panel
+      if (name === 'courses') loadPopularCourses('viewed');
+      if (name === 'searches') loadSearchAnalytics();
+      if (name === 'conversions') loadConversions(7);
+      if (name === 'content') loadContentData();
+      if (name === 'users') loadUsers();
+      if (name === 'reviews') loadReviews(false);
+      if (name === 'email') loadEmailSegments();
+    }
 
-        if (aIndex >= 0 && bIndex >= 0) return aIndex - bIndex;
-        if (aIndex >= 0) return -1;
-        if (bIndex >= 0) return 1;
-        return a.name.localeCompare(b.name);
+    // Dashboard
+    async function loadDashboard() {
+      const data = await api('/api/admin/analytics/dashboard');
+      if (!data) return;
+
+      document.getElementById('stat-users-total').textContent = data.users.total;
+      document.getElementById('stat-users-week').textContent = data.users.thisWeek;
+      document.getElementById('stat-rounds-total').textContent = data.rounds.total;
+      document.getElementById('stat-rounds-week').textContent = data.rounds.thisWeek;
+      document.getElementById('stat-views-today').textContent = data.pageViews.today;
+      document.getElementById('stat-views-week').textContent = data.pageViews.thisWeek;
+      document.getElementById('stat-clicks-today').textContent = data.bookingClicks.today;
+      document.getElementById('stat-clicks-week').textContent = data.bookingClicks.thisWeek;
+
+      // Render chart
+      const chart = document.getElementById('signupsChart');
+      chart.innerHTML = '';
+      const maxCount = Math.max(...data.charts.dailySignups.map(d => d.count), 1);
+      data.charts.dailySignups.forEach(d => {
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar';
+        bar.style.height = `${(d.count / maxCount) * 150}px`;
+        bar.title = `${d.date}: ${d.count} signups`;
+        chart.appendChild(bar);
       });
 
-      listEl.innerHTML = sortedCourses.map(course => {
-        const pickIndex = selectedPicks.indexOf(course.id);
-        const isSelected = pickIndex >= 0;
+      // Load staff picks
+      loadStaffPicks();
+    }
 
+    async function loadStaffPicks() {
+      const picks = await fetch('/api/courses?staff_picks=true').then(r => r.json());
+      staffPicks = picks.map(p => p.id);
+      renderStaffPicks(picks);
+    }
+
+    function renderStaffPicks(picks) {
+      const container = document.getElementById('staffPicksList');
+      container.innerHTML = picks.map((p, i) => `
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--green-light); border-radius: 8px; margin-bottom: 8px;">
+          <span style="font-weight: 600; color: var(--green);">${i + 1}</span>
+          <span style="flex: 1;">${p.name} - ${p.city}</span>
+          <button class="btn btn-sm btn-secondary" onclick="removeStaffPick(${p.id})">Remove</button>
+        </div>
+      `).join('');
+
+      // Add course selector
+      const nonPicks = allCourses.filter(c => !staffPicks.includes(c.id));
+      container.innerHTML += `
+        <div style="margin-top: 16px;">
+          <select id="addStaffPickSelect" style="padding: 8px; border-radius: 6px; border: 2px solid #ddd;">
+            <option value="">Add a course...</option>
+            ${nonPicks.map(c => `<option value="${c.id}">${c.name} - ${c.city}</option>`).join('')}
+          </select>
+          <button class="btn btn-sm btn-secondary" onclick="addStaffPick()" style="margin-left: 8px;">Add</button>
+        </div>
+      `;
+    }
+
+    function addStaffPick() {
+      const select = document.getElementById('addStaffPickSelect');
+      const id = parseInt(select.value);
+      if (id && !staffPicks.includes(id)) {
+        staffPicks.push(id);
+        const course = allCourses.find(c => c.id === id);
+        renderStaffPicks(staffPicks.map(id => allCourses.find(c => c.id === id)));
+      }
+    }
+
+    function removeStaffPick(id) {
+      staffPicks = staffPicks.filter(p => p !== id);
+      renderStaffPicks(staffPicks.map(id => allCourses.find(c => c.id === id)));
+    }
+
+    async function saveStaffPicks() {
+      await api('/api/admin/staff-picks', 'POST', { courseIds: staffPicks });
+      alert('Staff picks saved!');
+    }
+
+    // Popular Courses
+    let coursesData = {};
+    async function loadPopularCourses(type) {
+      if (!coursesData.mostViewed) {
+        coursesData = await api('/api/admin/analytics/popular-courses') || {};
+      }
+      showCoursesTab(type);
+    }
+
+    function showCoursesTab(type) {
+      document.querySelectorAll('#panel-courses .sub-tab').forEach(t => t.classList.remove('active'));
+      event?.target?.classList.add('active');
+
+      const map = { viewed: 'mostViewed', clicked: 'mostClicked', favorited: 'mostFavorited', played: 'mostPlayed' };
+      const countLabel = { viewed: 'view_count', clicked: 'click_count', favorited: 'favorite_count', played: 'rounds_count' };
+      const data = coursesData[map[type]] || [];
+
+      const tbody = document.querySelector('#coursesTable tbody');
+      tbody.innerHTML = data.map((c, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><a href="/course/${c.slug}" target="_blank">${c.name}</a></td>
+          <td>${c.city}, ${c.region}</td>
+          <td>${c[countLabel[type]] || 0}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Search Analytics
+    async function loadSearchAnalytics() {
+      const data = await api('/api/admin/analytics/searches');
+      if (!data) return;
+
+      document.querySelector('#topSearchesTable tbody').innerHTML = data.topSearches.map(s => `
+        <tr>
+          <td>${s.query}</td>
+          <td>${s.search_count}</td>
+          <td>${Math.round(s.avg_results || 0)}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="3">No search data yet</td></tr>';
+
+      document.querySelector('#failedSearchesTable tbody').innerHTML = data.failedSearches.map(s => `
+        <tr>
+          <td>${s.query}</td>
+          <td>${s.search_count}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="2">No failed searches</td></tr>';
+    }
+
+    // Conversions
+    async function loadConversions(period) {
+      document.querySelectorAll('#panel-conversions .sub-tab').forEach(t => t.classList.remove('active'));
+      event?.target?.classList.add('active');
+
+      const data = await api(`/api/admin/analytics/conversions?period=${period}`);
+      if (!data) return;
+
+      const maxCount = Math.max(...data.funnel.map(f => f.count), 1);
+      document.getElementById('conversionFunnel').innerHTML = data.funnel.map(f => `
+        <div class="funnel-stage">
+          <span class="name">${f.stage}</span>
+          <span class="count">${f.count}</span>
+        </div>
+        <div class="funnel-bar" style="width: ${(f.count / maxCount) * 100}%;"></div>
+      `).join('');
+    }
+
+    // Courses
+    async function loadCourses() {
+      allCourses = await api('/api/admin/courses') || [];
+      const select = document.getElementById('courseSelect');
+      select.innerHTML = '<option value="">-- Select a course --</option>' +
+        allCourses.map(c => `<option value="${c.id}">${c.name} - ${c.city}</option>`).join('');
+
+      // Also populate deal modal
+      document.getElementById('deal-course').innerHTML =
+        allCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+
+    async function loadCourseDetails() {
+      const id = document.getElementById('courseSelect').value;
+      if (!id) {
+        document.getElementById('courseEditForm').style.display = 'none';
+        return;
+      }
+
+      currentCourseData = await api(`/api/admin/courses/${id}/full`);
+      if (!currentCourseData) return;
+
+      document.getElementById('courseEditForm').style.display = 'block';
+      ['name', 'slug', 'city', 'region', 'holes', 'par', 'yardage', 'slope_rating', 'phone_number', 'booking_url', 'photo_url', 'description'].forEach(field => {
+        const el = document.getElementById(`edit-${field}`);
+        if (el) el.value = currentCourseData[field] || '';
+      });
+    }
+
+    async function saveCourse() {
+      const id = document.getElementById('courseSelect').value;
+      const updates = {};
+      ['name', 'slug', 'city', 'region', 'holes', 'par', 'yardage', 'slope_rating', 'phone_number', 'booking_url', 'photo_url', 'description'].forEach(field => {
+        const el = document.getElementById(`edit-${field}`);
+        if (el) updates[field] = el.value;
+      });
+
+      await api(`/api/admin/courses/${id}`, 'PUT', updates);
+      alert('Course updated!');
+      loadCourses();
+    }
+
+    // Content tabs
+    function showContentTab(tab) {
+      document.querySelectorAll('#panel-content .sub-tab').forEach(t => t.classList.remove('active'));
+      event?.target?.classList.add('active');
+
+      ['editor', 'announcements', 'deals', 'scraper'].forEach(t => {
+        document.getElementById(`content-${t}`).style.display = t === tab ? 'block' : 'none';
+      });
+
+      if (tab === 'announcements') loadAnnouncements();
+      if (tab === 'deals') loadDeals();
+      if (tab === 'scraper') loadScraperStatus();
+    }
+
+    async function loadContentData() {
+      showContentTab('editor');
+    }
+
+    // Announcements
+    async function loadAnnouncements() {
+      const data = await api('/api/admin/announcements') || [];
+      document.querySelector('#announcementsTable tbody').innerHTML = data.map(a => `
+        <tr>
+          <td>${a.title}</td>
+          <td><span class="badge badge-${a.type === 'warning' ? 'warning' : a.type === 'success' ? 'success' : 'info'}">${a.type}</span></td>
+          <td><span class="badge ${a.is_active ? 'badge-success' : 'badge-danger'}">${a.is_active ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="btn btn-sm btn-secondary" onclick="editAnnouncement(${a.id})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteAnnouncement(${a.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="4">No announcements</td></tr>';
+    }
+
+    function openAnnouncementModal(id = null) {
+      document.getElementById('announcementModalTitle').textContent = id ? 'Edit Announcement' : 'New Announcement';
+      document.getElementById('ann-id').value = id || '';
+      if (!id) {
+        ['title', 'message', 'link-url', 'link-text'].forEach(f => document.getElementById(`ann-${f}`).value = '');
+        document.getElementById('ann-type').value = 'info';
+        document.getElementById('ann-active').value = '1';
+      }
+      document.getElementById('announcementModal').classList.add('active');
+    }
+
+    async function editAnnouncement(id) {
+      const data = await api('/api/admin/announcements');
+      const ann = data.find(a => a.id === id);
+      if (!ann) return;
+
+      document.getElementById('ann-id').value = ann.id;
+      document.getElementById('ann-title').value = ann.title;
+      document.getElementById('ann-message').value = ann.message;
+      document.getElementById('ann-type').value = ann.type;
+      document.getElementById('ann-active').value = ann.is_active ? '1' : '0';
+      document.getElementById('ann-link-url').value = ann.link_url || '';
+      document.getElementById('ann-link-text').value = ann.link_text || '';
+      openAnnouncementModal(id);
+    }
+
+    async function saveAnnouncement() {
+      const id = document.getElementById('ann-id').value;
+      const body = {
+        title: document.getElementById('ann-title').value,
+        message: document.getElementById('ann-message').value,
+        type: document.getElementById('ann-type').value,
+        is_active: document.getElementById('ann-active').value === '1',
+        link_url: document.getElementById('ann-link-url').value || null,
+        link_text: document.getElementById('ann-link-text').value || null
+      };
+
+      if (id) {
+        await api(`/api/admin/announcements/${id}`, 'PUT', body);
+      } else {
+        await api('/api/admin/announcements', 'POST', body);
+      }
+      closeModal('announcementModal');
+      loadAnnouncements();
+    }
+
+    async function deleteAnnouncement(id) {
+      if (!confirm('Delete this announcement?')) return;
+      await api(`/api/admin/announcements/${id}`, 'DELETE');
+      loadAnnouncements();
+    }
+
+    // Featured Deals
+    async function loadDeals() {
+      const data = await api('/api/admin/featured-deals') || [];
+      document.querySelector('#dealsTable tbody').innerHTML = data.map(d => `
+        <tr>
+          <td>${d.title}</td>
+          <td>${d.course_name || 'Unknown'}</td>
+          <td>${d.discount_text || '-'}</td>
+          <td><span class="badge ${d.is_active ? 'badge-success' : 'badge-danger'}">${d.is_active ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="btn btn-sm btn-secondary" onclick="editDeal(${d.id})">Edit</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteDeal(${d.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="5">No featured deals</td></tr>';
+    }
+
+    function openDealModal(id = null) {
+      document.getElementById('dealModalTitle').textContent = id ? 'Edit Deal' : 'New Featured Deal';
+      document.getElementById('deal-id').value = id || '';
+      if (!id) {
+        ['title', 'description', 'discount', 'promo', 'link'].forEach(f => document.getElementById(`deal-${f}`).value = '');
+        document.getElementById('deal-active').value = '1';
+      }
+      document.getElementById('dealModal').classList.add('active');
+    }
+
+    async function editDeal(id) {
+      const data = await api('/api/admin/featured-deals');
+      const deal = data.find(d => d.id === id);
+      if (!deal) return;
+
+      document.getElementById('deal-id').value = deal.id;
+      document.getElementById('deal-course').value = deal.course_id;
+      document.getElementById('deal-title').value = deal.title;
+      document.getElementById('deal-description').value = deal.description || '';
+      document.getElementById('deal-discount').value = deal.discount_text || '';
+      document.getElementById('deal-promo').value = deal.promo_code || '';
+      document.getElementById('deal-link').value = deal.link_url || '';
+      document.getElementById('deal-active').value = deal.is_active ? '1' : '0';
+      openDealModal(id);
+    }
+
+    async function saveDeal() {
+      const id = document.getElementById('deal-id').value;
+      const body = {
+        course_id: parseInt(document.getElementById('deal-course').value),
+        title: document.getElementById('deal-title').value,
+        description: document.getElementById('deal-description').value || null,
+        discount_text: document.getElementById('deal-discount').value || null,
+        promo_code: document.getElementById('deal-promo').value || null,
+        link_url: document.getElementById('deal-link').value || null,
+        is_active: document.getElementById('deal-active').value === '1'
+      };
+
+      if (id) {
+        await api(`/api/admin/featured-deals/${id}`, 'PUT', body);
+      } else {
+        await api('/api/admin/featured-deals', 'POST', body);
+      }
+      closeModal('dealModal');
+      loadDeals();
+    }
+
+    async function deleteDeal(id) {
+      if (!confirm('Delete this deal?')) return;
+      await api(`/api/admin/featured-deals/${id}`, 'DELETE');
+      loadDeals();
+    }
+
+    // Scraper Status
+    async function loadScraperStatus() {
+      const data = await api('/api/admin/scraper-status') || [];
+      document.querySelector('#scraperTable tbody').innerHTML = data.map(c => {
+        const hoursSince = c.last_scraped ? Math.round((Date.now() - new Date(c.last_scraped).getTime()) / 3600000) : null;
+        let status = 'badge-danger';
+        let statusText = 'No data';
+        if (hoursSince !== null) {
+          if (hoursSince < 24) { status = 'badge-success'; statusText = 'Fresh'; }
+          else if (hoursSince < 72) { status = 'badge-warning'; statusText = 'Stale'; }
+          else { status = 'badge-danger'; statusText = 'Old'; }
+        }
         return `
-          <div class="course-item ${isSelected ? 'selected' : ''}" data-id="${course.id}">
-            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="togglePick(${course.id})">
-            <div class="order-badge ${isSelected ? '' : 'hidden'}">${isSelected ? pickIndex + 1 : ''}</div>
-            <div class="course-info">
-              <div class="course-name">${course.name}</div>
-              <div class="course-location">${course.city}, ${course.region}</div>
-            </div>
-            ${isSelected ? `
-              <div class="order-controls">
-                <button class="order-btn" onclick="movePick(${course.id}, -1)" ${pickIndex === 0 ? 'disabled' : ''}>↑</button>
-                <button class="order-btn" onclick="movePick(${course.id}, 1)" ${pickIndex === selectedPicks.length - 1 ? 'disabled' : ''}>↓</button>
-              </div>
-            ` : ''}
-          </div>
+          <tr>
+            <td>${c.name}</td>
+            <td>${c.tee_time_count || 0}</td>
+            <td>${c.last_scraped ? new Date(c.last_scraped).toLocaleDateString() : 'Never'}</td>
+            <td><span class="badge ${status}">${statusText}</span></td>
+          </tr>
         `;
       }).join('');
-
-      document.getElementById('picks-count').textContent = selectedPicks.length;
-      document.getElementById('save-btn').disabled = !hasChanges;
     }
 
-    function togglePick(courseId) {
-      const index = selectedPicks.indexOf(courseId);
-      if (index >= 0) {
-        selectedPicks.splice(index, 1);
+    // Users
+    let usersPage = 1;
+    async function loadUsers(page = 1) {
+      usersPage = page;
+      const search = document.getElementById('userSearch')?.value || '';
+      const data = await api(`/api/admin/users?page=${page}&search=${encodeURIComponent(search)}`) || { users: [], total: 0 };
+
+      document.querySelector('#usersTable tbody').innerHTML = data.users.map(u => `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              ${u.profile_picture ? `<img src="${u.profile_picture}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">` : ''}
+              <span>${u.display_name || 'Anonymous'}</span>
+            </div>
+          </td>
+          <td>${u.email} ${u.email_verified ? '<span class="badge badge-success">Verified</span>' : ''}</td>
+          <td>${u.rounds_count || 0}</td>
+          <td>${new Date(u.created_at).toLocaleDateString()}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="5">No users found</td></tr>';
+
+      // Pagination
+      const totalPages = Math.ceil(data.total / 50);
+      document.getElementById('usersPagination').innerHTML = Array.from({ length: Math.min(totalPages, 10) }, (_, i) =>
+        `<button class="btn btn-sm ${i + 1 === page ? 'btn-primary' : 'btn-secondary'}" onclick="loadUsers(${i + 1})">${i + 1}</button>`
+      ).join('');
+    }
+
+    function searchUsers() {
+      loadUsers(1);
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('Delete this user and all their data? This cannot be undone.')) return;
+      await api(`/api/admin/users/${id}`, 'DELETE');
+      loadUsers(usersPage);
+    }
+
+    // Reviews
+    async function loadReviews(flaggedOnly) {
+      document.querySelectorAll('#panel-reviews .sub-tab').forEach(t => t.classList.remove('active'));
+      event?.target?.classList.add('active');
+
+      const data = await api(`/api/admin/reviews?flagged_only=${flaggedOnly}`) || [];
+      document.querySelector('#reviewsTable tbody').innerHTML = data.map(r => `
+        <tr>
+          <td>${r.course_name}</td>
+          <td>${r.display_name}<br><small>${r.email}</small></td>
+          <td>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</td>
+          <td>${r.title ? `<strong>${r.title}</strong><br>` : ''}${r.content || ''}</td>
+          <td>
+            ${r.is_flagged ? '<span class="badge badge-warning">Flagged</span>' : ''}
+            ${r.is_approved ? '<span class="badge badge-success">Approved</span>' : '<span class="badge badge-danger">Rejected</span>'}
+          </td>
+          <td>
+            <button class="btn btn-sm btn-secondary" onclick="approveReview(${r.id})">Approve</button>
+            <button class="btn btn-sm btn-secondary" onclick="rejectReview(${r.id})">Reject</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteReview(${r.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="6">No reviews yet</td></tr>';
+    }
+
+    async function approveReview(id) {
+      await api(`/api/admin/reviews/${id}/approve`, 'PUT');
+      loadReviews(false);
+    }
+
+    async function rejectReview(id) {
+      await api(`/api/admin/reviews/${id}/reject`, 'PUT');
+      loadReviews(false);
+    }
+
+    async function deleteReview(id) {
+      if (!confirm('Delete this review?')) return;
+      await api(`/api/admin/reviews/${id}`, 'DELETE');
+      loadReviews(false);
+    }
+
+    // Email
+    async function loadEmailSegments() {
+      const data = await api('/api/admin/email-segments') || {};
+      document.getElementById('seg-all').textContent = data.all || 0;
+      document.getElementById('seg-verified').textContent = data.verified || 0;
+      document.getElementById('seg-active').textContent = data.active || 0;
+      document.getElementById('seg-inactive').textContent = data.inactive || 0;
+    }
+
+    async function sendBroadcast() {
+      const segment = document.getElementById('emailSegment').value;
+      const subject = document.getElementById('emailSubject').value;
+      const html_content = document.getElementById('emailContent').value;
+
+      if (!subject || !html_content) {
+        alert('Please fill in subject and content');
+        return;
+      }
+
+      if (!confirm(`Send email to all ${segment} users?`)) return;
+
+      const result = await api('/api/admin/email-broadcast', 'POST', { segment, subject, html_content });
+      if (result?.success) {
+        alert(`Sent: ${result.sent}, Failed: ${result.failed}`);
       } else {
-        selectedPicks.push(courseId);
+        alert('Failed to send: ' + (result?.error || 'Unknown error'));
       }
-      hasChanges = true;
-      renderCourses();
     }
 
-    function movePick(courseId, direction) {
-      const index = selectedPicks.indexOf(courseId);
-      if (index < 0) return;
-
-      const newIndex = index + direction;
-      if (newIndex < 0 || newIndex >= selectedPicks.length) return;
-
-      // Swap
-      [selectedPicks[index], selectedPicks[newIndex]] = [selectedPicks[newIndex], selectedPicks[index]];
-      hasChanges = true;
-      renderCourses();
+    // Modal helpers
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
     }
 
-    async function savePicks() {
-      const statusEl = document.getElementById('status-msg');
-      const saveBtn = document.getElementById('save-btn');
-
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving...';
-
-      try {
-        const picks = selectedPicks.map((id, index) => ({ id, order: index + 1 }));
-
-        const res = await fetch(`${API_BASE}/admin/staff-picks`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`
-          },
-          body: JSON.stringify({ picks })
-        });
-
-        if (res.status === 401) {
-          logout();
-          return;
-        }
-
-        if (res.ok) {
-          hasChanges = false;
-          statusEl.className = 'status-msg success';
-          statusEl.textContent = 'Staff Picks saved successfully!';
-          statusEl.style.display = 'block';
-
-          // Update local course data
-          courses.forEach(c => {
-            const pickIndex = selectedPicks.indexOf(c.id);
-            c.is_staff_pick = pickIndex >= 0 ? 1 : 0;
-            c.staff_pick_order = pickIndex >= 0 ? pickIndex + 1 : null;
-          });
-
-          setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
-        } else {
-          throw new Error('Save failed');
-        }
-      } catch (e) {
-        statusEl.className = 'status-msg error';
-        statusEl.textContent = 'Error saving. Please try again.';
-        statusEl.style.display = 'block';
-      }
-
-      saveBtn.disabled = !hasChanges;
-      saveBtn.textContent = 'Save Changes';
-      renderCourses();
+    // Init
+    if (adminToken) {
+      showAdmin();
     }
-
-    checkSession();
   </script>
 </body>
 </html>

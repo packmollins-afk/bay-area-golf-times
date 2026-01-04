@@ -935,6 +935,141 @@ app.get('/api/community/members', async (req, res) => {
   }
 });
 
+// ========== ANALYTICS TRACKING ==========
+
+// Track page views and events (called from frontend)
+app.post('/api/analytics/event', async (req, res) => {
+  try {
+    const { event_type, event_data, page_url, course_id } = req.body;
+    const userAgent = req.headers['user-agent'] || '';
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '';
+
+    // Create table if not exists
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS analytics_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL,
+        event_data TEXT,
+        page_url TEXT,
+        course_id INTEGER,
+        user_agent TEXT,
+        ip_hash TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Hash IP for privacy
+    const ipHash = crypto.createHash('sha256').update(ip + 'analytics_salt').digest('hex').substring(0, 16);
+
+    await db.execute({
+      sql: 'INSERT INTO analytics_events (event_type, event_data, page_url, course_id, user_agent, ip_hash) VALUES (?, ?, ?, ?, ?, ?)',
+      args: [event_type, JSON.stringify(event_data || {}), page_url, course_id || null, userAgent.substring(0, 255), ipHash]
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Analytics error:', error);
+    res.json({ success: true }); // Don't fail silently for analytics
+  }
+});
+
+// Track search queries
+app.post('/api/analytics/search', async (req, res) => {
+  try {
+    const { query, results_count, filters } = req.body;
+
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS search_analytics (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        query TEXT NOT NULL,
+        results_count INTEGER DEFAULT 0,
+        filters TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await db.execute({
+      sql: 'INSERT INTO search_analytics (query, results_count, filters) VALUES (?, ?, ?)',
+      args: [query, results_count || 0, JSON.stringify(filters || {})]
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Search analytics error:', error);
+    res.json({ success: true });
+  }
+});
+
+// ========== PUBLIC ANNOUNCEMENTS ==========
+
+app.get('/api/announcements/active', async (req, res) => {
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS announcements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        message TEXT NOT NULL,
+        type TEXT DEFAULT 'info',
+        link_url TEXT,
+        link_text TEXT,
+        is_active INTEGER DEFAULT 1,
+        starts_at DATETIME,
+        ends_at DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    const result = await db.execute(`
+      SELECT * FROM announcements
+      WHERE is_active = 1
+        AND (starts_at IS NULL OR starts_at <= datetime('now'))
+        AND (ends_at IS NULL OR ends_at >= datetime('now'))
+      ORDER BY created_at DESC
+      LIMIT 3
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== PUBLIC FEATURED DEALS ==========
+
+app.get('/api/featured-deals', async (req, res) => {
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS featured_deals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        course_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        discount_text TEXT,
+        promo_code TEXT,
+        link_url TEXT,
+        is_active INTEGER DEFAULT 1,
+        starts_at DATETIME,
+        ends_at DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (course_id) REFERENCES courses(id)
+      )
+    `);
+
+    const result = await db.execute(`
+      SELECT fd.*, c.name as course_name, c.slug as course_slug, c.city, c.region
+      FROM featured_deals fd
+      JOIN courses c ON fd.course_id = c.id
+      WHERE fd.is_active = 1
+        AND (fd.starts_at IS NULL OR fd.starts_at <= datetime('now'))
+        AND (fd.ends_at IS NULL OR fd.ends_at >= datetime('now'))
+      ORDER BY fd.created_at DESC
+      LIMIT 10
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ========== ADMIN ENDPOINTS ==========
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baygolf2024';
@@ -1011,6 +1146,589 @@ app.post('/api/admin/staff-picks', adminAuth, async (req, res) => {
     }
 
     res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== ADMIN ANALYTICS ENDPOINTS ==========
+
+// Dashboard overview
+app.get('/api/admin/analytics/dashboard', adminAuth, async (req, res) => {
+  try {
+    // Ensure tables exist
+    await db.execute(`CREATE TABLE IF NOT EXISTS analytics_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, event_type TEXT, event_data TEXT, page_url TEXT,
+      course_id INTEGER, user_agent TEXT, ip_hash TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    const [
+      totalUsers,
+      usersToday,
+      usersThisWeek,
+      usersThisMonth,
+      totalRounds,
+      roundsThisWeek,
+      pageViewsToday,
+      pageViewsThisWeek,
+      bookingClicksToday,
+      bookingClicksThisWeek
+    ] = await Promise.all([
+      db.execute("SELECT COUNT(*) as count FROM users"),
+      db.execute("SELECT COUNT(*) as count FROM users WHERE created_at >= date('now')"),
+      db.execute("SELECT COUNT(*) as count FROM users WHERE created_at >= date('now', '-7 days')"),
+      db.execute("SELECT COUNT(*) as count FROM users WHERE created_at >= date('now', '-30 days')"),
+      db.execute("SELECT COUNT(*) as count FROM rounds"),
+      db.execute("SELECT COUNT(*) as count FROM rounds WHERE created_at >= date('now', '-7 days')"),
+      db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now')"),
+      db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now', '-7 days')"),
+      db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND created_at >= date('now')"),
+      db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND created_at >= date('now', '-7 days')")
+    ]);
+
+    // Daily signups for chart (last 14 days)
+    const dailySignups = await db.execute(`
+      SELECT date(created_at) as date, COUNT(*) as count
+      FROM users
+      WHERE created_at >= date('now', '-14 days')
+      GROUP BY date(created_at)
+      ORDER BY date ASC
+    `);
+
+    // Daily page views for chart
+    const dailyPageViews = await db.execute(`
+      SELECT date(created_at) as date, COUNT(*) as count
+      FROM analytics_events
+      WHERE event_type = 'page_view' AND created_at >= date('now', '-14 days')
+      GROUP BY date(created_at)
+      ORDER BY date ASC
+    `);
+
+    res.json({
+      users: {
+        total: totalUsers.rows[0]?.count || 0,
+        today: usersToday.rows[0]?.count || 0,
+        thisWeek: usersThisWeek.rows[0]?.count || 0,
+        thisMonth: usersThisMonth.rows[0]?.count || 0
+      },
+      rounds: {
+        total: totalRounds.rows[0]?.count || 0,
+        thisWeek: roundsThisWeek.rows[0]?.count || 0
+      },
+      pageViews: {
+        today: pageViewsToday.rows[0]?.count || 0,
+        thisWeek: pageViewsThisWeek.rows[0]?.count || 0
+      },
+      bookingClicks: {
+        today: bookingClicksToday.rows[0]?.count || 0,
+        thisWeek: bookingClicksThisWeek.rows[0]?.count || 0
+      },
+      charts: {
+        dailySignups: dailySignups.rows,
+        dailyPageViews: dailyPageViews.rows
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Popular courses analytics
+app.get('/api/admin/analytics/popular-courses', adminAuth, async (req, res) => {
+  try {
+    // Most viewed courses
+    const mostViewed = await db.execute(`
+      SELECT c.id, c.name, c.slug, c.city, c.region, COUNT(ae.id) as view_count
+      FROM courses c
+      LEFT JOIN analytics_events ae ON ae.course_id = c.id AND ae.event_type = 'course_view'
+      GROUP BY c.id
+      ORDER BY view_count DESC
+      LIMIT 20
+    `);
+
+    // Most booking clicks
+    const mostClicked = await db.execute(`
+      SELECT c.id, c.name, c.slug, c.city, c.region, COUNT(ae.id) as click_count
+      FROM courses c
+      LEFT JOIN analytics_events ae ON ae.course_id = c.id AND ae.event_type = 'booking_click'
+      GROUP BY c.id
+      ORDER BY click_count DESC
+      LIMIT 20
+    `);
+
+    // Most favorited
+    const mostFavorited = await db.execute(`
+      SELECT c.id, c.name, c.slug, c.city, c.region, COUNT(uf.id) as favorite_count
+      FROM courses c
+      LEFT JOIN user_favorites uf ON uf.course_id = c.id
+      GROUP BY c.id
+      ORDER BY favorite_count DESC
+      LIMIT 20
+    `);
+
+    // Most played (rounds logged)
+    const mostPlayed = await db.execute(`
+      SELECT c.id, c.name, c.slug, c.city, c.region, COUNT(r.id) as rounds_count
+      FROM courses c
+      LEFT JOIN rounds r ON r.course_id = c.id
+      GROUP BY c.id
+      ORDER BY rounds_count DESC
+      LIMIT 20
+    `);
+
+    res.json({
+      mostViewed: mostViewed.rows,
+      mostClicked: mostClicked.rows,
+      mostFavorited: mostFavorited.rows,
+      mostPlayed: mostPlayed.rows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Search analytics
+app.get('/api/admin/analytics/searches', adminAuth, async (req, res) => {
+  try {
+    await db.execute(`CREATE TABLE IF NOT EXISTS search_analytics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, query TEXT, results_count INTEGER, filters TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // Top searches
+    const topSearches = await db.execute(`
+      SELECT query, COUNT(*) as search_count, AVG(results_count) as avg_results
+      FROM search_analytics
+      WHERE created_at >= date('now', '-30 days')
+      GROUP BY LOWER(query)
+      ORDER BY search_count DESC
+      LIMIT 50
+    `);
+
+    // Failed searches (0 results)
+    const failedSearches = await db.execute(`
+      SELECT query, COUNT(*) as search_count
+      FROM search_analytics
+      WHERE results_count = 0 AND created_at >= date('now', '-30 days')
+      GROUP BY LOWER(query)
+      ORDER BY search_count DESC
+      LIMIT 30
+    `);
+
+    // Search volume over time
+    const searchVolume = await db.execute(`
+      SELECT date(created_at) as date, COUNT(*) as count
+      FROM search_analytics
+      WHERE created_at >= date('now', '-14 days')
+      GROUP BY date(created_at)
+      ORDER BY date ASC
+    `);
+
+    res.json({
+      topSearches: topSearches.rows,
+      failedSearches: failedSearches.rows,
+      searchVolume: searchVolume.rows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Conversion funnel
+app.get('/api/admin/analytics/conversions', adminAuth, async (req, res) => {
+  try {
+    const period = req.query.period || '7';
+    const dateFilter = `created_at >= date('now', '-${period} days')`;
+
+    const [pageViews, courseViews, teeTimeViews, bookingClicks] = await Promise.all([
+      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'page_view' AND ${dateFilter}`),
+      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'course_view' AND ${dateFilter}`),
+      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'tee_time_view' AND ${dateFilter}`),
+      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND ${dateFilter}`)
+    ]);
+
+    res.json({
+      period: parseInt(period),
+      funnel: [
+        { stage: 'Page Views', count: pageViews.rows[0]?.count || 0 },
+        { stage: 'Course Views', count: courseViews.rows[0]?.count || 0 },
+        { stage: 'Tee Time Views', count: teeTimeViews.rows[0]?.count || 0 },
+        { stage: 'Booking Clicks', count: bookingClicks.rows[0]?.count || 0 }
+      ]
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== ADMIN CONTENT MANAGEMENT ENDPOINTS ==========
+
+// Full course editor - get single course with all fields
+app.get('/api/admin/courses/:id/full', adminAuth, async (req, res) => {
+  try {
+    const result = await db.execute({
+      sql: 'SELECT * FROM courses WHERE id = ?',
+      args: [parseInt(req.params.id)]
+    });
+    if (!result.rows.length) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Announcements CRUD
+app.get('/api/admin/announcements', adminAuth, async (req, res) => {
+  try {
+    await db.execute(`CREATE TABLE IF NOT EXISTS announcements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, message TEXT NOT NULL, type TEXT DEFAULT 'info',
+      link_url TEXT, link_text TEXT, is_active INTEGER DEFAULT 1, starts_at DATETIME, ends_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+    const result = await db.execute('SELECT * FROM announcements ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/admin/announcements', adminAuth, async (req, res) => {
+  try {
+    const { title, message, type, link_url, link_text, is_active, starts_at, ends_at } = req.body;
+    const result = await db.execute({
+      sql: 'INSERT INTO announcements (title, message, type, link_url, link_text, is_active, starts_at, ends_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [title, message, type || 'info', link_url, link_text, is_active ? 1 : 0, starts_at, ends_at]
+    });
+    res.json({ success: true, id: Number(result.lastInsertRowid) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/announcements/:id', adminAuth, async (req, res) => {
+  try {
+    const { title, message, type, link_url, link_text, is_active, starts_at, ends_at } = req.body;
+    await db.execute({
+      sql: 'UPDATE announcements SET title = ?, message = ?, type = ?, link_url = ?, link_text = ?, is_active = ?, starts_at = ?, ends_at = ? WHERE id = ?',
+      args: [title, message, type, link_url, link_text, is_active ? 1 : 0, starts_at, ends_at, parseInt(req.params.id)]
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/admin/announcements/:id', adminAuth, async (req, res) => {
+  try {
+    await db.execute({ sql: 'DELETE FROM announcements WHERE id = ?', args: [parseInt(req.params.id)] });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Featured Deals CRUD
+app.get('/api/admin/featured-deals', adminAuth, async (req, res) => {
+  try {
+    await db.execute(`CREATE TABLE IF NOT EXISTS featured_deals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT, course_id INTEGER NOT NULL, title TEXT NOT NULL, description TEXT,
+      discount_text TEXT, promo_code TEXT, link_url TEXT, is_active INTEGER DEFAULT 1, starts_at DATETIME, ends_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+    const result = await db.execute(`
+      SELECT fd.*, c.name as course_name, c.slug as course_slug
+      FROM featured_deals fd
+      LEFT JOIN courses c ON fd.course_id = c.id
+      ORDER BY fd.created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/admin/featured-deals', adminAuth, async (req, res) => {
+  try {
+    const { course_id, title, description, discount_text, promo_code, link_url, is_active, starts_at, ends_at } = req.body;
+    const result = await db.execute({
+      sql: 'INSERT INTO featured_deals (course_id, title, description, discount_text, promo_code, link_url, is_active, starts_at, ends_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [course_id, title, description, discount_text, promo_code, link_url, is_active ? 1 : 0, starts_at, ends_at]
+    });
+    res.json({ success: true, id: Number(result.lastInsertRowid) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/featured-deals/:id', adminAuth, async (req, res) => {
+  try {
+    const { course_id, title, description, discount_text, promo_code, link_url, is_active, starts_at, ends_at } = req.body;
+    await db.execute({
+      sql: 'UPDATE featured_deals SET course_id = ?, title = ?, description = ?, discount_text = ?, promo_code = ?, link_url = ?, is_active = ?, starts_at = ?, ends_at = ? WHERE id = ?',
+      args: [course_id, title, description, discount_text, promo_code, link_url, is_active ? 1 : 0, starts_at, ends_at, parseInt(req.params.id)]
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/admin/featured-deals/:id', adminAuth, async (req, res) => {
+  try {
+    await db.execute({ sql: 'DELETE FROM featured_deals WHERE id = ?', args: [parseInt(req.params.id)] });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Scraper status (mock for now - can be expanded with real scraper data)
+app.get('/api/admin/scraper-status', adminAuth, async (req, res) => {
+  try {
+    // Get tee time freshness per course
+    const result = await db.execute(`
+      SELECT c.id, c.name, c.slug, c.booking_url,
+        COUNT(t.id) as tee_time_count,
+        MAX(t.created_at) as last_scraped,
+        MIN(t.datetime) as next_available
+      FROM courses c
+      LEFT JOIN tee_times t ON t.course_id = c.id AND t.datetime >= datetime('now')
+      GROUP BY c.id
+      ORDER BY last_scraped ASC NULLS FIRST
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ========== ADMIN USER MANAGEMENT ENDPOINTS ==========
+
+// Get all users with stats
+app.get('/api/admin/users', adminAuth, async (req, res) => {
+  try {
+    const { page = 1, limit = 50, search } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    let sql = `
+      SELECT u.id, u.email, u.display_name, u.profile_picture, u.handicap, u.email_verified, u.created_at,
+        c.name as home_course_name,
+        COUNT(DISTINCT r.id) as rounds_count,
+        COUNT(DISTINCT uf.id) as favorites_count,
+        MAX(r.date) as last_round_date
+      FROM users u
+      LEFT JOIN courses c ON u.home_course_id = c.id
+      LEFT JOIN rounds r ON r.user_id = u.id
+      LEFT JOIN user_favorites uf ON uf.user_id = u.id
+    `;
+    const args = [];
+
+    if (search) {
+      sql += ` WHERE u.email LIKE ? OR u.display_name LIKE ?`;
+      args.push(`%${search}%`, `%${search}%`);
+    }
+
+    sql += ` GROUP BY u.id ORDER BY u.created_at DESC LIMIT ? OFFSET ?`;
+    args.push(parseInt(limit), offset);
+
+    const result = await db.execute({ sql, args });
+
+    // Get total count
+    let countSql = 'SELECT COUNT(*) as total FROM users';
+    const countArgs = [];
+    if (search) {
+      countSql += ` WHERE email LIKE ? OR display_name LIKE ?`;
+      countArgs.push(`%${search}%`, `%${search}%`);
+    }
+    const countResult = await db.execute({ sql: countSql, args: countArgs });
+
+    res.json({
+      users: result.rows,
+      total: countResult.rows[0]?.total || 0,
+      page: parseInt(page),
+      limit: parseInt(limit)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get single user details
+app.get('/api/admin/users/:id', adminAuth, async (req, res) => {
+  try {
+    const userResult = await db.execute({
+      sql: `SELECT u.*, c.name as home_course_name FROM users u LEFT JOIN courses c ON u.home_course_id = c.id WHERE u.id = ?`,
+      args: [parseInt(req.params.id)]
+    });
+
+    if (!userResult.rows.length) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const roundsResult = await db.execute({
+      sql: `SELECT r.*, c.name as course_name FROM rounds r JOIN courses c ON r.course_id = c.id WHERE r.user_id = ? ORDER BY r.date DESC LIMIT 20`,
+      args: [parseInt(req.params.id)]
+    });
+
+    res.json({
+      user: userResult.rows[0],
+      rounds: roundsResult.rows
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete user
+app.delete('/api/admin/users/:id', adminAuth, async (req, res) => {
+  try {
+    const userId = parseInt(req.params.id);
+    // Delete related data
+    await db.execute({ sql: 'DELETE FROM sessions WHERE user_id = ?', args: [userId] });
+    await db.execute({ sql: 'DELETE FROM round_holes WHERE round_id IN (SELECT id FROM rounds WHERE user_id = ?)', args: [userId] });
+    await db.execute({ sql: 'DELETE FROM rounds WHERE user_id = ?', args: [userId] });
+    await db.execute({ sql: 'DELETE FROM user_favorites WHERE user_id = ?', args: [userId] });
+    await db.execute({ sql: 'DELETE FROM users WHERE id = ?', args: [userId] });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Reviews management (create table and endpoints)
+app.get('/api/admin/reviews', adminAuth, async (req, res) => {
+  try {
+    await db.execute(`CREATE TABLE IF NOT EXISTS course_reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      course_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      rating INTEGER NOT NULL,
+      title TEXT,
+      content TEXT,
+      is_flagged INTEGER DEFAULT 0,
+      flag_reason TEXT,
+      is_approved INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (course_id) REFERENCES courses(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )`);
+
+    const { flagged_only } = req.query;
+    let sql = `
+      SELECT cr.*, u.display_name, u.email, c.name as course_name, c.slug as course_slug
+      FROM course_reviews cr
+      JOIN users u ON cr.user_id = u.id
+      JOIN courses c ON cr.course_id = c.id
+    `;
+    if (flagged_only === 'true') {
+      sql += ' WHERE cr.is_flagged = 1';
+    }
+    sql += ' ORDER BY cr.created_at DESC LIMIT 100';
+
+    const result = await db.execute(sql);
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/reviews/:id/approve', adminAuth, async (req, res) => {
+  try {
+    await db.execute({
+      sql: 'UPDATE course_reviews SET is_approved = 1, is_flagged = 0, flag_reason = NULL WHERE id = ?',
+      args: [parseInt(req.params.id)]
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/reviews/:id/reject', adminAuth, async (req, res) => {
+  try {
+    await db.execute({
+      sql: 'UPDATE course_reviews SET is_approved = 0 WHERE id = ?',
+      args: [parseInt(req.params.id)]
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/admin/reviews/:id', adminAuth, async (req, res) => {
+  try {
+    await db.execute({ sql: 'DELETE FROM course_reviews WHERE id = ?', args: [parseInt(req.params.id)] });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Email broadcast
+app.post('/api/admin/email-broadcast', adminAuth, async (req, res) => {
+  try {
+    const { subject, html_content, segment } = req.body;
+
+    if (!resend) {
+      return res.status(400).json({ error: 'Email service not configured' });
+    }
+
+    // Get users based on segment
+    let sql = 'SELECT email, display_name FROM users WHERE email_verified = 1';
+    if (segment === 'active') {
+      sql += " AND id IN (SELECT DISTINCT user_id FROM rounds WHERE created_at >= date('now', '-30 days'))";
+    } else if (segment === 'inactive') {
+      sql += " AND id NOT IN (SELECT DISTINCT user_id FROM rounds WHERE created_at >= date('now', '-30 days'))";
+    }
+
+    const usersResult = await db.execute(sql);
+    const users = usersResult.rows;
+
+    if (users.length === 0) {
+      return res.status(400).json({ error: 'No users match the selected segment' });
+    }
+
+    // Send emails (batch)
+    let sent = 0;
+    let failed = 0;
+
+    for (const user of users) {
+      try {
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || 'Bay Area Golf <noreply@bayareagolf.now>',
+          to: user.email,
+          subject: subject,
+          html: html_content.replace('{{name}}', user.display_name || 'Golfer')
+        });
+        sent++;
+      } catch (e) {
+        console.error(`Failed to send to ${user.email}:`, e);
+        failed++;
+      }
+    }
+
+    res.json({ success: true, sent, failed, total: users.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get email segments stats
+app.get('/api/admin/email-segments', adminAuth, async (req, res) => {
+  try {
+    const [all, verified, active, inactive] = await Promise.all([
+      db.execute('SELECT COUNT(*) as count FROM users'),
+      db.execute('SELECT COUNT(*) as count FROM users WHERE email_verified = 1'),
+      db.execute("SELECT COUNT(*) as count FROM users WHERE email_verified = 1 AND id IN (SELECT DISTINCT user_id FROM rounds WHERE created_at >= date('now', '-30 days'))"),
+      db.execute("SELECT COUNT(*) as count FROM users WHERE email_verified = 1 AND id NOT IN (SELECT DISTINCT user_id FROM rounds WHERE created_at >= date('now', '-30 days'))")
+    ]);
+
+    res.json({
+      all: all.rows[0]?.count || 0,
+      verified: verified.rows[0]?.count || 0,
+      active: active.rows[0]?.count || 0,
+      inactive: inactive.rows[0]?.count || 0
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
