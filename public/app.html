@@ -2231,7 +2231,7 @@
         <div class="course-chip">
           <a href="${courseUrl}" class="course-chip-name">${tt.course_name}</a>
           <span class="course-chip-price">${price}</span>
-          ${phoneNumber ? `<a href="tel:${phoneNumber}" class="chip-book chip-call">Call</a>` : `<a href="${courseUrl}" class="chip-book">View</a>`}
+          ${phoneNumber ? `<a href="tel:${phoneNumber}" class="chip-book chip-call">Call to Book</a>` : `<a href="${courseUrl}" class="chip-book">View</a>`}
         </div>
       `;
     }
@@ -2266,7 +2266,7 @@
             ${hasDiscount ? '<div class="deal-tag">HOT DEAL</div>' : ''}
           </div>
           ${course.phone_number
-            ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="book-btn call-btn">Call Club</a>`
+            ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="book-btn call-btn">Call to Book</a>`
             : `<a href="/course/${course.slug || tt.course_id}" class="book-btn">View</a>`}
         </div>
       `;
