@@ -2225,11 +2225,13 @@
       const course = coursesData.find(c => c.id === tt.course_id) || {};
       const courseUrl = `/course/${course.slug || tt.course_id}`;
 
+      // TODO: Replace with direct booking links once referral partnerships are set up
+      const phoneNumber = course.phone_number ? course.phone_number.replace(/[^\d+]/g, '') : '';
       return `
         <div class="course-chip">
           <a href="${courseUrl}" class="course-chip-name">${tt.course_name}</a>
           <span class="course-chip-price">${price}</span>
-          <a href="${tt.booking_url}" target="_blank" rel="noopener" class="chip-book">Book</a>
+          ${phoneNumber ? `<a href="tel:${phoneNumber}" class="chip-book chip-call">Call</a>` : `<a href="${courseUrl}" class="chip-book">View</a>`}
         </div>
       `;
     }
@@ -2263,7 +2265,9 @@
             <div class="price">${price}</div>
             ${hasDiscount ? '<div class="deal-tag">HOT DEAL</div>' : ''}
           </div>
-          <a href="${tt.booking_url}" target="_blank" rel="noopener" class="book-btn">Book</a>
+          ${course.phone_number
+            ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="book-btn call-btn">Call Club</a>`
+            : `<a href="/course/${course.slug || tt.course_id}" class="book-btn">View</a>`}
         </div>
       `;
     }
