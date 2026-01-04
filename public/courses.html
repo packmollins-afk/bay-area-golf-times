@@ -133,6 +133,7 @@
       gap: 6px;
     }
     .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+    .nav-btn.active { background: rgba(255,255,255,0.15); border-color: #fff; }
     .nav-btn svg { width: 16px; height: 16px; }
 
     /* Page title */
@@ -373,16 +374,11 @@
   <header>
     <div class="container">
       <h1>Bay Area Golf</h1>
-      <div class="header-nav">
-        <a href="/" class="nav-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
-          Home
-        </a>
+      <nav class="header-nav">
+        <a href="/" class="nav-btn">Home</a>
         <a href="/app.html" class="nav-btn">Tee Times</a>
-      </div>
+        <a href="/courses.html" class="nav-btn active">Courses</a>
+      </nav>
     </div>
   </header>
 
@@ -425,7 +421,7 @@
 
       <div class="region-chips">
         <button class="region-chip active" data-region="" onclick="selectRegion(this, '')">All</button>
-        <button class="region-chip" data-region="San Francisco" onclick="selectRegion(this, 'San Francisco')">San Francisco</button>
+        <button class="region-chip" data-region="San Francisco" onclick="selectRegion(this, 'San Francisco')">SF</button>
         <button class="region-chip" data-region="South Bay" onclick="selectRegion(this, 'South Bay')">South Bay</button>
         <button class="region-chip" data-region="East Bay" onclick="selectRegion(this, 'East Bay')">East Bay</button>
         <button class="region-chip" data-region="North Bay" onclick="selectRegion(this, 'North Bay')">North Bay</button>
