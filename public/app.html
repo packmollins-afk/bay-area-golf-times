@@ -1249,11 +1249,20 @@
       font-size: 1rem;
       border-bottom: 1px solid var(--border-light);
       text-align: center;
+      color: var(--text-muted);
     }
     .compare-value.better {
       color: var(--primary);
-      font-weight: 800;
-      font-size: 1.1rem;
+      font-weight: 900;
+      font-size: 1.25rem;
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      border-radius: 6px;
+      padding: 8px 4px;
+      position: relative;
+    }
+    .compare-value.better::after {
+      content: ' ✓';
+      font-size: 0.9rem;
     }
     .compare-section-title {
       grid-column: 1 / -1;
@@ -1329,7 +1338,16 @@
         text-align: center;
         padding: 6px 4px 10px;
         font-size: 1.15rem;
-        font-weight: 700;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+      .compare-stat-row .compare-value.better {
+        font-weight: 900;
+        font-size: 1.3rem;
+        color: var(--primary);
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        border-radius: 6px;
+        margin: 2px;
       }
       .compare-stat-row .compare-value:nth-child(1) { grid-area: val1; }
       .compare-stat-row .compare-value:nth-child(3) { grid-area: val2; }

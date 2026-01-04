@@ -375,9 +375,21 @@ app.get('/api/courses/compare', async (req, res) => {
       return res.status(404).json({ error: 'Course not found' });
     }
 
+    // Get current date/time in Pacific timezone for comparison
+    const now = new Date();
+    const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const todayStr = pst.toISOString().split('T')[0];
+    const currentTime = pst.toTimeString().slice(0, 5);
+
     const [tt1Result, tt2Result] = await Promise.all([
-      db.execute({ sql: `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now') ORDER BY datetime LIMIT 20`, args: [parseInt(course1)] }),
-      db.execute({ sql: `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now') ORDER BY datetime LIMIT 20`, args: [parseInt(course2)] })
+      db.execute({
+        sql: `SELECT * FROM tee_times WHERE course_id = ? AND (date > ? OR (date = ? AND time >= ?)) ORDER BY date, time LIMIT 20`,
+        args: [parseInt(course1), todayStr, todayStr, currentTime]
+      }),
+      db.execute({
+        sql: `SELECT * FROM tee_times WHERE course_id = ? AND (date > ? OR (date = ? AND time >= ?)) ORDER BY date, time LIMIT 20`,
+        args: [parseInt(course2), todayStr, todayStr, currentTime]
+      })
     ]);
 
     const getPriceStats = (teeTimes) => {
