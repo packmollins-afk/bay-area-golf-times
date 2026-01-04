@@ -136,18 +136,6 @@
     .nav-btn.active { background: rgba(255,255,255,0.15); border-color: #fff; }
     .nav-btn svg { width: 16px; height: 16px; }
 
-    /* Page title */
-    .page-title {
-      text-align: center;
-      padding: 32px 0 24px;
-    }
-    .page-title h2 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-    .page-title p { color: var(--text-muted); font-style: italic; }
-
     /* Search & Controls */
     .controls {
       background: var(--card-bg);
@@ -384,12 +372,7 @@
     </div>
   </header>
 
-  <main class="container">
-    <div class="page-title">
-      <h2>Bay Area Courses</h2>
-      <p>Explore public golf across the region</p>
-    </div>
-
+  <main class="container" style="padding-top: 24px;">
     <div class="controls">
       <div class="search-row">
         <input type="text" class="search-input" id="search" placeholder="Search courses by name or city..." oninput="filterCourses()">
