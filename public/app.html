@@ -1641,15 +1641,7 @@
             <option value="150">Under $150</option>
           </select>
         </div>
-        <div class="filter-group">
-          <label for="holes">Holes</label>
-          <select id="holes">
-            <option value="">All</option>
-            <option value="18">18 holes</option>
-            <option value="9">9 holes</option>
-          </select>
-        </div>
-        <button class="btn" onclick="searchTeeTimes()">Search</button>
+        <button class="btn" onclick="searchTeeTimes()">Filter</button>
       </div>
     </div>
 
@@ -2116,8 +2108,6 @@
       if (minTime) params.set('min_time', minTime);
       const maxPrice = document.getElementById('max-price').value;
       if (maxPrice) params.set('max_price', maxPrice);
-      const holes = document.getElementById('holes').value;
-      if (holes) params.set('holes', holes);
       params.set('sort_by', document.getElementById('sort-by').value);
       params.set('sort_order', document.getElementById('sort-order').value);
       params.set('limit', '200');

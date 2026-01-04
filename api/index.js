@@ -397,10 +397,10 @@ app.get('/api/courses/compare', async (req, res) => {
 
 app.get('/api/tee-times', async (req, res) => {
   try {
-    const { date, region, minPrice, maxPrice } = req.query;
+    const { date, region, minPrice, maxPrice, min_time, max_price, players, course_id, staff_picks, sort_by, sort_order, limit } = req.query;
 
     let sql = `
-      SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug
+      SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug, c.avg_rating
       FROM tee_times t
       JOIN courses c ON t.course_id = c.id
       WHERE t.datetime >= datetime('now')
@@ -415,16 +415,41 @@ app.get('/api/tee-times', async (req, res) => {
       sql += ' AND c.region = ?';
       args.push(region);
     }
+    if (staff_picks === 'true') {
+      sql += ' AND c.is_staff_pick = 1';
+    }
+    if (course_id) {
+      sql += ' AND t.course_id = ?';
+      args.push(parseInt(course_id));
+    }
     if (minPrice) {
       sql += ' AND t.price >= ?';
       args.push(parseFloat(minPrice));
     }
-    if (maxPrice) {
+    // Support both maxPrice and max_price
+    const maxPriceVal = maxPrice || max_price;
+    if (maxPriceVal) {
       sql += ' AND t.price <= ?';
-      args.push(parseFloat(maxPrice));
+      args.push(parseFloat(maxPriceVal));
+    }
+    if (min_time) {
+      sql += ' AND t.time >= ?';
+      args.push(min_time);
+    }
+    if (players) {
+      sql += ' AND t.players >= ?';
+      args.push(parseInt(players));
     }
 
-    sql += ' ORDER BY t.datetime LIMIT 200';
+    // Sorting
+    const validSortColumns = ['datetime', 'price', 'course_name', 'avg_rating'];
+    const sortCol = validSortColumns.includes(sort_by) ? (sort_by === 'course_name' ? 'c.name' : sort_by === 'avg_rating' ? 'c.avg_rating' : `t.${sort_by}`) : 't.datetime';
+    const sortDir = sort_order === 'DESC' ? 'DESC' : 'ASC';
+    sql += ` ORDER BY ${sortCol} ${sortDir}`;
+
+    // Limit
+    const resultLimit = Math.min(parseInt(limit) || 200, 500);
+    sql += ` LIMIT ${resultLimit}`;
 
     const result = await db.execute({ sql, args });
     res.json(result.rows);
