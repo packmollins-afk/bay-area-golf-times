@@ -2231,7 +2231,7 @@
         <div class="course-chip">
           <a href="${courseUrl}" class="course-chip-name">${tt.course_name}</a>
           <span class="course-chip-price">${price}</span>
-          ${phoneNumber ? `<a href="tel:${phoneNumber}" class="chip-book chip-call">Call to Book</a>` : `<a href="${courseUrl}" class="chip-book">View</a>`}
+          ${phoneNumber ? `<a href="tel:${phoneNumber}" class="chip-book chip-call" onclick="trackCallClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Book</a>` : `<a href="${courseUrl}" class="chip-book">View</a>`}
         </div>
       `;
     }
@@ -2266,7 +2266,7 @@
             ${hasDiscount ? '<div class="deal-tag">HOT DEAL</div>' : ''}
           </div>
           ${course.phone_number
-            ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="book-btn call-btn">Call to Book</a>`
+            ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="book-btn call-btn" onclick="trackCallClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Book</a>`
             : `<a href="/course/${course.slug || tt.course_id}" class="book-btn">View</a>`}
         </div>
       `;
@@ -2888,6 +2888,24 @@
       `;
 
       document.getElementById('compare-body').innerHTML = html;
+    }
+
+    // Track call button clicks
+    function trackCallClick(courseId, courseName) {
+      if (window.BayAreaGolfAnalytics) {
+        window.BayAreaGolfAnalytics.trackBookingClick(courseId, courseName, null);
+      }
+      // Track as call_initiated event
+      fetch('/api/analytics/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_type: 'call_initiated',
+          event_data: { course_name: courseName },
+          page_url: window.location.pathname,
+          course_id: courseId
+        })
+      }).catch(() => {});
     }
   </script>
   <script src="/js/analytics.js"></script>
