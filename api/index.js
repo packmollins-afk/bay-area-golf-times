@@ -1217,7 +1217,10 @@ app.get('/api/admin/analytics/dashboard', adminAuth, async (req, res) => {
       pageViewsToday,
       pageViewsThisWeek,
       bookingClicksToday,
-      bookingClicksThisWeek
+      bookingClicksThisWeek,
+      uniqueVisitorsToday,
+      uniqueVisitorsWeek,
+      uniqueVisitorsMonth
     ] = await Promise.all([
       db.execute("SELECT COUNT(*) as count FROM users"),
       db.execute("SELECT COUNT(*) as count FROM users WHERE created_at >= date('now')"),
@@ -1228,7 +1231,10 @@ app.get('/api/admin/analytics/dashboard', adminAuth, async (req, res) => {
       db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now')"),
       db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now', '-7 days')"),
       db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND created_at >= date('now')"),
-      db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND created_at >= date('now', '-7 days')")
+      db.execute("SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND created_at >= date('now', '-7 days')"),
+      db.execute("SELECT COUNT(DISTINCT ip_hash) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now')"),
+      db.execute("SELECT COUNT(DISTINCT ip_hash) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now', '-7 days')"),
+      db.execute("SELECT COUNT(DISTINCT ip_hash) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now', '-30 days')")
     ]);
 
     // Daily signups for chart (last 14 days)
@@ -1243,6 +1249,15 @@ app.get('/api/admin/analytics/dashboard', adminAuth, async (req, res) => {
     // Daily page views for chart
     const dailyPageViews = await db.execute(`
       SELECT date(created_at) as date, COUNT(*) as count
+      FROM analytics_events
+      WHERE event_type = 'page_view' AND created_at >= date('now', '-14 days')
+      GROUP BY date(created_at)
+      ORDER BY date ASC
+    `);
+
+    // Daily unique visitors for chart (last 14 days)
+    const dailyUniqueVisitors = await db.execute(`
+      SELECT date(created_at) as date, COUNT(DISTINCT ip_hash) as count
       FROM analytics_events
       WHERE event_type = 'page_view' AND created_at >= date('now', '-14 days')
       GROUP BY date(created_at)
@@ -1268,9 +1283,15 @@ app.get('/api/admin/analytics/dashboard', adminAuth, async (req, res) => {
         today: bookingClicksToday.rows[0]?.count || 0,
         thisWeek: bookingClicksThisWeek.rows[0]?.count || 0
       },
+      uniqueVisitors: {
+        today: uniqueVisitorsToday.rows[0]?.count || 0,
+        thisWeek: uniqueVisitorsWeek.rows[0]?.count || 0,
+        thisMonth: uniqueVisitorsMonth.rows[0]?.count || 0
+      },
       charts: {
         dailySignups: dailySignups.rows,
-        dailyPageViews: dailyPageViews.rows
+        dailyPageViews: dailyPageViews.rows,
+        dailyUniqueVisitors: dailyUniqueVisitors.rows
       }
     });
   } catch (error) {

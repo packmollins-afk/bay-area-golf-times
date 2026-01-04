@@ -395,6 +395,11 @@
           <div class="sub"><span id="stat-users-week">-</span> this week</div>
         </div>
         <div class="stat-card">
+          <div class="value" id="stat-visitors-today">-</div>
+          <div class="label">Unique Visitors Today</div>
+          <div class="sub"><span id="stat-visitors-week">-</span> this week / <span id="stat-visitors-month">-</span> this month</div>
+        </div>
+        <div class="stat-card">
           <div class="value" id="stat-rounds-total">-</div>
           <div class="label">Total Rounds</div>
           <div class="sub"><span id="stat-rounds-week">-</span> this week</div>
@@ -918,6 +923,13 @@
       document.getElementById('stat-views-week').textContent = data.pageViews.thisWeek;
       document.getElementById('stat-clicks-today').textContent = data.bookingClicks.today;
       document.getElementById('stat-clicks-week').textContent = data.bookingClicks.thisWeek;
+
+      // Unique visitors
+      if (data.uniqueVisitors) {
+        document.getElementById('stat-visitors-today').textContent = data.uniqueVisitors.today;
+        document.getElementById('stat-visitors-week').textContent = data.uniqueVisitors.thisWeek;
+        document.getElementById('stat-visitors-month').textContent = data.uniqueVisitors.thisMonth;
+      }
 
       // Render chart
       const chart = document.getElementById('signupsChart');
