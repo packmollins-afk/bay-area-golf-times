@@ -4,9 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
+  <!-- Primary Meta Tags (dynamically updated by JavaScript) -->
   <title>Loading... | Bay Area Golf</title>
   <meta name="description" content="Course details and tee times for Bay Area public golf courses.">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph (dynamically updated by JavaScript) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Bay Area Golf">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://bayareagolf.now/og-image.svg">
+
+  <!-- Twitter (dynamically updated by JavaScript) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://bayareagolf.now/og-image.svg">
+
+  <!-- Geo Meta Tags -->
+  <meta name="geo.region" content="US-CA">
+
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#2d5a27">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -838,10 +858,112 @@
     }
 
     function renderCourse(course) {
-      // Update page title and meta
+      // Update page title and meta for SEO
       document.title = `${course.name} | Bay Area Golf`;
-      document.querySelector('meta[name="description"]').content =
-        `${course.name} in ${course.city} - ${course.holes} holes, Par ${course.par || 'N/A'}. View course details, reviews, and book tee times.`;
+      const description = `${course.name} in ${course.city} - ${course.holes} holes, Par ${course.par || 'N/A'}. View course details, reviews, and book tee times.`;
+      document.querySelector('meta[name="description"]').content = description;
+
+      // Update canonical URL
+      const canonicalUrl = `https://bayareagolf.now/course/${course.slug}`;
+      let canonicalLink = document.querySelector('link[rel="canonical"]');
+      if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.rel = 'canonical';
+        document.head.appendChild(canonicalLink);
+      }
+      canonicalLink.href = canonicalUrl;
+
+      // Update Open Graph meta tags
+      const setMetaProperty = (property, content) => {
+        let meta = document.querySelector(`meta[property="${property}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('property', property);
+          document.head.appendChild(meta);
+        }
+        meta.content = content;
+      };
+
+      const setMetaName = (name, content) => {
+        let meta = document.querySelector(`meta[name="${name}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('name', name);
+          document.head.appendChild(meta);
+        }
+        meta.content = content;
+      };
+
+      setMetaProperty('og:url', canonicalUrl);
+      setMetaProperty('og:title', `${course.name} | Bay Area Golf`);
+      setMetaProperty('og:description', description);
+      setMetaName('twitter:url', canonicalUrl);
+      setMetaName('twitter:title', `${course.name} | Bay Area Golf`);
+      setMetaName('twitter:description', description);
+
+      // Inject JSON-LD structured data for GolfCourse
+      const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "GolfCourse",
+        "name": course.name,
+        "url": canonicalUrl,
+        "description": description,
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": course.city,
+          "addressRegion": "CA",
+          "addressCountry": "US"
+        },
+        "geo": course.latitude && course.longitude ? {
+          "@type": "GeoCoordinates",
+          "latitude": course.latitude,
+          "longitude": course.longitude
+        } : undefined,
+        "telephone": course.phone_number || undefined,
+        "numberOfHoles": course.holes || 18,
+        "amenityFeature": [
+          course.has_driving_range ? {"@type": "LocationFeatureSpecification", "name": "Driving Range", "value": true} : null,
+          course.has_practice_green ? {"@type": "LocationFeatureSpecification", "name": "Practice Green", "value": true} : null,
+          course.has_pro_shop ? {"@type": "LocationFeatureSpecification", "name": "Pro Shop", "value": true} : null
+        ].filter(Boolean),
+        "aggregateRating": course.avg_rating ? {
+          "@type": "AggregateRating",
+          "ratingValue": course.avg_rating.toFixed(1),
+          "ratingCount": course.total_reviews || 1,
+          "bestRating": "5",
+          "worstRating": "1"
+        } : undefined
+      };
+
+      // Remove undefined values
+      Object.keys(jsonLd).forEach(key => jsonLd[key] === undefined && delete jsonLd[key]);
+
+      // Inject breadcrumb schema
+      const breadcrumbLd = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://bayareagolf.now/"},
+          {"@type": "ListItem", "position": 2, "name": "Courses", "item": "https://bayareagolf.now/courses.html"},
+          {"@type": "ListItem", "position": 3, "name": course.name, "item": canonicalUrl}
+        ]
+      };
+
+      // Add JSON-LD scripts to head
+      let existingLd = document.querySelector('script[type="application/ld+json"]');
+      if (existingLd) existingLd.remove();
+      let existingBreadcrumbLd = document.querySelectorAll('script[type="application/ld+json"]');
+      existingBreadcrumbLd.forEach(el => el.remove());
+
+      const script1 = document.createElement('script');
+      script1.type = 'application/ld+json';
+      script1.textContent = JSON.stringify(jsonLd);
+      document.head.appendChild(script1);
+
+      const script2 = document.createElement('script');
+      script2.type = 'application/ld+json';
+      script2.textContent = JSON.stringify(breadcrumbLd);
+      document.head.appendChild(script2);
 
       // Hero image
       const heroImg = course.photos?.[0]?.url || course.photo_url || `https://picsum.photos/seed/${course.id}/1200/400`;

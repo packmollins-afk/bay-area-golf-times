@@ -188,6 +188,65 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
+// ========== SITEMAP ENDPOINT ==========
+
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const coursesResult = await db.execute('SELECT slug, updated_at FROM courses ORDER BY region, name');
+    const courses = coursesResult.rows;
+    const today = new Date().toISOString().split('T')[0];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
+  <url>
+    <loc>https://bayareagolf.now/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/app.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/courses.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/scorebook.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/community.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Individual Course Pages -->
+${courses.map(c => `  <url>
+    <loc>https://bayareagolf.now/course/${c.slug}</loc>
+    <lastmod>${c.updated_at ? c.updated_at.split('T')[0] : today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+    res.set('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    console.error('Sitemap error:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 // ========== COURSE ENDPOINTS ==========
 
 app.get('/api/courses', async (req, res) => {

@@ -10,8 +10,10 @@ Sitemap: https://bayareagolf.now/sitemap.xml
 # Crawl-delay for politeness
 Crawl-delay: 1
 
-# Disallow API routes from indexing
+# Disallow API routes and admin pages from indexing
 Disallow: /api/
+Disallow: /admin.html
+Disallow: /admin
 
 # Allow main content
 Allow: /index.html
