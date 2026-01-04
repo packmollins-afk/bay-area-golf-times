@@ -5,3 +5,6 @@ node_modules/
 *.log
 .vercel
 .env*.local
+.env.production
+golf.db
+*.db
