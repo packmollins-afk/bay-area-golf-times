@@ -731,7 +731,7 @@
       try {
         // Fetch course and all courses in parallel
         const [courseRes, allCoursesRes] = await Promise.all([
-          fetch(`${API_BASE}/courses/slug/${slug}?_t=${Date.now()}`),
+          fetch(`${API_BASE}/courses/${slug}?_t=${Date.now()}`),
           fetch(`${API_BASE}/courses?all=true&_t=${Date.now()}`)
         ]);
 
@@ -917,11 +917,11 @@
       }
 
       // Tournament history
-      if (course.tournament_history?.length > 0) {
+      if (course.tournamentHistory?.length > 0) {
         html += `
           <div class="section section-animate">
             <h3>PGA Tour History</h3>
-            ${course.tournament_history.map(t => `
+            ${course.tournamentHistory.map(t => `
               <div class="tournament-item">
                 <div class="tournament-header">
                   <span class="tournament-name">${t.tournament_name}</span>
