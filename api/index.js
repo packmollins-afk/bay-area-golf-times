@@ -282,6 +282,61 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
+// Compare two courses - MUST be before :idOrSlug route
+app.get('/api/courses/compare', async (req, res) => {
+  try {
+    const { course1, course2 } = req.query;
+
+    if (!course1 || !course2) {
+      return res.status(400).json({ error: 'Two course IDs required' });
+    }
+
+    const [c1Result, c2Result] = await Promise.all([
+      db.execute({ sql: 'SELECT * FROM courses WHERE id = ?', args: [parseInt(course1)] }),
+      db.execute({ sql: 'SELECT * FROM courses WHERE id = ?', args: [parseInt(course2)] })
+    ]);
+
+    if (!c1Result.rows.length || !c2Result.rows.length) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Get current date/time in Pacific timezone for comparison
+    const now = new Date();
+    const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const todayStr = pst.toISOString().split('T')[0];
+    const currentTime = pst.toTimeString().slice(0, 5);
+
+    const [tt1Result, tt2Result] = await Promise.all([
+      db.execute({
+        sql: `SELECT * FROM tee_times WHERE course_id = ? AND (date > ? OR (date = ? AND time >= ?)) ORDER BY date, time LIMIT 20`,
+        args: [parseInt(course1), todayStr, todayStr, currentTime]
+      }),
+      db.execute({
+        sql: `SELECT * FROM tee_times WHERE course_id = ? AND (date > ? OR (date = ? AND time >= ?)) ORDER BY date, time LIMIT 20`,
+        args: [parseInt(course2), todayStr, todayStr, currentTime]
+      })
+    ]);
+
+    const getPriceStats = (teeTimes) => {
+      if (!teeTimes.length) return null;
+      const prices = teeTimes.map(t => t.price).filter(p => p);
+      if (!prices.length) return null;
+      return {
+        min: Math.min(...prices),
+        max: Math.max(...prices),
+        avg: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length)
+      };
+    };
+
+    res.json({
+      course1: { ...c1Result.rows[0], teeTimes: tt1Result.rows, priceStats: getPriceStats(tt1Result.rows) },
+      course2: { ...c2Result.rows[0], teeTimes: tt2Result.rows, priceStats: getPriceStats(tt2Result.rows) }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/courses/:idOrSlug', async (req, res) => {
   try {
     const { idOrSlug } = req.params;
@@ -353,60 +408,6 @@ app.get('/api/courses/:id/tee-times', async (req, res) => {
 
     const result = await db.execute({ sql, args });
     res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/courses/compare', async (req, res) => {
-  try {
-    const { course1, course2 } = req.query;
-
-    if (!course1 || !course2) {
-      return res.status(400).json({ error: 'Two course IDs required' });
-    }
-
-    const [c1Result, c2Result] = await Promise.all([
-      db.execute({ sql: 'SELECT * FROM courses WHERE id = ?', args: [parseInt(course1)] }),
-      db.execute({ sql: 'SELECT * FROM courses WHERE id = ?', args: [parseInt(course2)] })
-    ]);
-
-    if (!c1Result.rows.length || !c2Result.rows.length) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-
-    // Get current date/time in Pacific timezone for comparison
-    const now = new Date();
-    const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    const todayStr = pst.toISOString().split('T')[0];
-    const currentTime = pst.toTimeString().slice(0, 5);
-
-    const [tt1Result, tt2Result] = await Promise.all([
-      db.execute({
-        sql: `SELECT * FROM tee_times WHERE course_id = ? AND (date > ? OR (date = ? AND time >= ?)) ORDER BY date, time LIMIT 20`,
-        args: [parseInt(course1), todayStr, todayStr, currentTime]
-      }),
-      db.execute({
-        sql: `SELECT * FROM tee_times WHERE course_id = ? AND (date > ? OR (date = ? AND time >= ?)) ORDER BY date, time LIMIT 20`,
-        args: [parseInt(course2), todayStr, todayStr, currentTime]
-      })
-    ]);
-
-    const getPriceStats = (teeTimes) => {
-      if (!teeTimes.length) return null;
-      const prices = teeTimes.map(t => t.price).filter(p => p);
-      if (!prices.length) return null;
-      return {
-        min: Math.min(...prices),
-        max: Math.max(...prices),
-        avg: Math.round(prices.reduce((a, b) => a + b, 0) / prices.length)
-      };
-    };
-
-    res.json({
-      course1: { ...c1Result.rows[0], teeTimes: tt1Result.rows, priceStats: getPriceStats(tt1Result.rows) },
-      course2: { ...c2Result.rows[0], teeTimes: tt2Result.rows, priceStats: getPriceStats(tt2Result.rows) }
-    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
