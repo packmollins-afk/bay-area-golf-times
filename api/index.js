@@ -23,7 +23,7 @@ const hashPassword = (password) => {
   return crypto.createHash('sha256').update(password + 'baygolf_salt_2024').digest('hex');
 };
 
-// Send verification email
+// Send verification email with welcome info
 const sendVerificationEmail = async (email, token, displayName) => {
   if (!resend) {
     console.log('Resend not configured - skipping verification email');
@@ -35,22 +35,87 @@ const sendVerificationEmail = async (email, token, displayName) => {
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL || 'Bay Area Golf <noreply@bayareagolf.now>',
     to: email,
-    subject: 'Verify your Bay Area Golf account',
+    subject: 'Welcome to Bay Area Golf - Verify Your Account',
     html: `
-      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-        <h1 style="color: #2d5a27; font-size: 28px; margin-bottom: 24px;">Welcome to Bay Area Golf, ${displayName}!</h1>
-        <p style="color: #3d2914; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
-          Thanks for signing up. Please verify your email address to complete your registration and start tracking your rounds.
-        </p>
-        <a href="${verifyUrl}" style="display: inline-block; background: #2d5a27; color: white; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">
-          Verify Email Address
-        </a>
-        <p style="color: #6b5344; font-size: 14px; margin-top: 32px;">
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #f9f6ef;">
+        <div style="background: #2d5a27; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
+          <h1 style="color: #f4f1e8; font-size: 28px; margin: 0;">Bay Area Golf</h1>
+        </div>
+
+        <div style="background: white; padding: 32px; border-radius: 0 0 8px 8px; border: 1px solid #ddd0bc; border-top: none;">
+          <h2 style="color: #2d5a27; font-size: 24px; margin: 0 0 16px 0;">Welcome, ${displayName}!</h2>
+
+          <p style="color: #3d2914; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+            Thanks for joining Bay Area Golf - your home for discovering and booking tee times across 40+ public courses in the San Francisco Bay Area.
+          </p>
+
+          <div style="text-align: center; margin-bottom: 32px;">
+            <a href="${verifyUrl}" style="display: inline-block; background: #2d5a27; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+              Verify Your Email
+            </a>
+          </div>
+
+          <hr style="border: none; border-top: 2px solid #e8efe6; margin: 32px 0;">
+
+          <h3 style="color: #2d5a27; font-size: 18px; margin: 0 0 16px 0;">What You Can Do:</h3>
+
+          <div style="margin-bottom: 20px;">
+            <div style="display: flex; margin-bottom: 16px;">
+              <div style="background: #e8efe6; border-radius: 50%; width: 36px; height: 36px; text-align: center; line-height: 36px; margin-right: 12px; flex-shrink: 0; color: #2d5a27; font-weight: bold;">1</div>
+              <div>
+                <strong style="color: #3d2914;">Find Tee Times</strong>
+                <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">Search and compare tee times across Bay Area courses. Filter by date, time, price, and region.</p>
+              </div>
+            </div>
+
+            <div style="display: flex; margin-bottom: 16px;">
+              <div style="background: #e8efe6; border-radius: 50%; width: 36px; height: 36px; text-align: center; line-height: 36px; margin-right: 12px; flex-shrink: 0; color: #2d5a27; font-weight: bold;">2</div>
+              <div>
+                <strong style="color: #3d2914;">Explore 40+ Courses</strong>
+                <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">Browse detailed course info including yardage, slope rating, photos, and upcoming tee times. Check out our Staff Picks!</p>
+              </div>
+            </div>
+
+            <div style="display: flex; margin-bottom: 16px;">
+              <div style="background: #e8efe6; border-radius: 50%; width: 36px; height: 36px; text-align: center; line-height: 36px; margin-right: 12px; flex-shrink: 0; color: #2d5a27; font-weight: bold;">3</div>
+              <div>
+                <strong style="color: #3d2914;">Track Your Rounds</strong>
+                <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">Log your scores in the Scorebook to track your progress and see your stats over time.</p>
+              </div>
+            </div>
+
+            <div style="display: flex; margin-bottom: 16px;">
+              <div style="background: #e8efe6; border-radius: 50%; width: 36px; height: 36px; text-align: center; line-height: 36px; margin-right: 12px; flex-shrink: 0; color: #2d5a27; font-weight: bold;">4</div>
+              <div>
+                <strong style="color: #3d2914;">Earn Your Passport</strong>
+                <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">Play different courses to collect stamps on your Bay Area Golf Passport. How many can you visit?</p>
+              </div>
+            </div>
+
+            <div style="display: flex;">
+              <div style="background: #e8efe6; border-radius: 50%; width: 36px; height: 36px; text-align: center; line-height: 36px; margin-right: 12px; flex-shrink: 0; color: #2d5a27; font-weight: bold;">5</div>
+              <div>
+                <strong style="color: #3d2914;">Join the Community</strong>
+                <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">See the leaderboard, connect with other Bay Area golfers, and share your golfing journey.</p>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border: none; border-top: 2px solid #e8efe6; margin: 32px 0;">
+
+          <div style="text-align: center;">
+            <p style="color: #3d2914; font-size: 16px; margin-bottom: 16px;"><strong>Ready to play?</strong></p>
+            <a href="https://bayareagolf.now/app.html" style="display: inline-block; background: white; color: #2d5a27; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; border: 2px solid #2d5a27; margin-right: 8px;">
+              Find Tee Times
+            </a>
+            <a href="https://bayareagolf.now/courses.html" style="display: inline-block; background: white; color: #2d5a27; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; border: 2px solid #2d5a27;">
+              Browse Courses
+            </a>
+          </div>
+        </div>
+
+        <p style="color: #6b5344; font-size: 12px; text-align: center; margin-top: 24px;">
           If you didn't create this account, you can safely ignore this email.
-        </p>
-        <hr style="border: none; border-top: 1px solid #ddd0bc; margin: 32px 0;">
-        <p style="color: #6b5344; font-size: 12px;">
-          Bay Area Golf - Track your rounds across the Bay
         </p>
       </div>
     `
