@@ -632,43 +632,77 @@
     }
 
     /* Course fun facts */
-    .fun-facts {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
+    /* Home Course Users */
+    .home-users {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
     }
-    .fun-fact {
+    .home-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
       background: var(--bg-paper);
       border: 2px solid var(--border-light);
-      border-radius: 12px;
-      padding: 20px 16px;
-      text-align: center;
-      transition: all var(--anim-fast) var(--ease-out);
+      border-radius: 30px;
     }
-    .fun-fact:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--primary);
+    .home-user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
-    .fun-fact-icon {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-      transition: transform var(--anim-fast) var(--ease-spring);
+    .home-user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
     }
-    .fun-fact:hover .fun-fact-icon {
-      transform: scale(1.2);
-    }
-    .fun-fact-value {
-      font-family: 'DM Mono', 'Courier New', monospace;
-      font-size: 1.4rem;
-      font-weight: 500;
-      color: var(--primary);
-    }
-    .fun-fact-label {
-      font-size: 0.8rem;
+    .home-user-handicap {
+      font-size: 0.75rem;
       color: var(--text-muted);
-      margin-top: 4px;
+      background: var(--border-light);
+      padding: 2px 8px;
+      border-radius: 10px;
     }
+
+    /* Nearby Restaurants */
+    .nearby-restaurants {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .restaurant-card {
+      padding: 16px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border-light);
+      border-radius: 10px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+    .restaurant-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .restaurant-name {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .restaurant-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    .restaurant-rating { color: var(--gold); }
+    .restaurant-distance { color: var(--text-muted); }
+    .restaurant-cuisine { font-size: 0.8rem; color: var(--text-muted); }
 
     /* Loading */
     .loading { text-align: center; padding: 60px; color: var(--text-muted); }
@@ -998,38 +1032,15 @@
       let html = '';
       let sectionIndex = 0;
 
-      // Region navigation
-      const regions = getAllRegions();
-      html += `
-        <div class="region-nav section-animate">
-          ${regions.map(r => `
-            <a href="/courses.html?region=${encodeURIComponent(r)}" class="region-chip ${r === course.region ? 'active' : ''}">${r}</a>
-          `).join('')}
-        </div>
-      `;
-
-      // Quick Stats
+      // 1. TEE TIMES FIRST
+      const upcomingTeeTimes = (course.teeTimes || []).slice(0, 5);
       html += `
         <div class="section section-animate">
-          <h3>Course Stats</h3>
-          <div class="course-stats">
-            <div class="course-stat"><div class="value">${course.par || '-'}</div><div class="label">Par</div></div>
-            <div class="course-stat"><div class="value">${course.yardage?.toLocaleString() || '-'}</div><div class="label">Yards</div></div>
-            <div class="course-stat"><div class="value">${course.slope_rating || '-'}</div><div class="label">Slope</div></div>
-            <div class="course-stat"><div class="value">${course.course_rating || '-'}</div><div class="label">Rating</div></div>
-          </div>
-        </div>
-      `;
-
-      // Upcoming Tee Times (next 3)
-      const upcomingTeeTimes = (course.teeTimes || []).slice(0, 3);
-      if (upcomingTeeTimes.length > 0) {
-        html += `
-          <div class="section section-animate">
-            <h3>Upcoming Tee Times</h3>
+          <h3>Tee Times</h3>
+          ${upcomingTeeTimes.length > 0 ? `
             <div class="upcoming-tee-times">
               ${upcomingTeeTimes.map(tt => `
-                <a href="${tt.booking_url || course.booking_url}" target="_blank" class="tee-time-slot">
+                <a href="tel:${course.phone_number?.replace(/[^\d+]/g, '') || ''}" class="tee-time-slot" onclick="trackCallClick()">
                   <div class="tee-time-info">
                     <span class="tee-time-date">${formatTeeTimeDate(tt.date)}</span>
                     <span class="tee-time-time">${formatTeeTimeTime(tt.time)}</span>
@@ -1040,9 +1051,27 @@
               `).join('')}
             </div>
             <a href="/app.html?course=${course.id}" class="view-all-link">View all ${course.teeTimes?.length || 0} tee times →</a>
+          ` : `
+            <p style="color: var(--text-muted); text-align: center;">No upcoming tee times available</p>
+          `}
+        </div>
+      `;
+
+      // 2. COURSE STATS (with avg rating, avg hole yards, hardest hole placeholder)
+      const avgHoleYards = course.yardage && course.holes ? Math.round(course.yardage / course.holes) : null;
+      html += `
+        <div class="section section-animate">
+          <h3>Course Stats</h3>
+          <div class="course-stats">
+            ${course.avg_rating ? `<div class="course-stat"><div class="value">★ ${course.avg_rating.toFixed(1)}</div><div class="label">Rating</div></div>` : ''}
+            <div class="course-stat"><div class="value">${course.par || '-'}</div><div class="label">Par</div></div>
+            <div class="course-stat"><div class="value">${course.yardage?.toLocaleString() || '-'}</div><div class="label">Yards</div></div>
+            <div class="course-stat"><div class="value">${course.slope_rating || '-'}</div><div class="label">Slope</div></div>
+            <div class="course-stat"><div class="value">${course.course_rating || '-'}</div><div class="label">Course Rating</div></div>
+            ${avgHoleYards ? `<div class="course-stat"><div class="value">${avgHoleYards}</div><div class="label">Avg Hole Yds</div></div>` : ''}
           </div>
-        `;
-      }
+        </div>
+      `;
 
       // Action buttons
       html += `
@@ -1066,26 +1095,21 @@
         </div>
       `;
 
-      // Contact info
-      if (course.phone_number || course.website_url) {
+      // 3. COURSE RECORD (moved up)
+      if (course.course_record_score) {
         html += `
           <div class="section section-animate">
-            <h3>Contact & Info</h3>
-            <div class="contact-info">
-              ${course.phone_number ? `
-                <a href="tel:${course.phone_number.replace(/[^0-9]/g, '')}" class="contact-item">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                  </svg>
-                  <div><div class="label">Clubhouse</div><div class="value">${course.phone_number}</div></div>
-                </a>
-              ` : ''}
+            <h3>Course Record</h3>
+            <div class="course-record">
+              <div class="score">${course.course_record_score}</div>
+              <div class="holder">${course.course_record_holder} (${course.course_record_date})</div>
+              ${course.course_record_details ? `<div class="details">${course.course_record_details}</div>` : ''}
             </div>
           </div>
         `;
       }
 
-      // Weather (embedded)
+      // 4. WEATHER (moved up)
       if (course.latitude && course.longitude) {
         html += `
           <div class="section section-animate">
@@ -1126,20 +1150,6 @@
         </div>
       `;
 
-      // Course record
-      if (course.course_record_score) {
-        html += `
-          <div class="section section-animate">
-            <h3>Course Record</h3>
-            <div class="course-record">
-              <div class="score">${course.course_record_score}</div>
-              <div class="holder">${course.course_record_holder} (${course.course_record_date})</div>
-              ${course.course_record_details ? `<div class="details">${course.course_record_details}</div>` : ''}
-            </div>
-          </div>
-        `;
-      }
-
       // Tournament history
       if (course.tournamentHistory?.length > 0) {
         html += `
@@ -1162,34 +1172,44 @@
         `;
       }
 
-      // Course Fun Facts (placeholder for future community data)
-      html += `
-        <div class="section section-animate">
-          <h3>Course Facts</h3>
-          <div class="fun-facts">
-            <div class="fun-fact">
-              <div class="fun-fact-icon">⭐</div>
-              <div class="fun-fact-value">${allTimeAvg}</div>
-              <div class="fun-fact-label">Avg Rating</div>
-            </div>
-            <div class="fun-fact">
-              <div class="fun-fact-icon">📝</div>
-              <div class="fun-fact-value">${course.total_reviews || 0}</div>
-              <div class="fun-fact-label">Reviews</div>
-            </div>
-            <div class="fun-fact">
-              <div class="fun-fact-icon">⛳</div>
-              <div class="fun-fact-value">${course.holes || 18}</div>
-              <div class="fun-fact-label">Holes</div>
-            </div>
-            <div class="fun-fact">
-              <div class="fun-fact-icon">🏌️</div>
-              <div class="fun-fact-value">${course.yardage ? Math.round(course.yardage / 18) : '--'}</div>
-              <div class="fun-fact-label">Avg Hole Yds</div>
+      // Home Course Users
+      if (course.homeUsers && course.homeUsers.length > 0) {
+        html += `
+          <div class="section section-animate">
+            <h3>Home Course For</h3>
+            <div class="home-users">
+              ${course.homeUsers.map(u => `
+                <div class="home-user">
+                  <div class="home-user-avatar">${u.display_name?.charAt(0)?.toUpperCase() || '?'}</div>
+                  <div class="home-user-name">${u.display_name || 'Golfer'}</div>
+                  ${u.handicap ? `<div class="home-user-handicap">${u.handicap} HCP</div>` : ''}
+                </div>
+              `).join('')}
             </div>
           </div>
-        </div>
-      `;
+        `;
+      }
+
+      // Nearby Restaurants (placeholder - needs API)
+      if (course.nearbyRestaurants && course.nearbyRestaurants.length > 0) {
+        html += `
+          <div class="section section-animate">
+            <h3>Nearby Dining</h3>
+            <div class="nearby-restaurants">
+              ${course.nearbyRestaurants.slice(0, 3).map(r => `
+                <a href="${r.url || '#'}" target="_blank" class="restaurant-card">
+                  <div class="restaurant-name">${r.name}</div>
+                  <div class="restaurant-meta">
+                    <span class="restaurant-rating">★ ${r.rating?.toFixed(1) || '-'}</span>
+                    <span class="restaurant-distance">${r.distance ? r.distance.toFixed(1) + ' mi' : ''}</span>
+                  </div>
+                  <div class="restaurant-cuisine">${r.cuisine || ''}</div>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
 
       // Photos
       if (course.photos?.length > 0) {

@@ -311,10 +311,17 @@ app.get('/api/courses/:idOrSlug', async (req, res) => {
       args: [course.id]
     });
 
+    // Get users with this as home course
+    const homeUsersResult = await db.execute({
+      sql: 'SELECT id, display_name, handicap FROM users WHERE home_course_id = ? LIMIT 10',
+      args: [course.id]
+    });
+
     res.json({
       ...course,
       teeTimes: teeTimesResult.rows,
-      tournamentHistory: tournamentsResult.rows
+      tournamentHistory: tournamentsResult.rows,
+      homeUsers: homeUsersResult.rows
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
