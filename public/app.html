@@ -281,31 +281,28 @@
     }
     .header-nav {
       display: flex;
-      gap: 8px;
+      gap: 10px;
     }
-    .nav-link {
-      color: rgba(255,255,255,0.8);
+    .nav-btn {
+      color: #f4f1e8;
       text-decoration: none;
+      font-family: 'Playfair Display', Georgia, serif;
       padding: 8px 14px;
+      border: 2px solid rgba(255,255,255,0.5);
       border-radius: 4px;
-      font-size: 0.9rem;
-      font-weight: 500;
       transition: all 0.2s;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .nav-link:hover {
-      color: #fff;
-      background: rgba(255,255,255,0.15);
-    }
-    .nav-link.active {
-      color: #fff;
-      background: rgba(255,255,255,0.2);
-      font-weight: 600;
-    }
+    .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+    .nav-btn svg { width: 16px; height: 16px; }
     @media (max-width: 600px) {
       .header-content { flex-direction: column; gap: 12px; }
       header h1 { font-size: 1.2rem; }
       .header-nav { flex-wrap: wrap; justify-content: center; }
-      .nav-link { padding: 6px 10px; font-size: 0.8rem; }
+      .nav-btn { padding: 6px 10px; font-size: 0.8rem; }
     }
     header h1 {
       font-family: 'Playfair Display', Georgia, serif;
@@ -1667,11 +1664,17 @@
 
   <header role="banner">
     <div class="container header-content">
-      <h1>Bay Area Golf Tee Times</h1>
+      <h1>Bay Area Golf</h1>
       <nav class="header-nav">
-        <a href="/" class="nav-link">Map</a>
-        <a href="/scorebook.html" class="nav-link">Scorebook</a>
-        <a href="/community.html" class="nav-link">Community</a>
+        <a href="/" class="nav-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          Map
+        </a>
+        <a href="/app.html" class="nav-btn">Tee Times</a>
       </nav>
     </div>
   </header>
