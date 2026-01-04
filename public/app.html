@@ -1134,7 +1134,7 @@
 
     /* Compare Modal Styles */
     .compare-btn { margin-left: auto; }
-    .compare-modal { max-width: 900px; min-width: min(600px, 95vw); }
+    .compare-modal { max-width: 900px; min-width: min(600px, 95vw); max-height: 90vh; display: flex; flex-direction: column; }
     .compare-header {
       padding: 24px 28px;
       border-bottom: 2px solid var(--border-light);
@@ -1179,7 +1179,7 @@
       font-size: 0.85rem;
       background: var(--bg-paper);
     }
-    .compare-body { padding: 24px 28px; }
+    .compare-body { padding: 24px 28px; flex-grow: 1; overflow-y: auto; }
     .compare-placeholder {
       text-align: center;
       color: var(--text-muted);
@@ -2201,8 +2201,6 @@
         const minPrice = Math.min(...group.courses.map(c => c.price || 999));
         const maxPrice = Math.max(...group.courses.map(c => c.price || 0));
         const priceRange = minPrice === maxPrice ? `$${minPrice}` : `$${minPrice}-$${maxPrice}`;
-        const hasDeals = group.courses.some(c => c.original_price && c.original_price > c.price);
-
         return `
           <div class="time-slot-card">
             <div class="time-slot-header">
@@ -2213,7 +2211,6 @@
               <div class="time-slot-meta">
                 <span class="course-count">${courseCount} course${courseCount > 1 ? 's' : ''}</span>
                 <span class="price-range">${priceRange}</span>
-                ${hasDeals ? '<span class="deals-badge">Deals</span>' : ''}
               </div>
             </div>
             <div class="time-slot-courses">
@@ -2244,7 +2241,6 @@
       const time = formatTime(tt.time);
       const date = formatDate(tt.date);
       const price = tt.price ? `$${Math.round(tt.price)}` : 'Call';
-      const hasDiscount = tt.original_price && tt.original_price > tt.price;
       const course = coursesData.find(c => c.id === tt.course_id) || {};
       const rating = course.avg_rating ? course.avg_rating.toFixed(1) : null;
 
@@ -2265,9 +2261,7 @@
             </div>
           </div>
           <div class="price-block">
-            ${hasDiscount ? `<div class="original-price">$${Math.round(tt.original_price)}</div>` : ''}
             <div class="price">${price}</div>
-            ${hasDiscount ? '<div class="deal-tag">HOT DEAL</div>' : ''}
           </div>
           ${course.phone_number
             ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="book-btn call-btn" onclick="trackCallClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Book</a>`
