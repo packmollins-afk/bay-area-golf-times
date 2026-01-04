@@ -787,183 +787,60 @@
     .course-chip {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
+      gap: 12px;
+      padding: 12px 16px;
       background: white;
       border-radius: 8px;
-      cursor: pointer;
       border: 2px solid var(--border-light);
-      transition: all var(--anim-fast) var(--ease-out);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .course-chip::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, transparent 60%, rgba(45, 90, 39, 0.03) 100%);
-      opacity: 0;
-      transition: opacity var(--anim-fast) var(--ease-out);
+      transition: all 0.2s ease;
     }
 
     .course-chip:hover {
-      background: white;
       border-color: var(--primary);
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 8px 24px rgba(45, 90, 39, 0.15);
-    }
-
-    .course-chip:hover::before {
-      opacity: 1;
-    }
-
-    .course-chip:active {
-      transform: translateY(-2px) scale(0.99);
-    }
-
-    .course-chip-main {
-      flex: 1;
-      min-width: 0;
-      position: relative;
-      z-index: 1;
+      transform: translateX(4px);
     }
 
     .course-chip-name {
-      display: block;
+      flex: 1;
       font-family: 'Playfair Display', Georgia, serif;
-      font-weight: 700;
+      font-weight: 600;
       font-size: 1rem;
       color: var(--text);
+      text-decoration: none;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      transition: color var(--anim-fast) var(--ease-out);
     }
 
-    .course-chip:hover .course-chip-name {
-      color: var(--primary-dark);
-    }
-
-    .course-chip-location {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-style: italic;
-      margin-top: 2px;
-    }
-
-    .course-chip-details {
-      display: flex;
-      gap: 8px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    .course-chip-details span {
-      background: var(--bg);
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid var(--border-light);
-      transition: all var(--anim-fast) var(--ease-out);
-    }
-
-    .course-chip:hover .course-chip-details span {
-      background: white;
-      border-color: var(--border);
-    }
-
-    .chip-rating {
-      color: var(--gold) !important;
-      font-weight: 600;
-      background: linear-gradient(135deg, #fffbeb, #fef3c7) !important;
-      border-color: var(--gold) !important;
+    .course-chip-name:hover {
+      color: var(--primary);
+      text-decoration: underline;
     }
 
     .course-chip-price {
-      text-align: right;
-      min-width: 60px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .course-chip-price .chip-original {
-      display: block;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      text-decoration: line-through;
-    }
-
-    .course-chip-price .chip-price {
       font-family: 'DM Mono', monospace;
-      font-weight: 500;
-      font-size: 1.15rem;
-      color: var(--text);
-      transition: all var(--anim-fast) var(--ease-spring);
-    }
-
-    .course-chip:hover .course-chip-price .chip-price {
-      transform: scale(1.08);
-    }
-
-    .course-chip-price.has-deal .chip-price {
-      color: var(--deal);
-    }
-
-    .course-chip-price.has-deal::after {
-      content: 'DEAL';
-      display: block;
-      font-size: 0.6rem;
       font-weight: 600;
-      color: white;
-      background: var(--deal);
-      padding: 2px 6px;
-      border-radius: 4px;
-      margin-top: 4px;
-      letter-spacing: 0.05em;
+      font-size: 1.1rem;
+      color: var(--primary);
+      min-width: 50px;
+      text-align: right;
     }
 
     .chip-book {
-      padding: 10px 18px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #f4f1e8;
+      padding: 8px 16px;
+      background: var(--primary);
+      color: #fff;
       text-decoration: none;
-      border-radius: 6px;
+      border-radius: 4px;
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 0.85rem;
       font-weight: 600;
       white-space: nowrap;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      border: none;
-      position: relative;
-      overflow: hidden;
-      transition: all var(--anim-fast) var(--ease-out);
-      box-shadow: 0 2px 8px rgba(45, 90, 39, 0.3);
-      z-index: 1;
-    }
-
-    .chip-book::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--primary-light), var(--primary));
-      opacity: 0;
-      transition: opacity var(--anim-fast) var(--ease-out);
+      transition: all 0.2s ease;
     }
 
     .chip-book:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(45, 90, 39, 0.4);
-    }
-
-    .chip-book:hover::before {
-      opacity: 1;
-    }
-
-    .chip-book:active {
-      transform: translateY(0);
+      background: var(--primary-dark);
     }
 
     .chip-book span {
@@ -980,12 +857,8 @@
       .time-slot-courses {
         grid-template-columns: 1fr;
       }
-      .course-chip {
-        flex-wrap: wrap;
-      }
-      .course-chip-main {
-        flex-basis: 100%;
-        margin-bottom: 8px;
+      .course-chip-name {
+        font-size: 0.9rem;
       }
     }
 
@@ -2221,14 +2094,16 @@
       searchTeeTimes();
     }
 
-    async function searchTeeTimes() {
+    async function searchTeeTimes(autoAdvanceDate = true) {
       const resultsEl = document.getElementById('results');
       resultsEl.setAttribute('aria-busy', 'true');
       resultsEl.innerHTML = `<div class="loading" role="status"><div class="loading-spinner" aria-hidden="true"></div><p>Searching for tee times...</p></div>`;
 
       const params = new URLSearchParams();
+      const dateInput = document.getElementById('date');
+      const selectedDate = dateInput.value;
       if (isNextAvailableMode) params.set('next_available', 'true');
-      else { const date = document.getElementById('date').value; if (date) params.set('date', date); }
+      else { if (selectedDate) params.set('date', selectedDate); }
       // Don't pass region to API if using multi-select regions - we'll filter client-side
       if (selectedRegion && selectedRegion !== 'favorites' && selectedRegion !== 'staff_picks' && selectedRegions.length === 0) {
         params.set('region', selectedRegion);
@@ -2261,6 +2136,16 @@
         // Filter by multi-select regions
         if (selectedRegions.length > 0) {
           teeTimes = teeTimes.filter(tt => selectedRegions.includes(tt.region));
+        }
+
+        // If no results for today and not in next available mode, auto-advance to tomorrow
+        const today = new Date().toISOString().split('T')[0];
+        if (teeTimes.length === 0 && autoAdvanceDate && !isNextAvailableMode && selectedDate === today) {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const tomorrowStr = tomorrow.toISOString().split('T')[0];
+          dateInput.value = tomorrowStr;
+          return searchTeeTimes(false); // Don't auto-advance again
         }
 
         const modeText = isNextAvailableMode ? 'next available ' : '';
@@ -2337,27 +2222,15 @@
     }
 
     function renderCourseChip(tt) {
-      const price = tt.price ? `$${Math.round(tt.price)}` : '';
-      const hasDiscount = tt.original_price && tt.original_price > tt.price;
+      const price = tt.price ? `$${Math.round(tt.price)}` : 'Call';
       const course = coursesData.find(c => c.id === tt.course_id) || {};
-      const rating = course.avg_rating ? course.avg_rating.toFixed(1) : null;
+      const courseUrl = `/course/${course.slug || tt.course_id}`;
 
       return `
-        <div class="course-chip" onclick="openCourseDetail(${tt.course_id})">
-          <div class="course-chip-main">
-            <span class="course-chip-name">${tt.course_name}</span>
-            <span class="course-chip-location">${tt.city}</span>
-          </div>
-          <div class="course-chip-details">
-            ${rating ? `<span class="chip-rating">★${rating}</span>` : ''}
-            <span class="chip-holes">${tt.holes || 18}H</span>
-            <span class="chip-spots">${tt.players || 4}p</span>
-          </div>
-          <div class="course-chip-price ${hasDiscount ? 'has-deal' : ''}">
-            ${hasDiscount ? `<span class="chip-original">$${Math.round(tt.original_price)}</span>` : ''}
-            <span class="chip-price">${price}</span>
-          </div>
-          <a href="${tt.booking_url}" target="_blank" rel="noopener" class="chip-book" onclick="event.stopPropagation()">Book</a>
+        <div class="course-chip">
+          <a href="${courseUrl}" class="course-chip-name">${tt.course_name}</a>
+          <span class="course-chip-price">${price}</span>
+          <a href="${tt.booking_url}" target="_blank" rel="noopener" class="chip-book">Book</a>
         </div>
       `;
     }

@@ -667,6 +667,72 @@
     }
     .not-found p { color: var(--text-muted); margin-bottom: 24px; }
 
+    /* Upcoming Tee Times */
+    .upcoming-tee-times {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tee-time-slot {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+    .tee-time-slot:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+      box-shadow: 0 2px 8px rgba(45, 90, 39, 0.15);
+    }
+    .tee-time-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tee-time-date {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .tee-time-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .tee-time-price {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .tee-time-book {
+      padding: 6px 14px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 4px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .view-all-link {
+      display: inline-block;
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .view-all-link:hover {
+      text-decoration: underline;
+    }
+
     /* Mobile */
     @media (max-width: 600px) {
       .hero { height: 220px; }
@@ -817,10 +883,32 @@
             <div class="course-stat"><div class="value">${course.yardage?.toLocaleString() || '-'}</div><div class="label">Yards</div></div>
             <div class="course-stat"><div class="value">${course.slope_rating || '-'}</div><div class="label">Slope</div></div>
             <div class="course-stat"><div class="value">${course.course_rating || '-'}</div><div class="label">Rating</div></div>
-            <div class="course-stat"><div class="value">${course.upcoming_tee_times}</div><div class="label">Tee Times</div></div>
           </div>
         </div>
       `;
+
+      // Upcoming Tee Times (next 3)
+      const upcomingTeeTimes = (course.teeTimes || []).slice(0, 3);
+      if (upcomingTeeTimes.length > 0) {
+        html += `
+          <div class="section section-animate">
+            <h3>Upcoming Tee Times</h3>
+            <div class="upcoming-tee-times">
+              ${upcomingTeeTimes.map(tt => `
+                <a href="${tt.booking_url || course.booking_url}" target="_blank" class="tee-time-slot">
+                  <div class="tee-time-info">
+                    <span class="tee-time-date">${formatTeeTimeDate(tt.date)}</span>
+                    <span class="tee-time-time">${formatTeeTimeTime(tt.time)}</span>
+                  </div>
+                  <div class="tee-time-price">$${tt.price || '--'}</div>
+                  <span class="tee-time-book">Book</span>
+                </a>
+              `).join('')}
+            </div>
+            <a href="/app.html?course=${course.id}" class="view-all-link">View all ${course.teeTimes?.length || 0} tee times →</a>
+          </div>
+        `;
+      }
 
       // Action buttons
       html += `
@@ -1068,6 +1156,28 @@
         console.error('Weather error:', e);
         widget.innerHTML = '<div style="text-align: center; opacity: 0.8;">Weather unavailable</div>';
       }
+    }
+
+    function formatTeeTimeDate(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr + 'T00:00:00');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      if (date.getTime() === today.getTime()) return 'Today';
+      if (date.getTime() === tomorrow.getTime()) return 'Tomorrow';
+
+      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+
+    function formatTeeTimeTime(timeStr) {
+      if (!timeStr) return '';
+      const [h, m] = timeStr.split(':').map(Number);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour = h % 12 || 12;
+      return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`;
     }
 
     function getWeatherCondition(code) {
