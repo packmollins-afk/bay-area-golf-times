@@ -49,6 +49,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#2d5a27">
 
+  <!-- PWA / iOS App -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bay Area Golf">
+  <link rel="apple-touch-startup-image" href="/icons/icon-512x512.png">
+
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
   {
@@ -1165,6 +1173,15 @@
 
     // Load prices on page load
     document.addEventListener('DOMContentLoaded', loadPrices);
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered'))
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
   </script>
   <script src="/js/analytics.js"></script>
 </body>
