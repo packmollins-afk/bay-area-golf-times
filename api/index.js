@@ -987,16 +987,19 @@ app.get('/api/community/members', async (req, res) => {
     const user = await getSession(token);
     if (!user) return res.status(401).json({ error: 'Not authenticated' });
 
-    const result = await db.execute(`
-      SELECT u.id, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
-             c.name as home_course_name, c.slug as home_course_slug,
-             COUNT(r.id) as rounds_played, ROUND(AVG(r.total_score), 1) as avg_score
-      FROM users u
-      LEFT JOIN courses c ON u.home_course_id = c.id
-      LEFT JOIN rounds r ON u.id = r.user_id
-      GROUP BY u.id
-      ORDER BY rounds_played DESC, u.display_name ASC
-    `);
+    const result = await db.execute({
+      sql: `
+        SELECT u.id, u.display_name, u.profile_picture, u.home_course_id, u.handicap,
+               c.name as home_course_name, c.slug as home_course_slug,
+               COUNT(r.id) as rounds_played, ROUND(AVG(r.total_score), 1) as avg_score
+        FROM users u
+        LEFT JOIN courses c ON u.home_course_id = c.id
+        LEFT JOIN rounds r ON u.id = r.user_id
+        GROUP BY u.id
+        ORDER BY CASE WHEN u.id = ? THEN 0 ELSE 1 END, rounds_played DESC, u.display_name ASC
+      `,
+      args: [user.id]
+    });
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
