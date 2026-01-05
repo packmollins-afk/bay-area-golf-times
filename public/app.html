@@ -1619,7 +1619,7 @@
       <div class="filters-grid">
         <div class="filter-group">
           <label for="date">Date</label>
-          <input type="date" id="date" />
+          <input type="date" id="date" onchange="onDateChange()" />
         </div>
         <div class="filter-group">
           <label for="course">Course</label>
@@ -1962,6 +1962,18 @@
         opt.textContent = `${c.name} (${c.city})`;
         select.appendChild(opt);
       });
+    }
+
+    function onDateChange() {
+      // When user manually changes date, disable Next Available mode
+      if (isNextAvailableMode) {
+        isNextAvailableMode = false;
+        const btn = document.getElementById('next-available-btn');
+        const dateInput = document.getElementById('date');
+        btn.classList.remove('active');
+        btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Next Available Tee Times`;
+        dateInput.disabled = false;
+      }
     }
 
     function toggleNextAvailable() {
