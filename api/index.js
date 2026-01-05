@@ -268,14 +268,16 @@ app.get('/api/courses', async (req, res) => {
       return res.json(result.rows);
     }
 
-    // Default: courses with prices
-    const result = await db.execute(`
-      SELECT c.*,
-        (SELECT MIN(t.price) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= datetime('now')) as next_price,
-        (SELECT t.datetime FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= datetime('now') ORDER BY t.datetime LIMIT 1) as next_time
+    // Default: courses with prices (using Pacific timezone for comparisons)
+    const pacificNow = getPacificNow();
+    const result = await db.execute({
+      sql: `SELECT c.*,
+        (SELECT MIN(t.price) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ?) as next_price,
+        (SELECT t.datetime FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ? ORDER BY t.datetime LIMIT 1) as next_time
       FROM courses c
-      ORDER BY c.region, c.city, c.name
-    `);
+      ORDER BY c.region, c.city, c.name`,
+      args: [pacificNow, pacificNow]
+    });
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -354,10 +356,11 @@ app.get('/api/courses/:idOrSlug', async (req, res) => {
 
     const course = result.rows[0];
 
-    // Get tee times
+    // Get tee times (using Pacific timezone)
+    const pacificNow = getPacificNow();
     const teeTimesResult = await db.execute({
-      sql: `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now') ORDER BY datetime LIMIT 50`,
-      args: [course.id]
+      sql: `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= ? ORDER BY datetime LIMIT 50`,
+      args: [course.id, pacificNow]
     });
 
     // Get tournament history
@@ -388,8 +391,10 @@ app.get('/api/courses/:id/tee-times', async (req, res) => {
     const { id } = req.params;
     const { date, minPrice, maxPrice, time } = req.query;
 
-    let sql = `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= datetime('now')`;
-    const args = [parseInt(id)];
+    // Use Pacific timezone for filtering
+    const pacificNow = getPacificNow();
+    let sql = `SELECT * FROM tee_times WHERE course_id = ? AND datetime >= ?`;
+    const args = [parseInt(id), pacificNow];
 
     if (date) {
       sql += ' AND date = ?';
@@ -415,17 +420,32 @@ app.get('/api/courses/:id/tee-times', async (req, res) => {
 
 // ========== TEE TIME ENDPOINTS ==========
 
+// Helper to get current Pacific datetime string
+const getPacificNow = () => {
+  const now = new Date();
+  const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  const year = pst.getFullYear();
+  const month = String(pst.getMonth() + 1).padStart(2, '0');
+  const day = String(pst.getDate()).padStart(2, '0');
+  const hours = String(pst.getHours()).padStart(2, '0');
+  const mins = String(pst.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${mins}`;
+};
+
 app.get('/api/tee-times', async (req, res) => {
   try {
     const { date, region, minPrice, maxPrice, min_time, max_price, players, course_id, staff_picks, sort_by, sort_order, limit } = req.query;
+
+    // Use Pacific timezone for filtering since tee times are stored in Pacific time
+    const pacificNow = getPacificNow();
 
     let sql = `
       SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug, c.avg_rating
       FROM tee_times t
       JOIN courses c ON t.course_id = c.id
-      WHERE t.datetime >= datetime('now')
+      WHERE t.datetime >= ?
     `;
-    const args = [];
+    const args = [pacificNow];
 
     if (date) {
       sql += ' AND t.date = ?';
@@ -480,18 +500,21 @@ app.get('/api/tee-times', async (req, res) => {
 
 app.get('/api/tee-times/deals', async (req, res) => {
   try {
-    const result = await db.execute(`
-      SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug,
+    // Use Pacific timezone for filtering
+    const pacificNow = getPacificNow();
+    const result = await db.execute({
+      sql: `SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug,
              (t.original_price - t.price) as savings,
              ROUND((t.original_price - t.price) * 100.0 / t.original_price, 0) as discount_pct
       FROM tee_times t
       JOIN courses c ON t.course_id = c.id
-      WHERE t.datetime >= datetime('now')
+      WHERE t.datetime >= ?
         AND t.original_price IS NOT NULL
         AND t.price < t.original_price
       ORDER BY discount_pct DESC
-      LIMIT 20
-    `);
+      LIMIT 20`,
+      args: [pacificNow]
+    });
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1550,17 +1573,19 @@ app.delete('/api/admin/featured-deals/:id', adminAuth, async (req, res) => {
 // Scraper status (mock for now - can be expanded with real scraper data)
 app.get('/api/admin/scraper-status', adminAuth, async (req, res) => {
   try {
-    // Get tee time freshness per course
-    const result = await db.execute(`
-      SELECT c.id, c.name, c.slug, c.booking_url,
+    // Get tee time freshness per course (using Pacific timezone)
+    const pacificNow = getPacificNow();
+    const result = await db.execute({
+      sql: `SELECT c.id, c.name, c.slug, c.booking_url,
         COUNT(t.id) as tee_time_count,
         MAX(t.created_at) as last_scraped,
         MIN(t.datetime) as next_available
       FROM courses c
-      LEFT JOIN tee_times t ON t.course_id = c.id AND t.datetime >= datetime('now')
+      LEFT JOIN tee_times t ON t.course_id = c.id AND t.datetime >= ?
       GROUP BY c.id
-      ORDER BY last_scraped ASC NULLS FIRST
-    `);
+      ORDER BY last_scraped ASC NULLS FIRST`,
+      args: [pacificNow]
+    });
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });

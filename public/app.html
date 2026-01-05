@@ -1770,7 +1770,26 @@
 
   <script>
     const API_BASE = '/api';
-    let isNextAvailableMode = false;
+    let isNextAvailableMode = true; // Default to showing next available tee times
+
+    // Helper to get today's date in Pacific timezone
+    function getPacificDate() {
+      const now = new Date();
+      const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+      const year = pst.getFullYear();
+      const month = String(pst.getMonth() + 1).padStart(2, '0');
+      const day = String(pst.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Helper to get current time in Pacific timezone (HH:MM format)
+    function getPacificTime() {
+      const now = new Date();
+      const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+      const hours = String(pst.getHours()).padStart(2, '0');
+      const mins = String(pst.getMinutes()).padStart(2, '0');
+      return `${hours}:${mins}`;
+    }
     let selectedRegion = '';
     let selectedRegions = []; // Multi-select regions
     let directoryRegion = '';
@@ -1857,12 +1876,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('date').value = today;
+      // Use Pacific timezone for date
+      const today = getPacificDate();
+      const dateInput = document.getElementById('date');
+      dateInput.value = today;
       loadCourses();
 
       // Default to Staff Picks
       selectedRegion = 'staff_picks';
+
+      // isNextAvailableMode is true by default, so date filter is disabled
+      // (No need to modify any button - the mode is already set)
+
       searchTeeTimes();
 
       // Handle URL hash for deep linking (SEO)
@@ -2142,11 +2167,16 @@
         }
 
         // If no results for today and not in next available mode, auto-advance to tomorrow
-        const today = new Date().toISOString().split('T')[0];
+        const today = getPacificDate();
         if (teeTimes.length === 0 && autoAdvanceDate && !isNextAvailableMode && selectedDate === today) {
-          const tomorrow = new Date();
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          const tomorrowStr = tomorrow.toISOString().split('T')[0];
+          // Calculate tomorrow in Pacific timezone
+          const now = new Date();
+          const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+          pst.setDate(pst.getDate() + 1);
+          const year = pst.getFullYear();
+          const month = String(pst.getMonth() + 1).padStart(2, '0');
+          const day = String(pst.getDate()).padStart(2, '0');
+          const tomorrowStr = `${year}-${month}-${day}`;
           dateInput.value = tomorrowStr;
           return searchTeeTimes(false); // Don't auto-advance again
         }
