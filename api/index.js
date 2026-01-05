@@ -1003,6 +1003,66 @@ app.get('/api/community/members', async (req, res) => {
   }
 });
 
+// Get individual member profile with recent rounds
+app.get('/api/community/members/:id', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    const user = await getSession(token);
+    if (!user) return res.status(401).json({ error: 'Not authenticated' });
+
+    const memberId = parseInt(req.params.id);
+
+    // Get member profile
+    const profileResult = await db.execute({
+      sql: `SELECT u.id, u.display_name, u.profile_picture, u.home_course_id, u.handicap, u.created_at,
+             c.name as home_course_name, c.slug as home_course_slug,
+             COUNT(r.id) as rounds_played,
+             COUNT(DISTINCT r.course_id) as courses_played,
+             ROUND(AVG(r.total_score), 1) as avg_score,
+             MIN(r.total_score) as best_score
+      FROM users u
+      LEFT JOIN courses c ON u.home_course_id = c.id
+      LEFT JOIN rounds r ON u.id = r.user_id
+      WHERE u.id = ?
+      GROUP BY u.id`,
+      args: [memberId]
+    });
+
+    if (!profileResult.rows.length) {
+      return res.status(404).json({ error: 'Member not found' });
+    }
+
+    // Get recent rounds
+    const roundsResult = await db.execute({
+      sql: `SELECT r.id, r.date, r.total_score, r.total_putts,
+             c.name as course_name, c.slug as course_slug, c.par as course_par
+      FROM rounds r
+      JOIN courses c ON r.course_id = c.id
+      WHERE r.user_id = ?
+      ORDER BY r.date DESC
+      LIMIT 5`,
+      args: [memberId]
+    });
+
+    // Get passport progress (courses played)
+    const passportResult = await db.execute({
+      sql: `SELECT COUNT(DISTINCT course_id) as courses_played,
+             (SELECT COUNT(*) FROM courses) as total_courses
+      FROM rounds WHERE user_id = ?`,
+      args: [memberId]
+    });
+
+    res.json({
+      ...profileResult.rows[0],
+      recentRounds: roundsResult.rows,
+      passport: passportResult.rows[0],
+      isOwnProfile: user.id === memberId
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ========== ANALYTICS TRACKING ==========
 
 // Track page views and events (called from frontend)
