@@ -10,7 +10,7 @@
   <!-- Primary Meta Tags -->
   <title>Bay Area Golf | Discover Public Courses in San Francisco Bay Area</title>
   <meta name="title" content="Bay Area Golf | Discover Public Courses in San Francisco Bay Area">
-  <meta name="description" content="Explore and book tee times at 40+ public golf courses across the San Francisco Bay Area. Find courses in SF, South Bay, East Bay, and North Bay with live pricing.">
+  <meta name="description" content="Explore and book tee times at 34 public golf courses across the San Francisco Bay Area. Find courses in SF, South Bay, East Bay, and North Bay with live pricing.">
   <meta name="keywords" content="bay area golf, golf courses san francisco, public golf bay area, tee times sf, golf near me, bay area golf map, san francisco golf, east bay golf, south bay golf, north bay golf">
   <meta name="author" content="Bay Area Golf">
   <meta name="robots" content="index, follow">
@@ -22,7 +22,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bayareagolf.now/">
   <meta property="og:title" content="Bay Area Golf | Discover Public Courses in San Francisco Bay Area">
-  <meta property="og:description" content="Explore and book tee times at 40+ public golf courses across the San Francisco Bay Area. Interactive map with live pricing.">
+  <meta property="og:description" content="Explore and book tee times at 34 public golf courses across the San Francisco Bay Area. Interactive map with live pricing.">
   <meta property="og:image" content="https://bayareagolf.now/og-image.svg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -33,7 +33,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://bayareagolf.now/">
   <meta name="twitter:title" content="Bay Area Golf | Discover Public Courses in San Francisco Bay Area">
-  <meta name="twitter:description" content="Explore and book tee times at 40+ public golf courses across the San Francisco Bay Area.">
+  <meta name="twitter:description" content="Explore and book tee times at 34 public golf courses across the San Francisco Bay Area.">
   <meta name="twitter:image" content="https://bayareagolf.now/og-image.svg">
 
   <!-- Geo Meta Tags for Local SEO -->
@@ -64,7 +64,7 @@
     "@type": "WebSite",
     "name": "Bay Area Golf",
     "url": "https://bayareagolf.now",
-    "description": "Find and book golf tee times at 40+ public courses across the San Francisco Bay Area",
+    "description": "Find and book golf tee times at 34 public courses across the San Francisco Bay Area",
     "potentialAction": {
       "@type": "SearchAction",
       "target": "https://bayareagolf.now/courses.html?search={search_term_string}",
@@ -80,7 +80,7 @@
     "name": "Bay Area Golf",
     "url": "https://bayareagolf.now",
     "logo": "https://bayareagolf.now/favicon.svg",
-    "description": "Bay Area's premier golf tee time finder covering 40+ public courses",
+    "description": "Bay Area's premier golf tee time finder covering 34 public courses",
     "areaServed": {
       "@type": "GeoCircle",
       "geoMidpoint": {
@@ -379,6 +379,15 @@
     /* Additional East Bay Course */
     .fw-corica-n { top: 36%; left: 56%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-8deg); }
 
+    /* New East Bay Courses */
+    .fw-bridges { top: 52%; left: 74%; width: 22px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(10deg); }
+    .fw-sanramon { top: 48%; left: 76%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(5deg); }
+    .fw-callippe { top: 58%; left: 70%; width: 20px; height: 32px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
+    .fw-redwood { top: 44%; left: 60%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
+
+    /* New North Bay Course */
+    .fw-mcinnis { top: 14%; left: 38%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-22deg); }
+
     /* Price tags under fairways */
     .fairway .price-tag {
       position: absolute;
@@ -437,6 +446,12 @@
     .fw-crystal .price-tag { --counter-rotate: 12deg; }
     .fw-hmb-old .price-tag { --counter-rotate: 20deg; }
     .fw-hmb-ocean .price-tag { --counter-rotate: 25deg; }
+    .fw-bridges .price-tag { --counter-rotate: -10deg; }
+    .fw-sanramon .price-tag { --counter-rotate: -5deg; }
+    .fw-callippe .price-tag { --counter-rotate: -15deg; }
+    .fw-redwood .price-tag { --counter-rotate: 5deg; }
+    .fw-mcinnis .price-tag { --counter-rotate: 22deg; }
+    .fw-laspositas .price-tag { --counter-rotate: -18deg; }
 
     /* Map title cartouche - more transparent */
     .cartouche {
@@ -1007,6 +1022,11 @@
       <a href="/course/metropolitan-golf-links" class="fairway fw-metropolitan" data-course="Metropolitan Golf Links" data-initial="M"><span class="price-tag loading">...</span></a>
       <a href="/course/poppy-ridge-golf-course" class="fairway fw-poppy" data-course="Poppy Ridge Golf Course" data-initial="PR"><span class="price-tag loading">...</span></a>
       <a href="/course/diablo-creek-golf-course" class="fairway fw-diablo" data-course="Diablo Creek Golf Course" data-initial="DC"><span class="price-tag loading">...</span></a>
+      <a href="/course/the-bridges-golf-club" class="fairway fw-bridges" data-course="The Bridges Golf Club" data-initial="BR"><span class="price-tag loading">...</span></a>
+      <a href="/course/san-ramon-golf-club" class="fairway fw-sanramon" data-course="San Ramon Golf Club" data-initial="SR"><span class="price-tag loading">...</span></a>
+      <a href="/course/las-positas-golf-course" class="fairway fw-laspositas" data-course="Las Positas Golf Course" data-initial="LP"><span class="price-tag loading">...</span></a>
+      <a href="/course/callippe-preserve-golf-course" class="fairway fw-callippe" data-course="Callippe Preserve Golf Course" data-initial="CA"><span class="price-tag loading">...</span></a>
+      <a href="/course/redwood-canyon-golf-course" class="fairway fw-redwood" data-course="Redwood Canyon Golf Course" data-initial="RC"><span class="price-tag loading">...</span></a>
 
       <!-- North Bay -->
       <a href="/course/peacock-gap-golf-club" class="fairway fw-peacock" data-course="Peacock Gap Golf Club" data-initial="PG"><span class="price-tag loading">...</span></a>
@@ -1015,6 +1035,7 @@
       <a href="/course/mill-valley-golf-course" class="fairway fw-millvalley" data-course="Mill Valley Golf Course" data-initial="MV"><span class="price-tag loading">...</span></a>
       <a href="/course/the-links-at-bodega-harbour" class="fairway fw-bodega" data-course="The Links at Bodega Harbour" data-initial="BH"><span class="price-tag loading">...</span></a>
       <a href="/course/northwood-golf-club" class="fairway fw-northwood" data-course="Northwood Golf Club" data-initial="NW"><span class="price-tag loading">...</span></a>
+      <a href="/course/mcinnis-park-golf-center" class="fairway fw-mcinnis" data-course="McInnis Park Golf Center" data-initial="MC"><span class="price-tag loading">...</span></a>
     </div>
 
     <!-- Region labels -->
@@ -1028,7 +1049,7 @@
     <div class="cartouche">
       <h1 class="map-title">Bay Area Golf</h1>
       <p class="map-subtitle">San Francisco & Vicinity</p>
-      <p class="map-year">28 Public Courses</p>
+      <p class="map-year">34 Public Courses</p>
 
       <nav class="nav-buttons">
         <a href="/app.html" class="nav-btn primary">
