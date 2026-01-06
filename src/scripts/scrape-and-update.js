@@ -346,6 +346,14 @@ async function scrapeAndUpdate() {
     console.error('Teesnap scraper error:', e.message);
   }
 
+  try {
+    // Quick18 scraper (Baylands Golf Links)
+    const { scrapeAllQuick18 } = require('../scrapers/quick18');
+    await scrapeAllQuick18(db, coursesBySlug);
+  } catch (e) {
+    console.error('Quick18 scraper error:', e.message);
+  }
+
   console.log('\n=== All Scrapers Complete ===');
 }
 
