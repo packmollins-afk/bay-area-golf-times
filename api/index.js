@@ -2031,6 +2031,346 @@ app.get('/api/admin/email-segments', adminAuth, async (req, res) => {
   }
 });
 
+// ========== AI BOOKING AGENT ENDPOINTS ==========
+
+// Import agent modules
+const {
+  processBookingRequest,
+  quickSearch,
+  refineSearch,
+  getCourseInsight,
+  ConversationState
+} = require('../src/agent');
+
+// Store conversation states (in production, use Redis or database)
+const conversationStates = new Map();
+
+// Helper to get all tee times for agent
+const getAgentTeeTimes = async () => {
+  const pacificNow = getPacificNow();
+  const result = await db.execute({
+    sql: `
+      SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug,
+             c.avg_rating, c.latitude, c.longitude, c.booking_url as course_booking_url
+      FROM tee_times t
+      JOIN courses c ON t.course_id = c.id
+      WHERE t.datetime >= ?
+      ORDER BY t.datetime
+      LIMIT 2000
+    `,
+    args: [pacificNow]
+  });
+  return result.rows;
+};
+
+// Main agent endpoint - process natural language booking request
+app.post('/api/agent/search', async (req, res) => {
+  try {
+    const { query, sessionId, location } = req.body;
+
+    if (!query || query.trim().length < 3) {
+      return res.status(400).json({ error: 'Please provide a search query' });
+    }
+
+    // Ensure we have fresh tee times
+    await ensureTeeTimesExist();
+
+    // Get all available tee times
+    const teeTimes = await getAgentTeeTimes();
+
+    // Get or create conversation state
+    let convState = conversationStates.get(sessionId);
+    if (!convState) {
+      convState = new ConversationState(sessionId || 'anonymous');
+      if (sessionId) conversationStates.set(sessionId, convState);
+    }
+
+    // Set user location if provided
+    if (location?.lat && location?.lng) {
+      convState.setUserLocation(location.lat, location.lng, location.city);
+    }
+
+    // Process the booking request
+    const result = await processBookingRequest(
+      query,
+      teeTimes,
+      convState.getContext()
+    );
+
+    // Save to conversation history
+    if (result.success) {
+      convState.addTurn(query, result);
+    }
+
+    res.json(result);
+
+  } catch (error) {
+    console.error('Agent search error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Sorry, I couldn't process your request. Please try again."
+    });
+  }
+});
+
+// Quick search endpoint - faster, no AI generation
+app.post('/api/agent/quick-search', async (req, res) => {
+  try {
+    const { query, location } = req.body;
+
+    if (!query || query.trim().length < 2) {
+      return res.status(400).json({ error: 'Query too short' });
+    }
+
+    await ensureTeeTimesExist();
+    const teeTimes = await getAgentTeeTimes();
+
+    const context = {};
+    if (location?.lat && location?.lng) {
+      context.userLocation = location;
+    }
+
+    const result = await quickSearch(query, teeTimes, context);
+    res.json(result);
+
+  } catch (error) {
+    console.error('Quick search error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Refine search - adjust existing search with new constraints
+app.post('/api/agent/refine', async (req, res) => {
+  try {
+    const { sessionId, refinement } = req.body;
+
+    const convState = conversationStates.get(sessionId);
+    if (!convState || !convState.lastParams) {
+      return res.status(400).json({
+        error: 'No previous search found. Please start a new search.'
+      });
+    }
+
+    await ensureTeeTimesExist();
+    const teeTimes = await getAgentTeeTimes();
+
+    const result = await refineSearch(
+      convState.lastParams,
+      refinement,
+      teeTimes,
+      convState.getContext()
+    );
+
+    res.json(result);
+
+  } catch (error) {
+    console.error('Refine search error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Course insight endpoint
+app.get('/api/agent/course/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    await ensureTeeTimesExist();
+    const teeTimes = await getAgentTeeTimes();
+
+    const insight = getCourseInsight(decodeURIComponent(name), teeTimes);
+    res.json(insight);
+
+  } catch (error) {
+    console.error('Course insight error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Example queries endpoint - help users get started
+app.get('/api/agent/examples', (req, res) => {
+  res.json({
+    examples: [
+      {
+        query: "Find me something under $60 this weekend in the East Bay",
+        description: "Budget-friendly weekend round"
+      },
+      {
+        query: "I want to play Harding Park tomorrow morning",
+        description: "Specific course request"
+      },
+      {
+        query: "Best deal for 4 players this Saturday afternoon",
+        description: "Group booking with time preference"
+      },
+      {
+        query: "Show me twilight rates near San Francisco",
+        description: "Time-based discount search"
+      },
+      {
+        query: "High-rated courses under $100 this week",
+        description: "Quality-focused search"
+      },
+      {
+        query: "Cheap 9-hole option for tomorrow",
+        description: "Quick round on a budget"
+      }
+    ]
+  });
+});
+
+// ========== BOOKING REQUEST ENDPOINTS ==========
+
+// In-memory booking queue (in production, use Redis or database)
+const bookingQueue = new Map();
+
+// Create a booking request
+app.post('/api/bookings/request', optionalAuth, async (req, res) => {
+  try {
+    const { teeTimeId, courseId, date, time, players, contact, bookingUrl } = req.body;
+
+    // Validate required fields
+    if (!contact?.email || !contact?.firstName || !contact?.lastName) {
+      return res.status(400).json({ error: 'Contact information required (firstName, lastName, email)' });
+    }
+
+    if (!bookingUrl && !teeTimeId) {
+      return res.status(400).json({ error: 'Either bookingUrl or teeTimeId required' });
+    }
+
+    // Get tee time details if teeTimeId provided
+    let teeTime = null;
+    if (teeTimeId) {
+      const result = await db.execute({
+        sql: `SELECT t.*, c.name as course_name, c.slug as course_slug
+              FROM tee_times t
+              JOIN courses c ON t.course_id = c.id
+              WHERE t.id = ?`,
+        args: [parseInt(teeTimeId)]
+      });
+      teeTime = result.rows[0];
+    }
+
+    // Create booking request
+    const bookingId = 'bk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const booking = {
+      id: bookingId,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      userId: req.user?.id || null,
+      teeTime: teeTime || {
+        course_id: courseId,
+        date,
+        time,
+        booking_url: bookingUrl
+      },
+      players: players || 1,
+      contact: {
+        firstName: contact.firstName,
+        lastName: contact.lastName,
+        email: contact.email,
+        phone: contact.phone
+      },
+      bookingUrl: bookingUrl || teeTime?.booking_url
+    };
+
+    // Store in queue
+    bookingQueue.set(bookingId, booking);
+
+    // In production, this would trigger the booking automation
+    // For now, we return the prepared booking with a deep link
+
+    // Generate deep booking link for GolfNow
+    const deepLink = booking.bookingUrl || `https://www.golfnow.com/tee-times/facility/${teeTime?.course_id}/search#date=${date}&time=${time}&players=${players}`;
+
+    res.json({
+      success: true,
+      booking: {
+        id: bookingId,
+        status: 'pending',
+        message: 'Booking request created. Use the link below to complete your reservation.',
+        deepLink,
+        teeTime: {
+          course: teeTime?.course_name || 'Selected Course',
+          date: teeTime?.date || date,
+          time: teeTime?.time || time,
+          price: teeTime?.price
+        },
+        contact: { email: contact.email }
+      }
+    });
+
+  } catch (error) {
+    console.error('Booking request error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get booking status
+app.get('/api/bookings/:id', optionalAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const booking = bookingQueue.get(id);
+
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // Check authorization
+    if (booking.userId && req.user?.id !== booking.userId) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    res.json({ booking });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Cancel booking request
+app.delete('/api/bookings/:id', optionalAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const booking = bookingQueue.get(id);
+
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    if (booking.userId && req.user?.id !== booking.userId) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    if (booking.status === 'confirmed') {
+      return res.status(400).json({ error: 'Cannot cancel confirmed booking through API' });
+    }
+
+    booking.status = 'cancelled';
+    booking.cancelledAt = new Date().toISOString();
+
+    res.json({ success: true, message: 'Booking request cancelled' });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get user's booking history
+app.get('/api/bookings', userAuth, async (req, res) => {
+  try {
+    // Get bookings from queue for this user
+    const userBookings = Array.from(bookingQueue.values())
+      .filter(b => b.userId === req.user.id)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.json({ bookings: userBookings });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // SPA fallback (Express 5 compatible)
 app.get('/{*splat}', (req, res) => {
   if (req.path.startsWith('/api/')) {
