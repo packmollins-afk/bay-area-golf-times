@@ -1,5 +1,15 @@
 const db = require('./schema');
 
+/**
+ * CHECKLIST FOR ADDING A NEW COURSE:
+ * 1. Add course entry to the `courses` array below
+ * 2. Add scraper config (if needed) in src/scrapers/{booking_system}.js
+ * 3. Add fairway to homepage map in public/index.html:
+ *    - Add CSS: .fw-{slug} { top: X%; left: Y%; ... } (around line 344)
+ *    - Add HTML: <a href="/course/{slug}" class="fairway fw-{slug}" ...> (around line 1183)
+ * 4. Run database seed to add course to Turso
+ */
+
 // Bay Area Public Golf Courses
 const courses = [
   // San Francisco
