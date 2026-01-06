@@ -10,7 +10,7 @@
   <!-- Primary Meta Tags -->
   <title>Bay Area Golf | Discover Public Courses in San Francisco Bay Area</title>
   <meta name="title" content="Bay Area Golf | Discover Public Courses in San Francisco Bay Area">
-  <meta name="description" content="Explore and book tee times at 34 public golf courses across the San Francisco Bay Area. Find courses in SF, South Bay, East Bay, and North Bay with live pricing.">
+  <meta name="description" content="Explore and book tee times at 40 public golf courses across the San Francisco Bay Area. Find courses in SF, South Bay, East Bay, and North Bay with live pricing.">
   <meta name="keywords" content="bay area golf, golf courses san francisco, public golf bay area, tee times sf, golf near me, bay area golf map, san francisco golf, east bay golf, south bay golf, north bay golf">
   <meta name="author" content="Bay Area Golf">
   <meta name="robots" content="index, follow">
@@ -22,7 +22,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bayareagolf.now/">
   <meta property="og:title" content="Bay Area Golf | Discover Public Courses in San Francisco Bay Area">
-  <meta property="og:description" content="Explore and book tee times at 34 public golf courses across the San Francisco Bay Area. Interactive map with live pricing.">
+  <meta property="og:description" content="Explore and book tee times at 40 public golf courses across the San Francisco Bay Area. Interactive map with live pricing.">
   <meta property="og:image" content="https://bayareagolf.now/og-image.svg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -33,7 +33,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://bayareagolf.now/">
   <meta name="twitter:title" content="Bay Area Golf | Discover Public Courses in San Francisco Bay Area">
-  <meta name="twitter:description" content="Explore and book tee times at 34 public golf courses across the San Francisco Bay Area.">
+  <meta name="twitter:description" content="Explore and book tee times at 40 public golf courses across the San Francisco Bay Area.">
   <meta name="twitter:image" content="https://bayareagolf.now/og-image.svg">
 
   <!-- Geo Meta Tags for Local SEO -->
@@ -64,7 +64,7 @@
     "@type": "WebSite",
     "name": "Bay Area Golf",
     "url": "https://bayareagolf.now",
-    "description": "Find and book golf tee times at 34 public courses across the San Francisco Bay Area",
+    "description": "Find and book golf tee times at 40 public courses across the San Francisco Bay Area",
     "potentialAction": {
       "@type": "SearchAction",
       "target": "https://bayareagolf.now/courses.html?search={search_term_string}",
@@ -80,7 +80,7 @@
     "name": "Bay Area Golf",
     "url": "https://bayareagolf.now",
     "logo": "https://bayareagolf.now/favicon.svg",
-    "description": "Bay Area's premier golf tee time finder covering 34 public courses",
+    "description": "Bay Area's premier golf tee time finder covering 40 public courses",
     "areaServed": {
       "@type": "GeoCircle",
       "geoMidpoint": {
@@ -388,6 +388,14 @@
     /* New North Bay Course */
     .fw-mcinnis { top: 14%; left: 38%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-22deg); }
 
+    /* Napa Valley Courses */
+    .fw-chardonnay { top: 6%; left: 56%; width: 22px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(-5deg); }
+    .fw-eaglevines { top: 4%; left: 62%; width: 20px; height: 32px; border-radius: 48% 52% 50% 50%; transform: rotate(-8deg); }
+    .fw-napakennedy { top: 10%; left: 58%; width: 16px; height: 26px; border-radius: 50%; transform: rotate(-3deg); }
+    .fw-vintners { top: 8%; left: 64%; width: 14px; height: 22px; border-radius: 50%; transform: rotate(-6deg); }
+    .fw-silverado-n { top: 2%; left: 68%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    .fw-silverado-s { top: 6%; left: 72%; width: 22px; height: 36px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
+
     /* Price tags under fairways */
     .fairway .price-tag {
       position: absolute;
@@ -452,6 +460,12 @@
     .fw-redwood .price-tag { --counter-rotate: 5deg; }
     .fw-mcinnis .price-tag { --counter-rotate: 22deg; }
     .fw-laspositas .price-tag { --counter-rotate: -18deg; }
+    .fw-chardonnay .price-tag { --counter-rotate: 5deg; }
+    .fw-eaglevines .price-tag { --counter-rotate: 8deg; }
+    .fw-napakennedy .price-tag { --counter-rotate: 3deg; }
+    .fw-vintners .price-tag { --counter-rotate: 6deg; }
+    .fw-silverado-n .price-tag { --counter-rotate: 10deg; }
+    .fw-silverado-s .price-tag { --counter-rotate: 12deg; }
 
     /* Map title cartouche - more transparent */
     .cartouche {
@@ -673,6 +687,7 @@
     .label-sb { top: 76%; left: 44%; }
     .label-eb { top: 44%; left: 68%; }
     .label-ma { top: 8%; left: 32%; transform: rotate(-5deg); }
+    .label-napa { top: 4%; left: 66%; color: #722F37; font-style: italic; }
     .label-pacific { top: 50%; left: 4%; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.3em; color: var(--water-dark); }
 
     /* Landmarks */
@@ -1192,6 +1207,14 @@
       <a href="/course/the-links-at-bodega-harbour" class="fairway fw-bodega" data-course="The Links at Bodega Harbour" data-initial="BH"><span class="price-tag loading">...</span></a>
       <a href="/course/northwood-golf-club" class="fairway fw-northwood" data-course="Northwood Golf Club" data-initial="NW"><span class="price-tag loading">...</span></a>
       <a href="/course/mcinnis-park-golf-center" class="fairway fw-mcinnis" data-course="McInnis Park Golf Center" data-initial="MC"><span class="price-tag loading">...</span></a>
+
+      <!-- Napa Valley -->
+      <a href="/course/chardonnay-golf-club" class="fairway fw-chardonnay" data-course="Chardonnay Golf Club" data-initial="CH"><span class="price-tag loading">...</span></a>
+      <a href="/course/eagle-vines-golf-club" class="fairway fw-eaglevines" data-course="Eagle Vines Golf Club" data-initial="EV"><span class="price-tag loading">...</span></a>
+      <a href="/course/napa-golf-course-at-kennedy-park" class="fairway fw-napakennedy" data-course="Napa Golf Course at Kennedy Park" data-initial="NK"><span class="price-tag loading">...</span></a>
+      <a href="/course/vintners-golf-club" class="fairway fw-vintners" data-course="Vintner's Golf Club" data-initial="VG"><span class="price-tag loading">...</span></a>
+      <a href="/course/silverado-resort-north-course" class="fairway fw-silverado-n" data-course="Silverado Resort - North Course" data-initial="SN"><span class="price-tag loading">...</span></a>
+      <a href="/course/silverado-resort-south-course" class="fairway fw-silverado-s" data-course="Silverado Resort - South Course" data-initial="SS"><span class="price-tag loading">...</span></a>
     </div>
 
     <!-- Region labels -->
@@ -1199,13 +1222,14 @@
     <div class="region-label label-sb">South Bay</div>
     <div class="region-label label-eb">East Bay</div>
     <div class="region-label label-ma">North Bay</div>
+    <div class="region-label label-napa">Napa</div>
     <div class="region-label label-pacific">Pacific Ocean</div>
 
     <!-- Central cartouche with title and nav -->
     <div class="cartouche">
       <h1 class="map-title">Bay Area Golf</h1>
       <p class="map-subtitle">San Francisco & Vicinity</p>
-      <p class="map-year">34 Public Courses</p>
+      <p class="map-year">40 Public Courses</p>
 
       <nav class="nav-buttons">
         <a href="/app.html" class="nav-btn primary">

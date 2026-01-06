@@ -459,7 +459,9 @@ const COURSE_BASE_PRICES = {
   'The Links at Bodega Harbour': 85, 'Northwood Golf Club': 55, 'Pasatiempo Golf Club': 295,
   'Diablo Creek Golf Course': 52, 'The Bridges Golf Club': 95, 'San Ramon Golf Club': 65,
   'Las Positas Golf Course': 58, 'Callippe Preserve Golf Course': 72, 'McInnis Park Golf Center': 52,
-  'Redwood Canyon Golf Course': 58
+  'Redwood Canyon Golf Course': 58, 'Chardonnay Golf Club': 75, 'Eagle Vines Golf Club': 85,
+  'Napa Golf Course at Kennedy Park': 55, "Vintner's Golf Club": 45, 'Silverado Resort - North Course': 195,
+  'Silverado Resort - South Course': 175
 };
 
 // Generate demo tee times on-the-fly for a course
