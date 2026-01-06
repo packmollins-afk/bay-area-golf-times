@@ -287,9 +287,54 @@ async function scrapeAndUpdate() {
     await browser.close();
   }
 
-  console.log(`\n=== Scrape Complete ===`);
+  console.log(`\n=== GolfNow Scrape Complete ===`);
   console.log(`Courses scraped: ${coursesScraped}`);
   console.log(`Total tee times: ${totalTeeTimes}`);
+
+  // Now run additional scrapers for non-GolfNow courses
+  console.log('\n=== Running Additional Scrapers ===');
+
+  try {
+    // TotaleIntegrated scraper (Boundary Oak, Callippe, Crystal Springs, etc.)
+    const { scrapeAllTotaleIntegrated } = require('../scrapers/totaleintegrated');
+    await scrapeAllTotaleIntegrated(db, coursesBySlug);
+  } catch (e) {
+    console.error('TotaleIntegrated scraper error:', e.message);
+  }
+
+  try {
+    // ForeUp scraper (Corica Park)
+    const { scrapeAllForeUp } = require('../scrapers/foreup');
+    await scrapeAllForeUp(db, coursesBySlug);
+  } catch (e) {
+    console.error('ForeUp scraper error:', e.message);
+  }
+
+  try {
+    // CPS.Golf scraper (Presidio, Diablo Creek)
+    const { scrapeAllCPSGolf } = require('../scrapers/cpsgolf');
+    await scrapeAllCPSGolf(db, coursesBySlug);
+  } catch (e) {
+    console.error('CPS.Golf scraper error:', e.message);
+  }
+
+  try {
+    // EZLinks scraper (Half Moon Bay)
+    const { scrapeAllEZLinks } = require('../scrapers/ezlinks');
+    await scrapeAllEZLinks(db, coursesBySlug);
+  } catch (e) {
+    console.error('EZLinks scraper error:', e.message);
+  }
+
+  try {
+    // Teesnap scraper (McInnis Park)
+    const { scrapeAllTeesnap } = require('../scrapers/teesnap');
+    await scrapeAllTeesnap(db, coursesBySlug);
+  } catch (e) {
+    console.error('Teesnap scraper error:', e.message);
+  }
+
+  console.log('\n=== All Scrapers Complete ===');
 }
 
 // Run
