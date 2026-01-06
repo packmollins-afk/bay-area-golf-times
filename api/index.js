@@ -492,7 +492,7 @@ const generateDemoTeeTimesForCourse = (course, daysAhead = 7) => {
         price = Math.round(price);
 
         const hasCart = Math.random() < 0.5;
-        const players = Math.random() < 0.7 ? 4 : (Math.random() < 0.5 ? 3 : 2);
+        const players = 4; // All times show 4 spots - actual availability confirmed when booking
 
         teeTimes.push({
           course_id: course.id,

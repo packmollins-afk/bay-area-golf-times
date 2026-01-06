@@ -193,7 +193,7 @@
         "name": "How do I book a tee time in the Bay Area?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Use Bay Area Golf Tee Times to search for available tee times across 40+ public courses in San Francisco, South Bay, East Bay, North Bay, and Napa. Filter by date, time, price, and number of players, then click 'Book' to reserve your spot directly with the course."
+          "text": "Use Bay Area Golf Tee Times to search for available tee times across 40+ public courses in San Francisco, South Bay, East Bay, North Bay, and Napa. Filter by date, time, and price, then click 'Book' to reserve your spot directly with the course."
         }
       },
       {
@@ -948,7 +948,6 @@
     .course-info .badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
     .badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; background: #e8f5e9; color: var(--primary); }
     .badge.holes { background: #e3f2fd; color: #1565c0; }
-    .badge.players { background: #fff3e0; color: #e65100; }
     .badge.rating { background: #fff8e1; color: #f57c00; display: flex; align-items: center; gap: 3px; }
 
     .price-block { text-align: right; }
@@ -1685,16 +1684,6 @@
           </select>
         </div>
         <div class="filter-group">
-          <label for="players">Players</label>
-          <select id="players">
-            <option value="">Any</option>
-            <option value="1">1+ spots</option>
-            <option value="2">2+ spots</option>
-            <option value="3">3+ spots</option>
-            <option value="4">4 spots</option>
-          </select>
-        </div>
-        <div class="filter-group">
           <label for="min-time">After</label>
           <select id="min-time">
             <option value="">Any time</option>
@@ -2210,22 +2199,18 @@
       if (activeQuickFilter === filter) {
         activeQuickFilter = null;
         // Reset to defaults
-        document.getElementById('players').value = '';
         document.getElementById('sort-by').value = 'datetime';
         document.getElementById('sort-order').value = 'ASC';
       } else {
         activeQuickFilter = filter;
         // Apply filter settings
         if (filter === 'solo') {
-          document.getElementById('players').value = '1';
           document.getElementById('sort-by').value = 'datetime';
           document.getElementById('sort-order').value = 'ASC';
         } else if (filter === 'cheapest') {
-          document.getElementById('players').value = '';
           document.getElementById('sort-by').value = 'price';
           document.getElementById('sort-order').value = 'ASC';
         } else if (filter === 'closest') {
-          document.getElementById('players').value = '';
           document.getElementById('sort-by').value = 'datetime';
           document.getElementById('sort-order').value = 'ASC';
         }
@@ -2258,8 +2243,6 @@
       if (selectedRegion === 'staff_picks') params.set('staff_picks', 'true');
       const course = document.getElementById('course').value;
       if (course) params.set('course_id', course);
-      const players = document.getElementById('players').value;
-      if (players) params.set('players', players);
       const minTime = document.getElementById('min-time').value;
       if (minTime) params.set('min_time', minTime);
       const maxPrice = document.getElementById('max-price').value;
@@ -2406,7 +2389,6 @@
             <div class="location">${tt.city}, ${tt.region}</div>
             <div class="badges">
               <span class="badge holes">${tt.holes || 18}H</span>
-              <span class="badge players">${tt.players || 4} spots</span>
               ${rating ? `<span class="badge rating">★ ${rating}</span>` : ''}
               ${tt.has_cart ? '<span class="badge">Cart</span>' : ''}
             </div>
@@ -2527,7 +2509,7 @@
                   <a href="${tt.booking_url}" target="_blank" rel="noopener" class="booking-time-slot">
                     <span class="time">${formatTime(tt.time)}</span>
                     <span class="price">$${tt.price}</span>
-                    <span class="details">${tt.holes === 9 ? '9H • ' : ''}${tt.players}P${tt.has_cart ? ' • Cart' : ''}</span>
+                    <span class="details">${tt.holes === 9 ? '9H • ' : ''}${tt.has_cart ? 'Cart included' : ''}</span>
                   </a>
                 `).join('')}
               </div>
