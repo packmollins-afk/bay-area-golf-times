@@ -43,98 +43,112 @@ function formatDateForForeUp(dateStr) {
  * Scrape tee times from ForeUp via Puppeteer
  */
 async function scrapeForeUp(page, config, date) {
-  const foreupDate = formatDateForForeUp(date);
-
   try {
-    // Construct URL with date parameter
-    const url = `${config.url}#date=${foreupDate}`;
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
-
-    // Wait for tee times to load
-    await page.waitForSelector('.booking-start-time, .time-block, [class*="tee-time"]', { timeout: 15000 }).catch(() => {});
-
-    // Additional wait for JavaScript rendering
+    // Navigate to the booking page
+    const url = config.url;
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 45000 });
     await new Promise(r => setTimeout(r, 3000));
 
-    // Try clicking on the date to refresh
-    try {
-      await page.evaluate((dateStr) => {
-        // Look for date input/selector
-        const dateInputs = document.querySelectorAll('input[type="date"], input[name*="date"], .date-picker input');
-        dateInputs.forEach(input => {
-          if (input) {
-            input.value = dateStr;
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-        });
-      }, foreupDate);
-      await new Promise(r => setTimeout(r, 2000));
-    } catch (e) {
-      // Date selection may work differently
-    }
+    // Click on "Public Rates" or similar schedule selector to load tee times
+    await page.evaluate(() => {
+      const links = Array.from(document.querySelectorAll('a, button, [onclick], div[class*="schedule"], span'));
+      for (const link of links) {
+        const text = (link.innerText || '').toLowerCase();
+        if (text.includes('public rate') || text.includes('0 - 7 days')) {
+          link.click();
+          return true;
+        }
+      }
+      // Try clicking the first schedule option
+      const scheduleLinks = document.querySelectorAll('[class*="schedule"], [class*="booking-class"]');
+      if (scheduleLinks.length > 0) {
+        scheduleLinks[0].click();
+        return true;
+      }
+      return false;
+    });
 
-    // Extract tee time data
+    await new Promise(r => setTimeout(r, 4000));
+
+    // Now try to navigate to the specific date if needed
+    const [year, month, day] = date.split('-');
+    const targetDay = parseInt(day);
+
+    // Click on the target date if available
+    await page.evaluate((targetDay, dateStr) => {
+      // Look for date navigation
+      const dateLinks = Array.from(document.querySelectorAll('a, button, div, span'));
+      for (const link of dateLinks) {
+        const text = link.innerText || '';
+        // Match date patterns like "Jan 7th" or just the day number
+        if (text.includes(targetDay + 'th') || text.includes(targetDay + 'st') ||
+            text.includes(targetDay + 'nd') || text.includes(targetDay + 'rd')) {
+          link.click();
+          return true;
+        }
+      }
+      return false;
+    }, targetDay, date);
+
+    await new Promise(r => setTimeout(r, 3000));
+
+    // Extract tee time data from the page text
     const teeTimes = await page.evaluate((dateStr) => {
       const results = [];
+      const pageText = document.body.innerText || '';
 
-      // ForeUp tee time elements
-      const timeElements = document.querySelectorAll('.booking-start-time, .time-block, .tee-time-slot, [data-time]');
+      // ForeUp displays times like: "12:55pm\nFRONT\n 9 or 18  2\n $55.00"
+      // Split by lines and parse
+      const lines = pageText.split('\n');
+      let currentTime = null;
+      let currentPrice = null;
+      let currentPlayers = 4;
 
-      timeElements.forEach(el => {
-        const text = el.innerText || el.textContent || '';
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
 
-        // Extract time
-        const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm))/i);
-        if (!timeMatch) return;
+        // Check for time pattern (e.g., "12:55pm" or "1:05pm")
+        const timeMatch = line.match(/^(\d{1,2}:\d{2}(?:am|pm))$/i);
+        if (timeMatch) {
+          // If we have a previous time with data, save it
+          if (currentTime && currentPrice) {
+            results.push({
+              time: currentTime.toUpperCase(),
+              price: currentPrice,
+              players: currentPlayers,
+              holes: 18,
+              has_cart: 0,
+              date: dateStr
+            });
+          }
+          currentTime = timeMatch[1];
+          currentPrice = null;
+          currentPlayers = 4;
+          continue;
+        }
 
-        // Extract price
-        const priceMatch = text.match(/\$(\d+(?:\.\d{2})?)/);
-        let price = priceMatch ? parseFloat(priceMatch[1]) : null;
-        if (price) price = Math.round(price);
+        // Check for price pattern (e.g., "$55.00" or "$45.00")
+        const priceMatch = line.match(/\$(\d+)(?:\.\d{2})?/);
+        if (priceMatch && currentTime) {
+          currentPrice = parseInt(priceMatch[1]);
+        }
 
-        // Extract available spots
-        const spotsMatch = text.match(/(\d+)\s*(?:spot|player|opening|available)/i);
-        const players = spotsMatch ? parseInt(spotsMatch[1]) : 4;
+        // Check for player count (e.g., "9 or 18  2" means 2 spots available)
+        const playersMatch = line.match(/9 or 18\s+(\d+)/);
+        if (playersMatch && currentTime) {
+          currentPlayers = parseInt(playersMatch[1]);
+        }
+      }
 
-        // Extract holes
-        const holesMatch = text.match(/(\d+)\s*hole/i);
-        const holes = holesMatch ? parseInt(holesMatch[1]) : 18;
-
-        // Check for cart
-        const hasCart = text.toLowerCase().includes('cart');
-
-        // Get booking link
-        const link = el.querySelector('a')?.href || el.closest('a')?.href;
-
+      // Don't forget the last time
+      if (currentTime && currentPrice) {
         results.push({
-          time: timeMatch[1].toUpperCase().replace(/\s+/g, ''),
-          price,
-          players,
-          holes,
-          has_cart: hasCart ? 1 : 0,
-          booking_url: link,
+          time: currentTime.toUpperCase(),
+          price: currentPrice,
+          players: currentPlayers,
+          holes: 18,
+          has_cart: 0,
           date: dateStr
-        });
-      });
-
-      // Alternative: look for the main tee time list structure
-      if (results.length === 0) {
-        document.querySelectorAll('.times-container .time, .availability-row, [class*="booking"]').forEach(el => {
-          const text = el.innerText || '';
-          const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
-          if (!timeMatch) return;
-
-          const priceMatch = text.match(/\$(\d+)/);
-          const price = priceMatch ? parseInt(priceMatch[1]) : null;
-
-          results.push({
-            time: timeMatch[1].toUpperCase().replace(/\s+/g, ''),
-            price,
-            players: 4,
-            holes: 18,
-            has_cart: 0,
-            date: dateStr
-          });
         });
       }
 
