@@ -356,6 +356,9 @@ app.get('/api/courses/:idOrSlug', async (req, res) => {
 
     const course = result.rows[0];
 
+    // Ensure we have fresh tee times
+    await ensureTeeTimesExist();
+
     // Get tee times (using Pacific timezone)
     const pacificNow = getPacificNow();
     const teeTimesResult = await db.execute({
@@ -432,9 +435,142 @@ const getPacificNow = () => {
   return `${year}-${month}-${day} ${hours}:${mins}`;
 };
 
+// Helper to get Pacific date string for a given offset
+const getPacificDate = (dayOffset = 0) => {
+  const now = new Date();
+  const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  pst.setDate(pst.getDate() + dayOffset);
+  const year = pst.getFullYear();
+  const month = String(pst.getMonth() + 1).padStart(2, '0');
+  const day = String(pst.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Base prices for courses (used for on-the-fly generation)
+const COURSE_BASE_PRICES = {
+  'TPC Harding Park': 89, 'Lincoln Park Golf Course': 52, 'Sharp Park Golf Course': 48,
+  'Presidio Golf Course': 165, 'Golden Gate Park Golf Course': 24, 'San Jose Municipal Golf Course': 45,
+  'Cinnabar Hills Golf Club': 79, 'Santa Teresa Golf Club': 65, 'Palo Alto Golf Course': 62,
+  'Deep Cliff Golf Course': 38, 'Corica Park - South Course': 75, 'Corica Park - North Course': 55,
+  'Metropolitan Golf Links': 68, 'Tilden Park Golf Course': 52, 'Boundary Oak Golf Course': 54,
+  'Poppy Ridge Golf Course': 72, 'Peacock Gap Golf Club': 75, 'Indian Valley Golf Club': 55,
+  'StoneTree Golf Club': 89, 'Mill Valley Golf Course': 32, 'TPC Harding Park - Fleming 9': 42,
+  'Crystal Springs Golf Course': 85, 'Half Moon Bay - Old Course': 175, 'Half Moon Bay - Ocean Course': 195,
+  'The Links at Bodega Harbour': 85, 'Northwood Golf Club': 55, 'Pasatiempo Golf Club': 295,
+  'Diablo Creek Golf Course': 52
+};
+
+// Generate demo tee times on-the-fly for a course
+const generateDemoTeeTimesForCourse = (course, daysAhead = 7) => {
+  const teeTimes = [];
+  const basePrice = COURSE_BASE_PRICES[course.name] || 50;
+
+  for (let dayOffset = 0; dayOffset < daysAhead; dayOffset++) {
+    const dateStr = getPacificDate(dayOffset);
+    const date = new Date(dateStr);
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    const priceMultiplier = isWeekend ? 1.3 : 1.0;
+
+    // Generate tee times from 6am to 5pm
+    for (let hour = 6; hour <= 17; hour++) {
+      // 2-4 times per hour
+      const timesThisHour = 2 + Math.floor(Math.random() * 3);
+
+      for (let i = 0; i < timesThisHour; i++) {
+        const minutes = Math.floor(Math.random() * 6) * 10;
+        const timeStr = `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
+        let price = basePrice * priceMultiplier;
+        const hasDiscount = Math.random() < 0.2;
+        const originalPrice = hasDiscount ? price : null;
+        if (hasDiscount) price = price * (0.7 + Math.random() * 0.2);
+        if (hour >= 14) price = price * 0.8; // Twilight discount
+        price = Math.round(price);
+
+        const hasCart = Math.random() < 0.5;
+        const players = Math.random() < 0.7 ? 4 : (Math.random() < 0.5 ? 3 : 2);
+
+        teeTimes.push({
+          course_id: course.id,
+          date: dateStr,
+          time: timeStr,
+          datetime: `${dateStr} ${timeStr}`,
+          holes: course.holes >= 18 ? 18 : 9,
+          players: players,
+          price: price,
+          original_price: originalPrice ? Math.round(originalPrice) : null,
+          has_cart: hasCart ? 1 : 0,
+          booking_url: course.booking_url,
+          source: 'demo',
+          course_name: course.name,
+          city: course.city,
+          region: course.region,
+          course_slug: course.slug,
+          avg_rating: course.avg_rating
+        });
+      }
+    }
+  }
+
+  return teeTimes;
+};
+
+// Ensure tee times exist for the next 7 days (regenerates if stale)
+const ensureTeeTimesExist = async () => {
+  const pacificNow = getPacificNow();
+  const futureDate = getPacificDate(7);
+
+  // Check if we have tee times for the next 7 days
+  const countResult = await db.execute({
+    sql: `SELECT COUNT(*) as count FROM tee_times WHERE datetime >= ? AND date <= ?`,
+    args: [pacificNow, futureDate]
+  });
+
+  const existingCount = countResult.rows[0]?.count || 0;
+
+  // If we have enough tee times (at least 500), don't regenerate
+  if (existingCount >= 500) {
+    return;
+  }
+
+  console.log(`Regenerating tee times (found ${existingCount}, need at least 500)...`);
+
+  // Get all courses
+  const coursesResult = await db.execute('SELECT * FROM courses');
+  const courses = coursesResult.rows;
+
+  // Clear old tee times
+  await db.execute({
+    sql: `DELETE FROM tee_times WHERE datetime < ?`,
+    args: [pacificNow]
+  });
+
+  // Generate new tee times for each course
+  for (const course of courses) {
+    const teeTimes = generateDemoTeeTimesForCourse(course, 7);
+
+    for (const tt of teeTimes) {
+      try {
+        await db.execute({
+          sql: `INSERT OR REPLACE INTO tee_times (course_id, date, time, datetime, holes, players, price, original_price, has_cart, booking_url, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [tt.course_id, tt.date, tt.time, tt.datetime, tt.holes, tt.players, tt.price, tt.original_price, tt.has_cart, tt.booking_url, tt.source]
+        });
+      } catch (e) {
+        // Ignore duplicate key errors
+      }
+    }
+  }
+
+  console.log(`Regenerated tee times for ${courses.length} courses`);
+};
+
 app.get('/api/tee-times', async (req, res) => {
   try {
     const { date, region, minPrice, maxPrice, min_time, max_price, players, course_id, staff_picks, sort_by, sort_order, limit } = req.query;
+
+    // Ensure we have fresh tee times (regenerates if stale)
+    await ensureTeeTimesExist();
 
     // Use Pacific timezone for filtering since tee times are stored in Pacific time
     const pacificNow = getPacificNow();
@@ -500,6 +636,9 @@ app.get('/api/tee-times', async (req, res) => {
 
 app.get('/api/tee-times/deals', async (req, res) => {
   try {
+    // Ensure we have fresh tee times
+    await ensureTeeTimesExist();
+
     // Use Pacific timezone for filtering
     const pacificNow = getPacificNow();
     const result = await db.execute({
