@@ -10,11 +10,16 @@ const puppeteer = require('puppeteer');
 const CPS_COURSES = {
   'presidio-golf-course': {
     url: 'https://presidio.cps.golf/',
-    name: 'Presidio Golf Course'
+    name: 'Presidio Golf Course',
+    requiresLogin: true
   },
   'diablo-creek-golf-course': {
     url: 'https://diablocreek.cps.golf/',
     name: 'Diablo Creek Golf Course'
+  },
+  'northwood-golf-club': {
+    url: 'https://www.northwoodgolf.com/bookteetimes',
+    name: 'Northwood Golf Club'
   }
 };
 
@@ -139,6 +144,12 @@ async function scrapeAllCPSGolf(db, coursesBySlug) {
 
   try {
     for (const [slug, config] of Object.entries(CPS_COURSES)) {
+      // Skip courses that require login for now
+      if (config.requiresLogin) {
+        console.log(`Skipping ${config.name} (requires login)`);
+        continue;
+      }
+
       const course = coursesBySlug[slug];
       if (!course) {
         console.log(`  Course not found for slug: ${slug}`);
