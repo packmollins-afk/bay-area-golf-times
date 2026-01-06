@@ -47,6 +47,18 @@ const GOLFNOW_IDS = {
   'mill-valley-golf-course': '166',
   'mcinnis-park-golf-center': '1459',
 
+  // North Bay - Napa/Sonoma
+  'silverado-resort-north-course': '620',
+  'silverado-resort-south-course': '621',
+  'napa-golf-course-at-kennedy-park': '129',
+  'vintners-golf-club': '1676',
+  'eagle-vines-golf-club': '486',
+  'chardonnay-golf-club': '463',
+
+  // East Bay - More courses
+  'the-bridges-golf-club': '5141',
+  'the-course-at-wente-vineyards': '658',
+
   // Peninsula
   'crystal-springs-golf-course': '1398',
   'half-moon-bay-old-course': '175',

@@ -638,6 +638,38 @@ app.get('/api/tee-times', async (req, res) => {
   }
 });
 
+// Get the cheapest next available tee time per course (for map display)
+app.get('/api/tee-times/next-available', async (req, res) => {
+  try {
+    await ensureTeeTimesExist();
+    const pacificNow = getPacificNow();
+
+    // Get minimum price tee time per course
+    const result = await db.execute({
+      sql: `
+        SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug, c.avg_rating
+        FROM tee_times t
+        JOIN courses c ON t.course_id = c.id
+        WHERE t.id IN (
+          SELECT t2.id FROM tee_times t2
+          WHERE t2.course_id = t.course_id
+            AND t2.datetime >= ?
+            AND t2.price IS NOT NULL
+            AND t2.price > 0
+          ORDER BY t2.price ASC
+          LIMIT 1
+        )
+        ORDER BY c.name
+      `,
+      args: [pacificNow]
+    });
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/api/tee-times/deals', async (req, res) => {
   try {
     // Ensure we have fresh tee times

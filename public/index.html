@@ -357,6 +357,7 @@
     .fw-lakechabot { top: 48%; left: 66%; width: 22px; height: 34px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
     .fw-poppy { top: 56%; left: 82%; width: 24px; height: 38px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
     .fw-laspositas { top: 62%; left: 86%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(18deg); }
+    .fw-wente { top: 66%; left: 84%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(15deg); }
     .fw-diablo { top: 38%; left: 82%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-8deg); }
 
     /* North Bay Courses - north of Golden Gate */
@@ -460,6 +461,7 @@
     .fw-redwood .price-tag { --counter-rotate: 5deg; }
     .fw-mcinnis .price-tag { --counter-rotate: 22deg; }
     .fw-laspositas .price-tag { --counter-rotate: -18deg; }
+    .fw-wente .price-tag { --counter-rotate: -15deg; }
     .fw-chardonnay .price-tag { --counter-rotate: 5deg; }
     .fw-eaglevines .price-tag { --counter-rotate: 8deg; }
     .fw-napakennedy .price-tag { --counter-rotate: 3deg; }
@@ -1196,6 +1198,7 @@
       <a href="/course/the-bridges-golf-club" class="fairway fw-bridges" data-course="The Bridges Golf Club" data-initial="BR"><span class="price-tag loading">...</span></a>
       <a href="/course/san-ramon-golf-club" class="fairway fw-sanramon" data-course="San Ramon Golf Club" data-initial="SR"><span class="price-tag loading">...</span></a>
       <a href="/course/las-positas-golf-course" class="fairway fw-laspositas" data-course="Las Positas Golf Course" data-initial="LP"><span class="price-tag loading">...</span></a>
+      <a href="/course/the-course-at-wente-vineyards" class="fairway fw-wente" data-course="The Course at Wente Vineyards" data-initial="W"><span class="price-tag loading">...</span></a>
       <a href="/course/callippe-preserve-golf-course" class="fairway fw-callippe" data-course="Callippe Preserve Golf Course" data-initial="CA"><span class="price-tag loading">...</span></a>
       <a href="/course/redwood-canyon-golf-course" class="fairway fw-redwood" data-course="Redwood Canyon Golf Course" data-initial="RC"><span class="price-tag loading">...</span></a>
 
@@ -1229,7 +1232,7 @@
     <div class="cartouche">
       <h1 class="map-title">Bay Area Golf</h1>
       <p class="map-subtitle">San Francisco & Vicinity</p>
-      <p class="map-year">40 Public Courses</p>
+      <p class="map-year">40+ Public Courses</p>
 
       <nav class="nav-buttons">
         <a href="/app.html" class="nav-btn primary">
@@ -1327,15 +1330,14 @@
     // Load next available tee time prices for each course
     async function loadPrices() {
       try {
-        const res = await fetch('/api/tee-times?next_available=true&limit=200');
+        // Fetch cheapest next available tee time per course
+        const res = await fetch('/api/tee-times/next-available');
         const teeTimes = await res.json();
 
-        // Group by course, get lowest price for each
+        // Build lookup by course name
         const coursePrices = {};
         teeTimes.forEach(tt => {
-          if (!coursePrices[tt.course_name] || tt.price < coursePrices[tt.course_name].price) {
-            coursePrices[tt.course_name] = { price: tt.price, time: tt.time };
-          }
+          coursePrices[tt.course_name] = { price: tt.price, time: tt.time };
         });
 
         // Update price tags
