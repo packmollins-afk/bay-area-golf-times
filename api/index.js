@@ -2056,7 +2056,7 @@ const getAgentTeeTimes = async () => {
       JOIN courses c ON t.course_id = c.id
       WHERE t.datetime >= ?
       ORDER BY t.datetime
-      LIMIT 2000
+      LIMIT 10000
     `,
     args: [pacificNow]
   });
