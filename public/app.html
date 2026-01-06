@@ -948,6 +948,7 @@
     .course-info .badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
     .badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; background: #e8f5e9; color: var(--primary); }
     .badge.holes { background: #e3f2fd; color: #1565c0; }
+    .badge.players { background: #f3e5f5; color: #7b1fa2; }
     .badge.rating { background: #fff8e1; color: #f57c00; display: flex; align-items: center; gap: 3px; }
 
     .price-block { text-align: right; }
@@ -1708,6 +1709,15 @@
             <option value="150">Under $150</option>
           </select>
         </div>
+        <div class="filter-group">
+          <label for="players">Players</label>
+          <select id="players">
+            <option value="">Any</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4</option>
+          </select>
+        </div>
         <button class="btn" onclick="searchTeeTimes()">Filter</button>
       </div>
     </div>
@@ -1975,8 +1985,10 @@
       if (isNextAvailableMode) {
         isNextAvailableMode = false;
         const btn = document.getElementById('next-available-btn');
-        btn.classList.remove('active');
-        btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Next Available Tee Times`;
+        if (btn) {
+          btn.classList.remove('active');
+          btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Next Available Tee Times`;
+        }
       }
 
       searchTeeTimes();
@@ -2066,13 +2078,17 @@
       isNextAvailableMode = !isNextAvailableMode;
       const btn = document.getElementById('next-available-btn');
       if (isNextAvailableMode) {
-        btn.classList.add('active');
-        btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Showing All Next Available`;
+        if (btn) {
+          btn.classList.add('active');
+          btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Showing All Next Available`;
+        }
         // Deselect all day buttons
         document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
       } else {
-        btn.classList.remove('active');
-        btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Next Available Tee Times`;
+        if (btn) {
+          btn.classList.remove('active');
+          btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Next Available Tee Times`;
+        }
         // Re-select current day
         document.querySelectorAll('.day-btn').forEach(b => {
           b.classList.toggle('active', b.dataset.date === selectedDate);
@@ -2247,6 +2263,8 @@
       if (minTime) params.set('min_time', minTime);
       const maxPrice = document.getElementById('max-price').value;
       if (maxPrice) params.set('max_price', maxPrice);
+      const players = document.getElementById('players').value;
+      if (players) params.set('players', players);
       params.set('sort_by', document.getElementById('sort-by').value);
       params.set('sort_order', document.getElementById('sort-order').value);
       params.set('limit', '200');
@@ -2389,6 +2407,7 @@
             <div class="location">${tt.city}, ${tt.region}</div>
             <div class="badges">
               <span class="badge holes">${tt.holes || 18}H</span>
+              ${tt.players ? `<span class="badge players">${tt.players} spots</span>` : ''}
               ${rating ? `<span class="badge rating">★ ${rating}</span>` : ''}
               ${tt.has_cart ? '<span class="badge">Cart</span>' : ''}
             </div>
