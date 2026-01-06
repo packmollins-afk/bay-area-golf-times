@@ -31,90 +31,55 @@ function getPacificDate(dayOffset = 0) {
 
 /**
  * Scrape tee times from CPS.Golf via Puppeteer
+ * CPS.Golf shows tee times in format: "12:56\nP\nM\n...Golf Course\n9 or 18 HOLES...\n$27.00"
  */
 async function scrapeCPSGolf(page, config, date) {
   try {
     await page.goto(config.url, { waitUntil: 'networkidle2', timeout: 45000 });
 
     // Wait for the app to load
-    await new Promise(r => setTimeout(r, 5000));
+    await new Promise(r => setTimeout(r, 4000));
 
-    // Wait for tee time elements
-    await page.waitForSelector('[class*="tee"], [class*="time"], [class*="slot"], .mat-card', { timeout: 20000 }).catch(() => {});
-
-    // Try to select the target date
-    const [year, month, day] = date.split('-');
-    try {
-      await page.evaluate((targetDay, targetMonth) => {
-        // Look for date picker or calendar
-        const dayButtons = document.querySelectorAll('button, [role="button"], .day, [class*="calendar"]');
-        dayButtons.forEach(btn => {
-          if (btn.textContent.trim() === targetDay) {
-            btn.click();
-          }
-        });
-      }, day, month);
-      await new Promise(r => setTimeout(r, 3000));
-    } catch (e) {
-      // Date selection might work differently
-    }
-
-    // Extract tee time data
+    // Extract tee time data by parsing the page text
     const teeTimes = await page.evaluate((dateStr) => {
       const results = [];
-      const text = document.body.innerText || '';
+      const pageText = document.body.innerText || '';
+      const lines = pageText.split('\n');
 
-      // Find all time patterns in the page
-      const timePattern = /(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm))/gi;
-      const times = text.match(timePattern) || [];
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
 
-      // Find all price patterns
-      const pricePattern = /\$(\d+(?:\.\d{2})?)/g;
-      const prices = [];
-      let match;
-      while ((match = pricePattern.exec(text)) !== null) {
-        const val = parseFloat(match[1]);
-        if (val >= 20 && val <= 400) {
-          prices.push(Math.round(val));
+        // Match time like "12:56" or "1:04" (without AM/PM - CPS uses P\nM format)
+        const timeMatch = line.match(/^(\d{1,2}):(\d{2})$/);
+        if (timeMatch) {
+          // Next line should be AM/PM indicator (P or A for PM/AM)
+          const ampm = lines[i + 1]?.trim();
+          if (ampm === 'P' || ampm === 'A') {
+            const period = ampm === 'P' ? 'PM' : 'AM';
+            const time = timeMatch[0] + period;
+
+            // Look for price in nearby lines (usually within next 5-6 lines)
+            let price = null;
+            for (let j = i; j < Math.min(i + 8, lines.length); j++) {
+              const priceMatch = lines[j].match(/\$(\d+(?:\.\d{2})?)/);
+              if (priceMatch) {
+                price = parseInt(priceMatch[1]);
+                break;
+              }
+            }
+
+            if (price) {
+              results.push({
+                time: time,
+                price: price,
+                players: 4,
+                holes: 18,
+                has_cart: 0,
+                date: dateStr
+              });
+            }
+          }
         }
-      }
-
-      // Try to find structured tee time elements
-      document.querySelectorAll('[class*="tee-time"], [class*="slot"], .mat-card, [class*="reservation"]').forEach(el => {
-        const elText = el.innerText || '';
-        const timeMatch = elText.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
-        if (!timeMatch) return;
-
-        const priceMatch = elText.match(/\$(\d+(?:\.\d{2})?)/);
-        let price = priceMatch ? parseFloat(priceMatch[1]) : null;
-        if (price) price = Math.round(price);
-
-        const spotsMatch = elText.match(/(\d+)\s*(?:spot|player|available)/i);
-        const players = spotsMatch ? parseInt(spotsMatch[1]) : 4;
-
-        results.push({
-          time: timeMatch[1].toUpperCase().replace(/\s+/g, ''),
-          price,
-          players,
-          holes: 18,
-          has_cart: elText.toLowerCase().includes('cart') ? 1 : 0,
-          date: dateStr
-        });
-      });
-
-      // Fallback: create tee times from found patterns
-      if (results.length === 0 && times.length > 0) {
-        const avgPrice = prices.length > 0 ? prices[Math.floor(prices.length / 2)] : null;
-        times.slice(0, 20).forEach(time => {
-          results.push({
-            time: time.toUpperCase().replace(/\s+/g, ''),
-            price: avgPrice,
-            players: 4,
-            holes: 18,
-            has_cart: 0,
-            date: dateStr
-          });
-        });
       }
 
       return results;
