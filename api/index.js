@@ -457,7 +457,9 @@ const COURSE_BASE_PRICES = {
   'StoneTree Golf Club': 89, 'Mill Valley Golf Course': 32, 'TPC Harding Park - Fleming 9': 42,
   'Crystal Springs Golf Course': 85, 'Half Moon Bay - Old Course': 175, 'Half Moon Bay - Ocean Course': 195,
   'The Links at Bodega Harbour': 85, 'Northwood Golf Club': 55, 'Pasatiempo Golf Club': 295,
-  'Diablo Creek Golf Course': 52
+  'Diablo Creek Golf Course': 52, 'The Bridges Golf Club': 95, 'San Ramon Golf Club': 65,
+  'Las Positas Golf Course': 58, 'Callippe Preserve Golf Course': 72, 'McInnis Park Golf Center': 52,
+  'Redwood Canyon Golf Course': 58
 };
 
 // Generate demo tee times on-the-fly for a course
