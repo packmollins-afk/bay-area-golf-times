@@ -518,22 +518,22 @@ const generateDemoTeeTimesForCourse = (course, daysAhead = 7) => {
 // Ensure tee times exist for the next 7 days (regenerates if stale)
 const ensureTeeTimesExist = async () => {
   const pacificNow = getPacificNow();
-  const futureDate = getPacificDate(7);
+  const day7 = getPacificDate(6); // Check if we have times for day 7
 
-  // Check if we have tee times for the next 7 days
-  const countResult = await db.execute({
-    sql: `SELECT COUNT(*) as count FROM tee_times WHERE datetime >= ? AND date <= ?`,
-    args: [pacificNow, futureDate]
+  // Check if we have tee times for day 7 (ensures full 7-day coverage)
+  const day7Result = await db.execute({
+    sql: `SELECT COUNT(*) as count FROM tee_times WHERE date = ?`,
+    args: [day7]
   });
 
-  const existingCount = countResult.rows[0]?.count || 0;
+  const day7Count = day7Result.rows[0]?.count || 0;
 
-  // If we have enough tee times (at least 500), don't regenerate
-  if (existingCount >= 500) {
+  // If we have tee times for day 7, we're good
+  if (day7Count >= 50) {
     return;
   }
 
-  console.log(`Regenerating tee times (found ${existingCount}, need at least 500)...`);
+  console.log(`Regenerating tee times (day 7 has ${day7Count} times, need at least 50)...`);
 
   // Get all courses
   const coursesResult = await db.execute('SELECT * FROM courses');
