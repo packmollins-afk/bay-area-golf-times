@@ -716,6 +716,45 @@
     }
     .btn:hover { background: var(--primary-light); }
 
+    /* Booking action buttons */
+    .booking-actions { padding: 20px 0; }
+    .booking-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      font-size: 1rem;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s;
+      flex: 1;
+      justify-content: center;
+      min-width: 140px;
+      background: linear-gradient(135deg, #2d5016, #3d6b1e);
+      color: #fff;
+      border: 2px solid #2d5016;
+    }
+    .btn-action:hover {
+      background: linear-gradient(135deg, #3d6b1e, #4a7d24);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+    }
+    .btn-secondary {
+      background: var(--cream);
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: #fff;
+      border-color: var(--primary);
+    }
+
     .results-header {
       display: flex;
       justify-content: space-between;
@@ -900,8 +939,13 @@
       text-align: right;
     }
 
-    .chip-book {
-      padding: 8px 16px;
+    .chip-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    .chip-book, .chip-call {
+      padding: 8px 14px;
       background: var(--primary);
       color: #fff;
       text-decoration: none;
@@ -913,13 +957,8 @@
       transition: all 0.2s ease;
     }
 
-    .chip-book:hover {
+    .chip-book:hover, .chip-call:hover {
       background: var(--primary-dark);
-    }
-
-    .chip-book span {
-      position: relative;
-      z-index: 1;
     }
 
     @media (max-width: 768px) {
@@ -969,8 +1008,13 @@
     .price-block .original-price { font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through; }
     .price-block .deal-tag { font-size: 0.75rem; color: var(--deal); font-weight: 600; }
 
-    .book-btn {
-      padding: 12px 24px;
+    .card-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .book-btn, .call-btn {
+      padding: 12px 20px;
       background: var(--primary);
       color: white;
       text-decoration: none;
@@ -979,7 +1023,7 @@
       transition: background 0.2s;
       white-space: nowrap;
     }
-    .book-btn:hover { background: var(--primary-light); }
+    .book-btn:hover, .call-btn:hover { background: var(--primary-light); }
 
     .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); }
     .loading-spinner {
@@ -2393,17 +2437,19 @@
     }
 
     function renderCourseChip(tt) {
-      const price = tt.price ? `$${Math.round(tt.price)}` : 'Call';
+      const price = tt.price ? `$${Math.round(tt.price)}` : '--';
       const course = coursesData.find(c => c.id === tt.course_id) || {};
-      const courseUrl = `/course/${course.slug || tt.course_id}`;
-
-      // TODO: Replace with direct booking links once referral partnerships are set up
+      const bookingUrl = course.booking_url || `/course/${course.slug || tt.course_id}`;
       const phoneNumber = course.phone_number ? course.phone_number.replace(/[^\d+]/g, '') : '';
+
       return `
         <div class="course-chip">
-          <a href="${courseUrl}" class="course-chip-name">${tt.course_name}</a>
+          <a href="/course/${course.slug || tt.course_id}" class="course-chip-name">${tt.course_name}</a>
           <span class="course-chip-price">${price}</span>
-          ${phoneNumber ? `<a href="tel:${phoneNumber}" class="chip-book chip-call" onclick="trackCallClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Book</a>` : `<a href="${courseUrl}" class="chip-book">View</a>`}
+          <div class="chip-buttons">
+            <a href="${bookingUrl}" target="_blank" class="chip-book" onclick="trackBookClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Book</a>
+            ${phoneNumber ? `<a href="tel:${phoneNumber}" class="chip-call" onclick="trackCallClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Call</a>` : ''}
+          </div>
         </div>
       `;
     }
@@ -2411,9 +2457,11 @@
     function renderTeeTime(tt) {
       const time = formatTime(tt.time);
       const date = formatDate(tt.date);
-      const price = tt.price ? `$${Math.round(tt.price)}` : 'Call';
+      const price = tt.price ? `$${Math.round(tt.price)}` : '--';
       const course = coursesData.find(c => c.id === tt.course_id) || {};
       const rating = course.avg_rating ? course.avg_rating.toFixed(1) : null;
+      const bookingUrl = course.booking_url || `/course/${course.slug || tt.course_id}`;
+      const phoneNumber = course.phone_number ? course.phone_number.replace(/[^\d+]/g, '') : '';
 
       return `
         <div class="tee-time-card">
@@ -2434,9 +2482,10 @@
           <div class="price-block">
             <div class="price">${price}</div>
           </div>
-          ${course.phone_number
-            ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="book-btn call-btn" onclick="trackCallClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Book</a>`
-            : `<a href="/course/${course.slug || tt.course_id}" class="book-btn">View</a>`}
+          <div class="card-buttons">
+            <a href="${bookingUrl}" target="_blank" class="book-btn" onclick="trackBookClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Book</a>
+            ${phoneNumber ? `<a href="tel:${phoneNumber}" class="call-btn" onclick="trackCallClick(${tt.course_id}, '${tt.course_name.replace(/'/g, "\\'")}')">Call</a>` : ''}
+          </div>
         </div>
       `;
     }
@@ -2531,12 +2580,41 @@
         return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
       };
 
-      // Build tee times section
-      let teeTimesHtml = '<div class="modal-section"><h3>Available Tee Times (Next 2 Days)</h3>';
+      // Build booking action buttons (always show these prominently)
+      const phoneNumber = course.external?.phone || course.phone_number;
+      const bookingUrl = course.booking_url;
 
-      if (Object.keys(teeTimesByDate).length === 0) {
-        teeTimesHtml += '<p class="no-times">No tee times available in the next 2 days</p>';
-      } else {
+      let bookingActionsHtml = `
+        <div class="modal-section booking-actions">
+          <div class="booking-buttons">
+            ${bookingUrl ? `
+              <a href="${bookingUrl}" target="_blank" rel="noopener" class="btn btn-action">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Book Online
+              </a>
+            ` : ''}
+            ${phoneNumber ? `
+              <a href="tel:${phoneNumber.replace(/[^0-9]/g, '')}" class="btn btn-action">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                Call to Book
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      // Build tee times section
+      let teeTimesHtml = '';
+
+      if (Object.keys(teeTimesByDate).length > 0) {
+        teeTimesHtml = '<div class="modal-section"><h3>Available Tee Times</h3>';
         Object.keys(teeTimesByDate).sort().forEach(dateStr => {
           const dayTeeTimes = teeTimesByDate[dateStr];
           teeTimesHtml += `
@@ -2544,7 +2622,7 @@
               <h4>${formatDateLabel(dateStr)}</h4>
               <div class="booking-times-grid">
                 ${dayTeeTimes.map(tt => `
-                  <a href="${tt.booking_url}" target="_blank" rel="noopener" class="booking-time-slot">
+                  <a href="${tt.booking_url || bookingUrl}" target="_blank" rel="noopener" class="booking-time-slot">
                     <span class="time">${formatTime(tt.time)}</span>
                     <span class="price">$${tt.price}</span>
                     <span class="details">${tt.holes === 9 ? '9H • ' : ''}${tt.has_cart ? 'Cart included' : ''}</span>
@@ -2554,17 +2632,17 @@
             </div>
           `;
         });
+        teeTimesHtml += '</div>';
       }
-      teeTimesHtml += '</div>';
 
       // Link to full course page
       const coursePageLink = `
         <div class="modal-section" style="text-align: center; padding-top: 0;">
-          <a href="/course/${course.slug || course.id}" class="btn" style="display: inline-block;">Map</a>
+          <a href="/course/${course.slug || course.id}" class="btn btn-secondary" style="display: inline-block;">View on Map</a>
         </div>
       `;
 
-      document.getElementById('modal-body').innerHTML = externalInfoHtml + teeTimesHtml + coursePageLink;
+      document.getElementById('modal-body').innerHTML = bookingActionsHtml + externalInfoHtml + teeTimesHtml + coursePageLink;
     }
 
     function renderCourseDetail(course) {
@@ -3070,6 +3148,23 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           event_type: 'call_initiated',
+          event_data: { course_name: courseName },
+          page_url: window.location.pathname,
+          course_id: courseId
+        })
+      }).catch(() => {});
+    }
+
+    function trackBookClick(courseId, courseName) {
+      if (window.BayAreaGolfAnalytics) {
+        window.BayAreaGolfAnalytics.trackBookingClick(courseId, courseName, null);
+      }
+      // Track as book_clicked event
+      fetch('/api/analytics/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_type: 'book_clicked',
           event_data: { course_name: courseName },
           page_url: window.location.pathname,
           course_id: courseId

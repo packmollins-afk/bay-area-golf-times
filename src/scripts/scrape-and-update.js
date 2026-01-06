@@ -14,36 +14,50 @@ const db = createClient({
 
 // GolfNow facility IDs for Bay Area courses
 // Format: course_slug -> golfnow_facility_id
+// IDs verified from golfnow.com/tee-times/facility/{id}/search URLs
 const GOLFNOW_IDS = {
-  'tpc-harding-park': '8685',
-  'lincoln-park-golf-course': '8632',
-  'sharp-park-golf-course': '8663',
-  'presidio-golf-course': '8655',
-  'golden-gate-park-golf-course': '8616',
-  'corica-park-south-course': '8589',
-  'corica-park-north-course': '8589', // Same facility
-  'metropolitan-golf-links': '8638',
-  'tilden-park-golf-course': '8668',
-  'boundary-oak-golf-course': '8580',
-  'peacock-gap-golf-club': '8651',
-  'indian-valley-golf-club': '8625',
-  'stonetree-golf-club': '8665',
-  'mill-valley-golf-course': '8640',
-  'crystal-springs-golf-course': '8594',
-  'half-moon-bay-old-course': '8619',
-  'half-moon-bay-ocean-course': '8619',
-  'diablo-creek-golf-course': '8596',
-  'san-ramon-golf-club': '8661',
-  'las-positas-golf-course': '8631',
-  'callippe-preserve-golf-course': '8583',
-  'mcinnis-park-golf-center': '8637',
-  'redwood-canyon-golf-course': '8657',
-  'palo-alto-golf-course': '8649',
-  'deep-cliff-golf-course': '8595',
-  'cinnabar-hills-golf-club': '8586',
-  'santa-teresa-golf-club': '8662',
-  'san-jose-municipal-golf-course': '8660',
-  'poppy-ridge-golf-course': '8653'
+  // San Francisco
+  'tpc-harding-park': '8276',
+  'lincoln-park-golf-course': '9723',
+  'sharp-park-golf-course': '9722',
+  'presidio-golf-course': '148',
+  'golden-gate-park-golf-course': '9721',  // SF muni
+
+  // East Bay - Oakland/Berkeley
+  'metropolitan-golf-links': '161',
+  'tilden-park-golf-course': '306',
+  'redwood-canyon-golf-course': '3796',
+
+  // East Bay - Tri-Valley/Concord
+  'boundary-oak-golf-course': '1845',
+  'diablo-creek-golf-course': '1448',
+  'san-ramon-golf-club': '241',
+  'las-positas-golf-course': '1457',
+  'callippe-preserve-golf-course': '1432',
+  'poppy-ridge-golf-course': '106',
+
+  // East Bay - Alameda
+  'corica-park-south-course': '9717',
+  'corica-park-north-course': '9717', // Same facility
+
+  // North Bay - Marin
+  'peacock-gap-golf-club': '218',
+  'indian-valley-golf-club': '1431',
+  'stonetree-golf-club': '290',
+  'mill-valley-golf-course': '166',
+  'mcinnis-park-golf-center': '1459',
+
+  // Peninsula
+  'crystal-springs-golf-course': '1398',
+  'half-moon-bay-old-course': '175',
+  'half-moon-bay-ocean-course': '14024',
+  'palo-alto-golf-course': '9719',
+
+  // South Bay
+  'deep-cliff-golf-course': '929',
+  'cinnabar-hills-golf-club': '3821',
+  'santa-teresa-golf-club': '9720',
+  'san-jose-municipal-golf-course': '9718'
 };
 
 // Get Pacific date string for a given offset

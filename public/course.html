@@ -352,14 +352,6 @@
       box-shadow: var(--shadow-sm);
     }
 
-    /* Call button - shows "Call Club" on mobile, number on desktop */
-    .btn-call .call-number { display: none; }
-    .btn-call .call-text { display: inline; }
-    @media (min-width: 768px) {
-      .btn-call .call-number { display: inline; }
-      .btn-call .call-text { display: none; }
-    }
-
     /* Contact info */
     .contact-info { display: flex; flex-wrap: wrap; gap: 16px; }
     .contact-item {
@@ -1076,16 +1068,21 @@
         </div>
       `;
 
-      // Action buttons
+      // Action buttons - Book Online and Call to Book side by side
       html += `
-        <div class="section section-animate" style="text-align: center;">
-          <!-- TODO: Add direct booking links once referral partnerships are set up -->
+        <div class="section section-animate">
           <div class="action-buttons" style="justify-content: center;">
-            ${course.phone_number ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="btn btn-primary btn-call" onclick="trackCallClick()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-              <span class="call-text">Book</span>
-              <span class="call-number">${course.phone_number}</span>
+            ${course.booking_url ? `<a href="${course.booking_url}" target="_blank" class="btn btn-primary" onclick="trackBookClick()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              Book Online
             </a>` : ''}
+            ${course.phone_number ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="btn btn-primary" onclick="trackCallClick()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              Call to Book
+            </a>` : ''}
+          </div>
+          ${course.website_url || course.bluegolf_url ? `
+          <div class="action-buttons secondary-actions" style="justify-content: center; margin-top: 12px;">
             ${course.website_url ? `<a href="${course.website_url}" target="_blank" class="btn btn-secondary">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
               Course Website
@@ -1095,6 +1092,7 @@
               Hole by Hole Info
             </a>` : ''}
           </div>
+          ` : ''}
         </div>
       `;
 
@@ -1364,6 +1362,22 @@
           body: JSON.stringify({
             event_type: 'call_initiated',
             event_data: { course_name: currentCourse.name },
+            page_url: window.location.pathname,
+            course_id: currentCourse.id
+          })
+        }).catch(() => {});
+      }
+    }
+
+    // Track book button clicks
+    function trackBookClick() {
+      if (currentCourse) {
+        fetch('/api/analytics/event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_type: 'book_clicked',
+            event_data: { course_name: currentCourse.name, booking_url: currentCourse.booking_url },
             page_url: window.location.pathname,
             course_id: currentCourse.id
           })
