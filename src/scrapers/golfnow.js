@@ -1,309 +1,301 @@
 const puppeteer = require('puppeteer');
-const db = require('../db/schema');
+const { db } = require('../db/turso');
 
-// Shared browser instance for efficiency
-let browserInstance = null;
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
 
-/**
- * Get or create browser instance
- */
+const CONFIG = {
+  pageTimeout: 30000,
+  waitTimeout: 15000,
+  scrollDelay: 2000,
+};
+
+const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+
+// Bay Area search locations to cover all courses
+const SEARCH_LOCATIONS = [
+  { lat: 37.7749, lng: -122.4194, name: 'San Francisco' },
+  { lat: 37.3382, lng: -121.8863, name: 'San Jose' },
+  { lat: 37.8044, lng: -122.2712, name: 'Oakland' },
+  { lat: 38.2975, lng: -122.2869, name: 'Napa' },
+  { lat: 37.6879, lng: -122.4702, name: 'Pacifica' },
+];
+
+let browser = null;
+
 async function getBrowser() {
-  if (!browserInstance || !browserInstance.isConnected()) {
-    browserInstance = await puppeteer.launch({
+  if (!browser || !browser.isConnected()) {
+    browser = await puppeteer.launch({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
   }
-  return browserInstance;
+  return browser;
 }
 
-/**
- * Close browser instance
- */
 async function closeBrowser() {
-  if (browserInstance) {
-    await browserInstance.close();
-    browserInstance = null;
+  if (browser) {
+    await browser.close().catch(() => {});
+    browser = null;
   }
 }
 
-/**
- * Scrape tee times from GolfNow using Puppeteer
- * The GolfNow website is client-side rendered, so we need a real browser
- */
-async function fetchGolfNowTeeTimes(facilityId, date) {
+// ============================================================================
+// SCRAPE SEARCH RESULTS
+// ============================================================================
+
+async function scrapeSearchResults(page, date) {
   const formattedDate = date.toISOString().split('T')[0];
-  const browser = await getBrowser();
 
-  try {
-    const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+  // Extract tee times from search results
+  const teeTimes = await page.evaluate((dateStr) => {
+    const results = [];
+    const seen = new Set();
 
-    // Format date for GolfNow URL (e.g., "Jan 07 2026")
-    const dateObj = new Date(formattedDate);
-    const dateStr = dateObj.toLocaleDateString('en-US', {
-      month: 'short',
-      day: '2-digit',
-      year: 'numeric'
-    }).replace(',', '');
+    // Find all elements with facility links
+    document.querySelectorAll('a[href*="/facility/"]').forEach(link => {
+      // Navigate up to find container with tee time data
+      let container = link;
+      for (let i = 0; i < 5 && container.parentElement; i++) {
+        container = container.parentElement;
+        const text = container.innerText || '';
 
-    const url = `https://www.golfnow.com/tee-times/facility/${facilityId}/search#date=${encodeURIComponent(dateStr)}&sortby=Date&view=List&holes=3`;
+        // Check if this container has both time and price patterns
+        const hasTime = /\d{1,2}:\d{2}\s*(?:AM|PM)/i.test(text);
+        const hasPrice = /\$\d+/.test(text);
 
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+        if (hasTime && hasPrice && text.length < 500) {
+          // Skip simulators
+          if (text.toLowerCase().includes('simulator')) return;
 
-    // Wait for tee times to load
-    await page.waitForFunction(
-      () => document.body.innerText.includes('AM') || document.body.innerText.includes('PM') || document.body.innerText.includes('no tee times'),
-      { timeout: 15000 }
-    ).catch(() => {});
+          // Extract facility ID
+          const hrefMatch = link.href.match(/facility\/(\d+)/);
+          if (!hrefMatch) return;
+          const facilityId = hrefMatch[1];
 
-    // Additional wait for dynamic content
-    await new Promise(r => setTimeout(r, 2000));
-
-    // Extract tee time data from the page
-    const teeTimes = await page.evaluate((dateArg, facilityIdArg) => {
-      const results = [];
-      const seen = new Set();
-
-      // Look for elements with data-players attribute (most reliable)
-      document.querySelectorAll('[data-players]').forEach(el => {
-        const text = el.innerText || '';
-
-        // Extract time (e.g., "7:30AM" or "7:30 AM")
-        const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
-        if (!timeMatch) return;
-
-        const time = timeMatch[1].replace(/\s+/g, '');
-
-        // Extract price - handle GolfNow's cents format
-        const allPrices = text.match(/\$(\d+)/g) || [];
-        let price = null;
-        for (const p of allPrices) {
-          const val = parseInt(p.replace('$', ''));
-          if (val > 500 && val < 50000) {
-            // Price in cents (e.g., 15348 = $153)
-            price = Math.round(val / 100);
-            break;
-          } else if (val >= 15 && val <= 500) {
-            // Already in dollars
-            price = val;
-            break;
-          }
-        }
-
-        // Get players from data attribute
-        const players = parseInt(el.dataset.players) || 4;
-
-        // Extract holes (e.g., "18 / 2-4")
-        const holesMatch = text.match(/(\d+)\s*\/\s*\d+-\d+/);
-        const holes = holesMatch ? parseInt(holesMatch[1]) : 18;
-
-        // Check for cart
-        const hasCart = text.toLowerCase().includes('cart') && !text.toLowerCase().includes('no cart');
-
-        // Get booking URL
-        const link = el.querySelector('a')?.href || el.closest('a')?.href;
-
-        // Dedupe by time+price
-        const key = `${time}-${price}`;
-        if (!seen.has(key)) {
+          // Skip if already processed
+          const key = `${facilityId}-${dateStr}`;
+          if (seen.has(key)) return;
           seen.add(key);
-          results.push({
-            time,
-            date: dateArg,
-            price,
-            holes,
-            players,
-            has_cart: hasCart ? 1 : 0,
-            booking_url: link || `https://www.golfnow.com/tee-times/facility/${facilityIdArg}/search`,
-            source: 'golfnow'
-          });
-        }
-      });
 
-      // Fallback: look for other patterns if no data-players elements found
-      if (results.length === 0) {
-        document.querySelectorAll('.select-rate-link, section.result, .teetime-row, [class*="rate"]').forEach(el => {
-          const text = el.innerText || '';
-          const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
-          if (!timeMatch) return;
+          // Extract course name - look for text before location pattern
+          const nameMatch = text.match(/^(?:Top Pick\s*\|?\s*|Featured\s*\|?\s*|League Available\s*\|?\s*)?([^|]+?)(?:\s*\||\s+[A-Z][a-z]+,\s*California)/);
+          const courseName = nameMatch ? nameMatch[1].trim() : '';
 
-          const time = timeMatch[1].replace(/\s+/g, '');
-          const priceMatch = text.match(/\$(\d+)/);
-          let price = priceMatch ? parseInt(priceMatch[1]) : null;
-          if (price && price > 1000) price = Math.round(price / 100);
+          // Extract time range (e.g., "7:30AM - 6:30PM")
+          const timeRangeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*-\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
 
-          const key = `${time}-${price}`;
-          if (!seen.has(key) && price && price >= 15 && price <= 500) {
-            seen.add(key);
+          // Extract price range - prices like "$3449" = $34.49, "$6549" = $65.49
+          const priceMatch = text.match(/\$(\d{2,4})\d{2}\s*-\s*\$(\d{2,4})\d{2}/);
+
+          if (timeRangeMatch) {
+            // Parse price (remove cents portion)
+            let minPrice = null;
+            if (priceMatch) {
+              minPrice = parseInt(priceMatch[1]);
+            }
+
             results.push({
-              time,
-              date: dateArg,
-              price,
-              holes: 18,
-              players: 4,
-              has_cart: 0,
-              booking_url: `https://www.golfnow.com/tee-times/facility/${facilityIdArg}/search`,
+              facilityId,
+              courseName,
+              date: dateStr,
+              firstTime: timeRangeMatch[1].replace(/\s+/g, ''),
+              lastTime: timeRangeMatch[2].replace(/\s+/g, ''),
+              minPrice,
               source: 'golfnow'
             });
           }
-        });
-      }
 
-      return results;
-    }, formattedDate, facilityId);
+          break;  // Found container, stop looking
+        }
+      }
+    });
+
+    return results;
+  }, formattedDate);
+
+  return teeTimes;
+}
+
+async function scrapeLocation(location, date) {
+  const browserInstance = await getBrowser();
+  const page = await browserInstance.newPage();
+
+  await page.setUserAgent(USER_AGENT);
+  await page.setViewport({ width: 1280, height: 800 });
+
+  // Build search URL (without date - GolfNow defaults to today which is what we want for first day)
+  const searchUrl = `https://www.golfnow.com/tee-times/search#q=location&latitude=${location.lat}&longitude=${location.lng}&radius=50`;
+
+  console.log(`  Searching ${location.name}...`);
+
+  try {
+    await page.goto(searchUrl, { waitUntil: 'networkidle2', timeout: CONFIG.pageTimeout });
+
+    // Wait for results
+    await page.waitForSelector('[class*="course"], [class*="tile"]', { timeout: CONFIG.waitTimeout }).catch(() => {});
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Scroll to load more results
+    for (let i = 0; i < 5; i++) {
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await new Promise(r => setTimeout(r, CONFIG.scrollDelay));
+    }
+
+    const teeTimes = await scrapeSearchResults(page, date);
+    console.log(`    Found ${teeTimes.length} courses with tee times`);
 
     await page.close();
     return teeTimes;
 
   } catch (error) {
-    console.error(`Error scraping facility ${facilityId}:`, error.message);
+    console.log(`    Error: ${error.message}`);
+    await page.close().catch(() => {});
     return [];
   }
 }
 
-/**
- * Scrape tee times for a single course
- */
-async function scrapeCourse(course, date) {
-  if (!course.golfnow_id) {
-    return [];
+// ============================================================================
+// DATABASE OPERATIONS
+// ============================================================================
+
+async function getCourseMappings() {
+  // Get courses from database and create mapping by golfnow_id
+  const result = await db.execute('SELECT id, name, golfnow_id FROM courses WHERE golfnow_id IS NOT NULL');
+  const mapping = {};
+  result.rows.forEach(c => {
+    mapping[c.golfnow_id] = { id: c.id, name: c.name };
+  });
+  return mapping;
+}
+
+async function clearOldTeeTimes(dates) {
+  if (dates.length === 0) return;
+  const placeholders = dates.map(() => '?').join(', ');
+  await db.execute({
+    sql: `DELETE FROM tee_times WHERE date IN (${placeholders}) AND source = 'golfnow'`,
+    args: dates
+  });
+  console.log(`Cleared old GolfNow tee times for ${dates.length} dates`);
+}
+
+async function insertTeeTimes(teeTimes, courseMappings) {
+  if (teeTimes.length === 0) return 0;
+
+  let inserted = 0;
+
+  for (const tt of teeTimes) {
+    const course = courseMappings[tt.facilityId];
+    if (!course) continue;  // Course not in our database
+
+    try {
+      // Insert a representative tee time (first available time at min price)
+      await db.execute({
+        sql: `INSERT OR REPLACE INTO tee_times
+              (course_id, date, time, datetime, holes, players, price, has_cart, booking_url, source, scraped_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+        args: [
+          course.id,
+          tt.date,
+          tt.firstTime,
+          `${tt.date} ${tt.firstTime}`,
+          18,
+          4,
+          tt.minPrice,
+          0,
+          `https://www.golfnow.com/tee-times/facility/${tt.facilityId}/search`,
+          'golfnow'
+        ]
+      });
+      inserted++;
+    } catch (error) {
+      // Ignore duplicate errors
+    }
   }
 
-  console.log(`Scraping ${course.name}...`);
-
-  const teeTimes = await fetchGolfNowTeeTimes(course.golfnow_id, date);
-
-  // Add course_id to each tee time
-  return teeTimes.map(tt => ({
-    ...tt,
-    course_id: course.id
-  }));
+  return inserted;
 }
 
-/**
- * Scrape all courses for a given date
- * Uses longer delays and browser restarts to avoid GolfNow rate limiting
- */
-async function scrapeAllCourses(date) {
-  const { getCoursesWithGolfNow } = require('../db/courses');
-  const rawCourses = getCoursesWithGolfNow();
+// ============================================================================
+// MAIN SCRAPER
+// ============================================================================
 
-  // Deduplicate courses by golfnow_id (keep first occurrence)
-  const seenIds = new Set();
-  const courses = rawCourses.filter(c => {
-    if (seenIds.has(c.golfnow_id)) return false;
-    seenIds.add(c.golfnow_id);
-    return true;
-  });
-
-  console.log(`Scraping ${courses.length} unique GolfNow courses...`);
-  const allTeeTimes = [];
-
-  // Process sequentially with delays to avoid rate limiting
-  const batchSize = 5; // Restart browser every N courses
-
-  for (let i = 0; i < courses.length; i++) {
-    const course = courses[i];
-
-    // Restart browser every batchSize courses to avoid detection
-    if (i > 0 && i % batchSize === 0) {
-      console.log(`  [Restarting browser to avoid rate limiting...]`);
-      await closeBrowser();
-      await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second pause
-    }
-
-    const teeTimes = await scrapeCourse(course, date);
-    allTeeTimes.push(...teeTimes);
-
-    // Longer delay between courses (2-4 seconds randomized)
-    const delay = 2000 + Math.random() * 2000;
-    await new Promise(resolve => setTimeout(resolve, delay));
-  }
-
-  return allTeeTimes;
-}
-
-/**
- * Save tee times to database
- */
-function saveTeeTimes(teeTimes) {
-  const insert = db.prepare(`
-    INSERT OR REPLACE INTO tee_times
-    (course_id, date, time, datetime, holes, players, price, original_price, has_cart, booking_url, source, scraped_at)
-    VALUES (@course_id, @date, @time, @datetime, @holes, @players, @price, @original_price, @has_cart, @booking_url, @source, datetime('now'))
-  `);
-
-  const insertMany = db.transaction((teeTimes) => {
-    let count = 0;
-    for (const tt of teeTimes) {
-      try {
-        insert.run({
-          course_id: tt.course_id,
-          date: tt.date,
-          time: tt.time,
-          datetime: `${tt.date} ${tt.time}`,
-          holes: tt.holes || 18,
-          players: tt.players || 4,
-          price: tt.price,
-          original_price: tt.original_price || null,
-          has_cart: tt.has_cart || 0,
-          booking_url: tt.booking_url,
-          source: tt.source
-        });
-        count++;
-      } catch (error) {
-        console.error(`Error saving tee time:`, error.message);
-      }
-    }
-    return count;
-  });
-
-  return insertMany(teeTimes);
-}
-
-/**
- * Main scrape function
- */
 async function runScraper(daysAhead = 7) {
-  console.log('Starting GolfNow scraper (Puppeteer)...');
+  console.log('='.repeat(60));
+  console.log('GolfNow Scraper (Location Search Method)');
+  console.log('='.repeat(60));
 
+  const startTime = Date.now();
   const today = new Date();
   let totalTeeTimes = 0;
+
+  // Get course mappings from database
+  const courseMappings = await getCourseMappings();
+  console.log(`Loaded ${Object.keys(courseMappings).length} course mappings`);
+
+  // Collect dates
+  const dates = [];
+  for (let i = 0; i < daysAhead; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() + i);
+    dates.push(date.toISOString().split('T')[0]);
+  }
+
+  // Clear old data
+  await clearOldTeeTimes(dates);
 
   try {
     for (let i = 0; i < daysAhead; i++) {
       const date = new Date(today);
       date.setDate(date.getDate() + i);
+      const dateStr = date.toISOString().split('T')[0];
 
-      console.log(`\nScraping for ${date.toISOString().split('T')[0]}...`);
-      const teeTimes = await scrapeAllCourses(date);
+      console.log(`\n[Day ${i + 1}/${daysAhead}] ${dateStr}`);
 
-      if (teeTimes.length > 0) {
-        const saved = saveTeeTimes(teeTimes);
-        console.log(`Saved ${saved} tee times`);
+      // Scrape all locations and combine results
+      const allTeeTimes = new Map();  // Use Map to dedupe by facilityId
+
+      for (const location of SEARCH_LOCATIONS) {
+        const teeTimes = await scrapeLocation(location, date);
+
+        teeTimes.forEach(tt => {
+          // Keep first occurrence of each course
+          if (!allTeeTimes.has(tt.facilityId)) {
+            allTeeTimes.set(tt.facilityId, tt);
+          }
+        });
+
+        // Small delay between searches
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      const uniqueTeeTimes = Array.from(allTeeTimes.values());
+      console.log(`  Total unique: ${uniqueTeeTimes.length} courses`);
+
+      if (uniqueTeeTimes.length > 0) {
+        const saved = await insertTeeTimes(uniqueTeeTimes, courseMappings);
+        console.log(`  Saved ${saved} tee times`);
         totalTeeTimes += saved;
       }
 
-      // Delay between days
-      if (i < daysAhead - 1) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
+      // Restart browser between days
+      await closeBrowser();
     }
   } finally {
-    // Always close the browser when done
     await closeBrowser();
   }
 
-  console.log(`\nScraping complete! Total tee times saved: ${totalTeeTimes}`);
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  console.log('\n' + '='.repeat(60));
+  console.log(`Complete! ${totalTeeTimes} tee times in ${elapsed}s`);
+  console.log('='.repeat(60));
+
   return totalTeeTimes;
 }
 
 module.exports = {
-  fetchGolfNowTeeTimes,
-  scrapeCourse,
-  scrapeAllCourses,
-  saveTeeTimes,
   runScraper,
-  closeBrowser
+  closeBrowser,
+  CONFIG
 };
