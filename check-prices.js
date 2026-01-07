@@ -1,38 +1,33 @@
-const puppeteer = require('puppeteer');
+require('dotenv').config({ path: '.env.local' });
+const { createClient } = require('@libsql/client');
+const db = createClient({ url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN });
 
-async function scrape() {
-  const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
-  const page = await browser.newPage();
-  await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
+async function check() {
+  const result = await db.execute(`
+    SELECT c.name,
+           MIN(t.price) as min_price,
+           COUNT(t.id) as count,
+           MIN(t.date) as earliest_date
+    FROM courses c
+    LEFT JOIN tee_times t ON c.id = t.course_id
+      AND t.date >= date('now')
+      AND t.price IS NOT NULL
+      AND t.price > 0
+    GROUP BY c.id
+    ORDER BY count DESC
+  `);
 
-  await page.goto('https://www.golfnow.com/tee-times/facility/148-presidio-golf-course/search',
-    { waitUntil: 'networkidle2', timeout: 30000 });
-  await new Promise(r => setTimeout(r, 4000));
+  const withPrices = result.rows.filter(r => r.count > 0 && r.min_price > 0);
+  const withoutPrices = result.rows.filter(r => r.count === 0 || !r.min_price);
 
-  const teeTimes = await page.evaluate(() => {
-    const results = [];
-    document.querySelectorAll('section.result').forEach(el => {
-      const text = el.innerText;
-      const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
-      const priceMatch = text.match(/\$(\d+)/g);
-
-      if (timeMatch) {
-        results.push({
-          time: timeMatch[1],
-          prices: priceMatch || [],
-          text: text.replace(/\s+/g, ' ').substring(0, 200)
-        });
-      }
-    });
-    return results;
+  console.log('Courses WITH valid prices (' + withPrices.length + '):');
+  withPrices.forEach(r => {
+    console.log('✓', r.name, '| min: $' + r.min_price, '| count:', r.count);
   });
 
-  console.log('Presidio tee times from GolfNow NOW:\n');
-  teeTimes.forEach(t => {
-    console.log(t.time, '| Prices:', t.prices.join(', ') || 'none');
+  console.log('\nCourses WITHOUT valid prices (' + withoutPrices.length + '):');
+  withoutPrices.forEach(r => {
+    console.log('✗', r.name);
   });
-
-  await browser.close();
 }
-
-scrape().catch(e => console.error('Error:', e.message));
+check().catch(console.error);

@@ -57,7 +57,7 @@ const GOLFNOW_IDS = {
 
   // East Bay - More courses
   'the-bridges-golf-club': '5141',
-  'the-course-at-wente-vineyards': '658',
+  'wente-vineyards': '658',
 
   // Peninsula
   'crystal-springs-golf-course': '1398',
