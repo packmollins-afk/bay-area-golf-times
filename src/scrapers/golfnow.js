@@ -162,10 +162,14 @@ async function scrapeLocation(location, date) {
 
 async function getCourseMappings() {
   // Get courses from database and create mapping by golfnow_id
+  // Note: Multiple courses can share the same golfnow_id (e.g., TPC Harding Park & Fleming 9)
   const result = await db.execute('SELECT id, name, golfnow_id FROM courses WHERE golfnow_id IS NOT NULL');
   const mapping = {};
   result.rows.forEach(c => {
-    mapping[c.golfnow_id] = { id: c.id, name: c.name };
+    if (!mapping[c.golfnow_id]) {
+      mapping[c.golfnow_id] = [];
+    }
+    mapping[c.golfnow_id].push({ id: c.id, name: c.name });
   });
   return mapping;
 }
@@ -186,31 +190,34 @@ async function insertTeeTimes(teeTimes, courseMappings) {
   let inserted = 0;
 
   for (const tt of teeTimes) {
-    const course = courseMappings[tt.facilityId];
-    if (!course) continue;  // Course not in our database
+    const courses = courseMappings[tt.facilityId];
+    if (!courses || courses.length === 0) continue;  // Course not in our database
 
-    try {
-      // Insert a representative tee time (first available time at min price)
-      await db.execute({
-        sql: `INSERT OR REPLACE INTO tee_times
-              (course_id, date, time, datetime, holes, players, price, has_cart, booking_url, source, scraped_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-        args: [
-          course.id,
-          tt.date,
-          tt.firstTime,
-          `${tt.date} ${tt.firstTime}`,
-          18,
-          4,
-          tt.minPrice,
-          0,
-          `https://www.golfnow.com/tee-times/facility/${tt.facilityId}/search`,
-          'golfnow'
-        ]
-      });
-      inserted++;
-    } catch (error) {
-      // Ignore duplicate errors
+    // Insert tee time for all courses that share this GolfNow facility ID
+    for (const course of courses) {
+      try {
+        // Insert a representative tee time (first available time at min price)
+        await db.execute({
+          sql: `INSERT OR REPLACE INTO tee_times
+                (course_id, date, time, datetime, holes, players, price, has_cart, booking_url, source, scraped_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+          args: [
+            course.id,
+            tt.date,
+            tt.firstTime,
+            `${tt.date} ${tt.firstTime}`,
+            18,
+            4,
+            tt.minPrice,
+            0,
+            `https://www.golfnow.com/tee-times/facility/${tt.facilityId}/search`,
+            'golfnow'
+          ]
+        });
+        inserted++;
+      } catch (error) {
+        // Ignore duplicate errors
+      }
     }
   }
 
