@@ -1,7 +1,7 @@
 /**
- * TotaleIntegrated Fast Scraper
+ * TotaleIntegrated Scraper
  * Scrapes CourseCo courses NOT on GolfNow: Bay Area, Monterey, Napa, Sacramento
- * Gets first available tee time for today only (fast like GolfNow scraper)
+ * Supports multi-day scraping like GolfNow
  */
 
 const puppeteer = require('puppeteer');
@@ -53,9 +53,10 @@ const TOTALE_COURSES = {
   }
 };
 
-function getPacificDate() {
+function getPacificDate(dayOffset = 0) {
   const now = new Date();
   const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  pst.setDate(pst.getDate() + dayOffset);
   const year = pst.getFullYear();
   const month = String(pst.getMonth() + 1).padStart(2, '0');
   const day = String(pst.getDate()).padStart(2, '0');
@@ -63,25 +64,49 @@ function getPacificDate() {
 }
 
 /**
- * Fast scrape - just get first available time and price from landing page
+ * Scrape tee times - click Search button to load times
  */
-async function scrapeFast(page, siteUrl, timeout = 30000) {
+async function scrapeTimes(page, siteUrl, dayOffset = 0, timeout = 30000) {
   try {
     await page.goto(siteUrl, { waitUntil: 'networkidle2', timeout });
+    await new Promise(r => setTimeout(r, 2000));
 
-    // Wait for content to render
-    await new Promise(r => setTimeout(r, 8000));
+    // Navigate to correct day using chevron buttons
+    for (let i = 0; i < dayOffset; i++) {
+      try {
+        await page.click('text=chevron_right');
+        await new Promise(r => setTimeout(r, 500));
+      } catch (e) {
+        break;
+      }
+    }
 
-    // Extract first available tee time and price
-    const result = await page.evaluate(() => {
+    // Click Search button to load tee times
+    try {
+      const buttons = await page.$$('button');
+      for (const btn of buttons) {
+        const text = await page.evaluate(el => el.textContent, btn);
+        if (text && text.includes('Search')) {
+          await btn.click();
+          break;
+        }
+      }
+    } catch (e) {
+      // Continue anyway
+    }
+
+    await new Promise(r => setTimeout(r, 4000));
+
+    // Extract all tee times and prices
+    const results = await page.evaluate(() => {
       const text = document.body.innerText || '';
+      const times = [];
 
-      // Find first time pattern
-      const timeMatch = text.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
-      if (!timeMatch) return null;
-
-      // Find first price
+      // Find all time patterns
+      const timeMatches = text.matchAll(/(\d{1,2}:\d{2}\s*(?:AM|PM))/gi);
       const priceMatches = text.match(/\$(\d+(?:\.\d{2})?)/g) || [];
+
+      // Get first valid price
       let price = null;
       for (const p of priceMatches) {
         const val = parseFloat(p.replace('$', ''));
@@ -91,16 +116,22 @@ async function scrapeFast(page, siteUrl, timeout = 30000) {
         }
       }
 
-      return {
-        time: timeMatch[1].replace(/\s+/g, ''),
-        price
-      };
+      // Collect unique times
+      const seenTimes = new Set();
+      for (const match of timeMatches) {
+        const time = match[1].replace(/\s+/g, '').toUpperCase();
+        if (!seenTimes.has(time)) {
+          seenTimes.add(time);
+          times.push({ time, price });
+        }
+      }
+
+      return times.slice(0, 30); // Max 30 times per day
     });
 
-    return result;
+    return results;
   } catch (error) {
-    console.log(`    Error: ${error.message}`);
-    return null;
+    return [];
   }
 }
 
@@ -119,10 +150,10 @@ function convertTo24Hour(timeStr) {
 }
 
 /**
- * Fast scraper - only today, only non-GolfNow courses
+ * Multi-day scraper for TotaleIntegrated courses
  */
-async function scrapeAllTotaleIntegrated(db, coursesBySlug) {
-  console.log('--- TotaleIntegrated Fast Scraper ---');
+async function scrapeAllTotaleIntegrated(db, coursesBySlug, days = 7) {
+  console.log(`--- TotaleIntegrated Scraper (${days} days) ---`);
 
   const browser = await puppeteer.launch({
     headless: 'new',
@@ -132,11 +163,13 @@ async function scrapeAllTotaleIntegrated(db, coursesBySlug) {
   const page = await browser.newPage();
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
 
-  const dateStr = getPacificDate();
   let totalTeeTimes = 0;
   let coursesScraped = 0;
 
   try {
+    // Clear old totaleintegrated data
+    await db.execute({ sql: 'DELETE FROM tee_times WHERE source = ?', args: ['totaleintegrated'] });
+
     for (const [slug, config] of Object.entries(TOTALE_COURSES)) {
       const course = coursesBySlug[slug];
       if (!course) {
@@ -145,32 +178,33 @@ async function scrapeAllTotaleIntegrated(db, coursesBySlug) {
       }
 
       console.log(`  ${config.name}...`);
+      let courseTeeTimes = 0;
 
-      const result = await scrapeFast(page, config.url);
+      // Scrape each day
+      for (let dayOffset = 0; dayOffset < days; dayOffset++) {
+        const dateStr = getPacificDate(dayOffset);
+        const results = await scrapeTimes(page, config.url, dayOffset);
 
-      if (result && result.time) {
-        const time24 = convertTo24Hour(result.time);
-        if (time24) {
-          // Clear old data and insert new
-          await db.execute({
-            sql: 'DELETE FROM tee_times WHERE course_id = ? AND source = ?',
-            args: [course.id, 'totaleintegrated']
-          });
+        for (const tt of results) {
+          const time24 = convertTo24Hour(tt.time);
+          if (!time24) continue;
 
-          await db.execute({
-            sql: `INSERT OR REPLACE INTO tee_times
-                  (course_id, date, time, datetime, holes, players, price, has_cart, booking_url, source, scraped_at)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-            args: [course.id, dateStr, time24, `${dateStr} ${time24}`, 18, 4, result.price, 0, config.url, 'totaleintegrated']
-          });
-
-          console.log(`    ✓ ${result.time} - $${result.price || '?'}`);
-          totalTeeTimes++;
+          try {
+            await db.execute({
+              sql: `INSERT OR IGNORE INTO tee_times
+                    (course_id, date, time, datetime, holes, players, price, has_cart, booking_url, source, scraped_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+              args: [course.id, dateStr, time24, `${dateStr} ${time24}`, 18, 4, tt.price, 0, config.url, 'totaleintegrated']
+            });
+            courseTeeTimes++;
+            totalTeeTimes++;
+          } catch (e) {
+            // Ignore duplicates
+          }
         }
-      } else {
-        console.log(`    ✗ No tee times found`);
       }
 
+      console.log(`    ✓ ${courseTeeTimes} tee times`);
       coursesScraped++;
     }
   } finally {
