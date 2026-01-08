@@ -9,11 +9,11 @@ const puppeteer = require('puppeteer');
 // Only courses that are NOT on GolfNow
 const TOTALE_COURSES = {
   'boundary-oak-golf-course': {
-    url: 'https://playboundaryoak.totaleintegrated.com/',
+    url: 'https://boundaryoak.totaleintegrated.net/web/tee-times',
     name: 'Boundary Oak Golf Course'
   },
   'metropolitan-golf-links': {
-    url: 'https://playmetro.totaleintegrated.com/',
+    url: 'https://metro.totaleintegrated.net/web/tee-times',
     name: 'Metropolitan Golf Links'
   },
   'san-jose-municipal-golf-course': {
@@ -22,11 +22,11 @@ const TOTALE_COURSES = {
   },
   // Monterey Region (CourseCo - no GolfNow inventory)
   'pacific-grove-golf-links': {
-    url: 'https://playpacificgrove.totaleintegrated.com/',
+    url: 'https://pacificgrove.totaleintegrated.net/web/tee-times',
     name: 'Pacific Grove Golf Links'
   },
   'laguna-seca-golf-ranch': {
-    url: 'https://lagunasecagolf.totaleintegrated.com/',
+    url: 'https://lagunaseca.totaleintegrated.net/web/tee-times',
     name: 'Laguna Seca Golf Ranch'
   },
   // North Bay / Napa Region (CourseCo - no GolfNow inventory)
@@ -35,20 +35,20 @@ const TOTALE_COURSES = {
     name: 'Valley of the Moon Club'
   },
   'napa-golf-course': {
-    url: 'https://playnapa.totaleintegrated.com/',
+    url: 'https://napa.totaleintegrated.net/web/tee-times',
     name: 'Napa Golf Course'
   },
   // Sacramento Region (CourseCo - no GolfNow inventory)
   'ancil-hoffman-golf-course': {
-    url: 'https://playancilhoffman.totaleintegrated.com/',
+    url: 'https://ancilhoffman.totaleintegrated.net/web/tee-times',
     name: 'Ancil Hoffman Golf Course'
   },
   'mather-golf-course': {
-    url: 'https://playmather.totaleintegrated.com/',
+    url: 'https://mather.totaleintegrated.net/web/tee-times',
     name: 'Mather Golf Course'
   },
   'cherry-island-golf-course': {
-    url: 'https://playgolfcherryisland.totaleintegrated.com/',
+    url: 'https://cherryisland.totaleintegrated.net/web/tee-times',
     name: 'Cherry Island Golf Course'
   }
 };
