@@ -60,7 +60,8 @@ app.get('/api/regions', (req, res) => {
 /**
  * GET /api/tee-times
  * Get tee times with filters
- * Query params: date, region, course_id, min_time, max_time, max_price, holes, players, next_available
+ * Query params: date (REQUIRED), region (REQUIRED), course_id, min_time, max_time, max_price, holes, players
+ * Returns 400 if region or date is missing (to reduce API load)
  */
 app.get('/api/tee-times', (req, res) => {
   try {
@@ -80,6 +81,20 @@ app.get('/api/tee-times', (req, res) => {
       offset = 0
     } = req.query;
 
+    // Require region and date for app.html (reduces API load)
+    // Allow bypass for course.html and index.html via course_id or next_available
+    const isCourseSpecific = course_id;
+    const isNextAvailableMode = next_available === 'true' || next_available === '1';
+
+    if (!isCourseSpecific && !isNextAvailableMode) {
+      if (!region) {
+        return res.status(400).json({ error: 'Region is required. Please select a region.' });
+      }
+      if (!date) {
+        return res.status(400).json({ error: 'Date is required. Please select a date.' });
+      }
+    }
+
     let sql = `
       SELECT
         t.*,
@@ -97,12 +112,13 @@ app.get('/api/tee-times', (req, res) => {
     // Always filter out past tee times (use Pacific time: UTC-8)
     sql += " AND t.datetime >= datetime('now', '-8 hours')";
 
-    // If not next_available mode, also filter by specific date
-    if (next_available !== 'true' && next_available !== '1' && date) {
+    // Filter by date (required unless next_available mode)
+    if (!isNextAvailableMode && date) {
       sql += ' AND t.date = ?';
       params.push(date);
     }
 
+    // Filter by region (required unless course_id specified)
     if (region) {
       sql += ' AND c.region = ?';
       params.push(region);
@@ -155,6 +171,38 @@ app.get('/api/tee-times', (req, res) => {
     params.push(parseInt(limit), parseInt(offset));
 
     const teeTimes = db.prepare(sql).all(...params);
+    res.json(teeTimes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tee-times/next-available
+ * Get the cheapest next available tee time for each course
+ * Used by homepage to show price tags
+ */
+app.get('/api/tee-times/next-available', (req, res) => {
+  try {
+    // Get the first (cheapest by time) future tee time per course
+    const teeTimes = db.prepare(`
+      SELECT
+        t.*,
+        c.name as course_name,
+        c.city,
+        c.region
+      FROM tee_times t
+      JOIN courses c ON t.course_id = c.id
+      WHERE t.datetime >= datetime('now', '-8 hours')
+      AND t.id IN (
+        SELECT MIN(t2.id)
+        FROM tee_times t2
+        WHERE t2.course_id = t.course_id
+          AND t2.datetime >= datetime('now', '-8 hours')
+        GROUP BY t2.course_id
+      )
+      ORDER BY c.name
+    `).all();
     res.json(teeTimes);
   } catch (error) {
     res.status(500).json({ error: error.message });
