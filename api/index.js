@@ -2745,9 +2745,13 @@ app.get('/go/:slug', async (req, res) => {
 });
 
 // Tracking beacon endpoint - receives data from client
-app.post('/api/track', async (req, res) => {
+app.post('/api/track', express.text({ type: '*/*' }), async (req, res) => {
   try {
-    const d = req.body;
+    // Handle both JSON and text/plain (sendBeacon sends as text/plain)
+    let d = req.body;
+    if (typeof d === 'string') {
+      try { d = JSON.parse(d); } catch (e) { d = {}; }
+    }
 
     // Insert click
     await db.execute({
