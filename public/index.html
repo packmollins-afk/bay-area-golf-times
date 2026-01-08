@@ -714,39 +714,61 @@
       stroke-width: 2;
     }
 
-    /* Zoom controls in nav bar */
+    /* Zoom controls - fixed bottom right corner */
     .zoom-controls {
+      position: fixed;
+      bottom: calc(90px + env(safe-area-inset-bottom, 12px));
+      right: 16px;
       display: flex;
-      gap: 4px;
-      margin-right: 0.5rem;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      z-index: 100;
+    }
+
+    .zoom-label {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 9px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .zoom-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
-      background: rgba(255, 255, 255, 0.9);
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid var(--contour-light);
-      border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .zoom-btn:first-of-type {
+      border-radius: 8px 8px 0 0;
+      border-bottom: none;
+    }
+
+    .zoom-btn:last-of-type {
+      border-radius: 0 0 8px 8px;
     }
 
     .zoom-btn:hover {
       background: rgba(255, 255, 255, 1);
       border-color: var(--contour);
-      transform: scale(1.05);
     }
 
     .zoom-btn:active {
-      transform: scale(0.95);
+      background: var(--paper-dark);
     }
 
     .zoom-btn svg {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       stroke: var(--text-dark);
       stroke-width: 2.5;
       stroke-linecap: round;
@@ -1293,9 +1315,18 @@
         height: 20px;
       }
 
+      .zoom-controls {
+        bottom: calc(80px + env(safe-area-inset-bottom, 12px));
+        right: 12px;
+      }
+
       .zoom-btn {
         width: 40px;
         height: 40px;
+      }
+
+      .zoom-label {
+        font-size: 8px;
       }
 
       .login-btn {
@@ -1655,16 +1686,19 @@
       <span id="login-text">Log In</span>
     </a>
 
+    <!-- Zoom controls - bottom right corner -->
+    <div class="zoom-controls">
+      <span class="zoom-label">Zoom</span>
+      <button class="zoom-btn" id="zoom-in" title="Zoom In">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+      <button class="zoom-btn" id="zoom-out" title="Zoom Out">
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      </button>
+    </div>
+
     <!-- Bottom navigation bar -->
     <nav class="nav-bar">
-      <div class="zoom-controls">
-        <button class="zoom-btn" id="zoom-out" title="Zoom Out">
-          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        </button>
-        <button class="zoom-btn" id="zoom-in" title="Zoom In">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        </button>
-      </div>
       <a href="/app.html" class="nav-btn primary">
         <svg viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10"></circle>
@@ -1827,10 +1861,10 @@
       const isMobile = window.innerWidth < 768;
 
       const config = {
-        // Zoom limits - allow zooming out to see all courses
-        minZoom: 0.5,                      // Both can zoom out to see everything
+        // Zoom limits
+        minZoom: 0.5,                      // Can zoom out to see all courses
         maxZoom: 2.5,                      // How far in
-        defaultZoom: isMobile ? 0.55 : 0.5, // Start zoomed out to show all courses
+        defaultZoom: isMobile ? 0.7 : 0.55, // Mobile more zoomed to fit screen, desktop wider
 
         // Button zoom steps (per click)
         zoomInStep: 0.1,         // + button increment
@@ -1851,15 +1885,15 @@
         momentumDecay: 0.92,     // How quickly momentum slows (0-1)
         momentumThreshold: 0.1,  // Min velocity to apply momentum
 
-        // Initial position (centered on all courses)
-        startX: 12,              // Centered horizontally on course cluster
-        startY: 5,               // Centered vertically on course cluster
+        // Initial position (centered on Bay Area courses)
+        startX: isMobile ? 15 : 10,  // Mobile slightly more east
+        startY: isMobile ? 8 : 5,    // Mobile slightly more south to center Bay
 
         // Pan bounds - keep courses in view when zooming
         boundsWest: -10,         // Limit Pacific
-        boundsEast: 50,          // Allow inland (east)
+        boundsEast: 60,          // Allow inland (east)
         boundsNorth: -30,        // Allow north (Sonoma)
-        boundsSouth: 40          // Allow south (Santa Cruz)
+        boundsSouth: 50          // Allow south (Santa Cruz)
       };
 
       let isDragging = false;
