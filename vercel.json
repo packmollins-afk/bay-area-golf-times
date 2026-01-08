@@ -36,7 +36,11 @@
     },
     {
       "src": "/course/([^/]+)",
-      "dest": "public/course.html"
+      "dest": "api/index.js"
+    },
+    {
+      "src": "/(sf|east-bay|south-bay|north-bay|napa|monterey|sonoma|sacramento)-golf",
+      "dest": "api/index.js"
     },
     {
       "src": "/admin",

@@ -323,6 +323,56 @@ app.get('/sitemap.xml', async (req, res) => {
     <priority>0.5</priority>
   </url>
 
+  <!-- Regional Landing Pages -->
+  <url>
+    <loc>https://bayareagolf.now/sf-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/east-bay-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/south-bay-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/north-bay-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/napa-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/monterey-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/sonoma-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bayareagolf.now/sacramento-golf</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Individual Course Pages -->
 ${courses.map(c => `  <url>
     <loc>https://bayareagolf.now/course/${c.slug}</loc>
@@ -3094,6 +3144,261 @@ app.get('/api/admin/export', adminAuth, async (req, res) => {
   }
 });
 
+// ========== SEO: SERVER-RENDERED COURSE PAGES ==========
+
+app.get('/course/:slug', async (req, res) => {
+  const { slug } = req.params;
+  const publicPath = path.join(__dirname, '../public');
+
+  try {
+    // Look up course
+    const result = await db.execute({
+      sql: 'SELECT * FROM courses WHERE slug = ?',
+      args: [slug]
+    });
+
+    if (result.rows.length === 0) {
+      return res.sendFile(path.join(publicPath, 'course.html'));
+    }
+
+    const course = result.rows[0];
+
+    // Read the course.html template
+    const fs = require('fs');
+    let html = fs.readFileSync(path.join(publicPath, 'course.html'), 'utf8');
+
+    // Build SEO meta tags
+    const title = `${course.name} Tee Times & Prices | Bay Area Golf`;
+    const description = `Book tee times at ${course.name} in ${course.city}. ${course.holes} holes, par ${course.par}. Live availability for Bay Area golf.`;
+    const url = `https://bayareagolf.now/course/${slug}`;
+
+    // Build JSON-LD GolfCourse schema
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "GolfCourse",
+      "name": course.name,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": course.city,
+        "addressRegion": "CA",
+        "addressCountry": "US"
+      },
+      "url": url
+    };
+
+    if (course.latitude && course.longitude) {
+      jsonLd.geo = {
+        "@type": "GeoCoordinates",
+        "latitude": course.latitude,
+        "longitude": course.longitude
+      };
+    }
+
+    if (course.phone_number) {
+      jsonLd.telephone = course.phone_number;
+    }
+
+    if (course.avg_rating && course.total_reviews) {
+      jsonLd.aggregateRating = {
+        "@type": "AggregateRating",
+        "ratingValue": course.avg_rating,
+        "reviewCount": course.total_reviews
+      };
+    }
+
+    // Replace placeholder meta tags
+    html = html.replace(
+      '<title>Loading... | Bay Area Golf</title>',
+      `<title>${title}</title>`
+    );
+    html = html.replace(
+      '<meta name="description" content="Course details and tee times for Bay Area public golf courses.">',
+      `<meta name="description" content="${description}">`
+    );
+
+    // Add OG and Twitter tags
+    const ogTags = `
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${description}">
+  <meta property="og:url" content="${url}">`;
+    html = html.replace(
+      '<meta property="og:type" content="website">',
+      `<meta property="og:type" content="website">${ogTags}`
+    );
+
+    const twitterTags = `
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${description}">`;
+    html = html.replace(
+      '<meta name="twitter:card" content="summary_large_image">',
+      `<meta name="twitter:card" content="summary_large_image">${twitterTags}`
+    );
+
+    // Add canonical URL
+    html = html.replace(
+      '</head>',
+      `  <link rel="canonical" href="${url}">
+  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+</head>`
+    );
+
+    res.send(html);
+  } catch (error) {
+    console.error('Course page error:', error);
+    res.sendFile(path.join(publicPath, 'course.html'));
+  }
+});
+
+// ========== SEO: REGIONAL LANDING PAGES ==========
+
+const REGION_MAP = {
+  'sf': 'San Francisco',
+  'east-bay': 'East Bay',
+  'south-bay': 'South Bay',
+  'north-bay': 'North Bay',
+  'napa': 'Napa',
+  'monterey': 'Monterey',
+  'sonoma': 'Sonoma',
+  'sacramento': 'Sacramento'
+};
+
+app.get('/:regionSlug-golf', async (req, res) => {
+  const { regionSlug } = req.params;
+  const regionName = REGION_MAP[regionSlug];
+
+  if (!regionName) {
+    return res.status(404).send('Region not found');
+  }
+
+  try {
+    // Get courses for this region
+    const result = await db.execute({
+      sql: 'SELECT * FROM courses WHERE region = ? ORDER BY name',
+      args: [regionName]
+    });
+    const courses = result.rows;
+
+    const title = `${regionName} Golf Courses - Tee Times & Prices | Bay Area Golf`;
+    const description = `Compare tee times at ${courses.length} golf courses in ${regionName}. Find the best prices today.`;
+    const url = `https://bayareagolf.now/${regionSlug}-golf`;
+
+    // Build HTML
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <meta name="description" content="${description}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="${url}">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${url}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${description}">
+  <meta property="og:site_name" content="Bay Area Golf">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${description}">
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="theme-color" content="#2d5a27">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@400;600&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Source Serif 4', Georgia, serif; background: #f4f1e8; color: #3d2914; line-height: 1.6; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    header { background: #2d5a27; color: white; padding: 40px 20px; text-align: center; }
+    header h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 10px; }
+    header p { opacity: 0.9; font-size: 1.1rem; }
+    nav { background: #f9f6ef; border-bottom: 1px solid #c4a882; padding: 15px 20px; }
+    nav a { color: #2d5a27; text-decoration: none; margin-right: 20px; font-weight: 600; }
+    nav a:hover { text-decoration: underline; }
+    .courses { display: grid; gap: 20px; margin-top: 30px; }
+    .course-card { background: white; border: 1px solid #c4a882; border-radius: 8px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .course-info h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 5px; }
+    .course-info h2 a { color: #2d5a27; text-decoration: none; }
+    .course-info h2 a:hover { text-decoration: underline; }
+    .course-meta { color: #6b5344; font-size: 0.9rem; }
+    .book-btn { background: #2d5a27; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; }
+    .book-btn:hover { background: #1a3d17; }
+    .stats { display: flex; gap: 30px; margin-top: 30px; padding: 20px; background: #f9f6ef; border-radius: 8px; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 2rem; font-weight: 700; color: #2d5a27; }
+    .stat-label { color: #6b5344; font-size: 0.9rem; }
+    footer { margin-top: 50px; padding: 30px 20px; background: #2d5a27; color: white; text-align: center; }
+    footer a { color: #a8d4a0; }
+    .regions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; }
+    .regions a { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; color: white; text-decoration: none; font-size: 0.9rem; }
+    .regions a:hover { background: rgba(255,255,255,0.2); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>${regionName} Golf Courses</h1>
+    <p>${courses.length} public courses with live tee times</p>
+  </header>
+
+  <nav>
+    <a href="/">Home</a>
+    <a href="/courses">All Courses</a>
+    <a href="/app.html">Book Tee Times</a>
+  </nav>
+
+  <div class="container">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">${courses.length}</div>
+        <div class="stat-label">Courses</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">${courses.filter(c => c.holes === 18).length}</div>
+        <div class="stat-label">18-Hole</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">${courses.filter(c => c.holes === 9).length}</div>
+        <div class="stat-label">9-Hole</div>
+      </div>
+    </div>
+
+    <div class="courses">
+      ${courses.map(c => `
+      <div class="course-card">
+        <div class="course-info">
+          <h2><a href="/course/${c.slug}">${c.name}</a></h2>
+          <p class="course-meta">${c.city} • ${c.holes} holes • Par ${c.par || 'N/A'}</p>
+        </div>
+        ${c.booking_url ? `<a href="/go/${c.slug}" class="book-btn">Book Now</a>` : ''}
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <footer>
+    <p><a href="/">Bay Area Golf</a> - Compare tee times from 80+ courses</p>
+    <div class="regions">
+      <a href="/sf-golf">San Francisco</a>
+      <a href="/east-bay-golf">East Bay</a>
+      <a href="/south-bay-golf">South Bay</a>
+      <a href="/north-bay-golf">North Bay</a>
+      <a href="/napa-golf">Napa</a>
+      <a href="/monterey-golf">Monterey</a>
+      <a href="/sonoma-golf">Sonoma</a>
+      <a href="/sacramento-golf">Sacramento</a>
+    </div>
+  </footer>
+</body>
+</html>`;
+
+    res.send(html);
+  } catch (error) {
+    console.error('Regional page error:', error);
+    res.status(500).send('Error loading regional page');
+  }
+});
+
 // SPA fallback (Express 5 compatible) - MUST be last route
 app.get('/{*splat}', (req, res) => {
   if (req.path.startsWith('/api/')) {
@@ -3101,10 +3406,6 @@ app.get('/{*splat}', (req, res) => {
   }
 
   const publicPath = path.join(__dirname, '../public');
-
-  if (req.path.startsWith('/course/')) {
-    return res.sendFile(path.join(publicPath, 'course.html'));
-  }
   if (req.path === '/courses') {
     return res.sendFile(path.join(publicPath, 'courses.html'));
   }
