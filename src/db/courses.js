@@ -115,6 +115,10 @@ const courses = [
   // Sonoma County
   { name: "Bennett Valley Golf Course", city: "Santa Rosa", region: "Sonoma", holes: 18, par: 72, yardage: 6583, latitude: 38.4226, longitude: -122.6595, phone_number: "(707) 528-3673", golfnow_id: "8367", booking_url: "https://www.golfnow.com/tee-times/facility/8367-bennett-valley-golf-course/search", booking_system: "golfnow" },
   { name: "Windsor Golf Club", city: "Windsor", region: "Sonoma", holes: 18, par: 72, yardage: 6650, latitude: 38.5285, longitude: -122.8069, phone_number: "(707) 838-7888", golfnow_id: "4725", booking_url: "https://www.golfnow.com/tee-times/facility/4725-the-windsor-golf-club/search", booking_system: "golfnow" },
+  { name: "Valley of the Moon Club", city: "Santa Rosa", region: "Sonoma", holes: 18, par: 72, yardage: 6300, latitude: 38.4085, longitude: -122.5750, phone_number: "(707) 539-5291", golfnow_id: "243", booking_url: "https://www.golfnow.com/tee-times/facility/243-valley-of-the-moon-club/search", booking_system: "golfnow" },
+  { name: "Sonoma Golf Club", city: "Sonoma", region: "Sonoma", holes: 18, par: 72, yardage: 7087, latitude: 38.2919, longitude: -122.4580, phone_number: "(707) 996-0300", golfnow_id: "18188", booking_url: "https://www.golfnow.com/tee-times/facility/18188-sonoma-golf-club/search", booking_system: "golfnow" },
+  { name: "Fairgrounds Golf Course", city: "Santa Rosa", region: "Sonoma", holes: 9, par: 29, yardage: 1800, latitude: 38.4350, longitude: -122.7250, phone_number: "(707) 577-0755", golfnow_id: "1604", booking_url: "https://www.golfnow.com/tee-times/facility/1604-fairgrounds-golf-course/search", booking_system: "golfnow" },
+  { name: "Oakmont Golf Club", city: "Santa Rosa", region: "Sonoma", holes: 18, par: 63, yardage: 4200, latitude: 38.4450, longitude: -122.5480, phone_number: "(707) 539-0415", golfnow_id: "8429", booking_url: "https://www.golfnow.com/tee-times/facility/8429-the-club-at-sugarloaf/search", booking_system: "golfnow" },
 ];
 
 // Insert courses if they don't exist

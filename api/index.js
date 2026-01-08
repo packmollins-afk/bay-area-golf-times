@@ -463,7 +463,8 @@ const COURSE_BASE_PRICES = {
   'Napa Golf Course at Kennedy Park': 55, "Vintner's Golf Club": 45, 'Silverado Resort - North Course': 195,
   'Silverado Resort - South Course': 175,
   // Sonoma
-  'Bennett Valley Golf Course': 55, 'Windsor Golf Club': 65
+  'Bennett Valley Golf Course': 55, 'Windsor Golf Club': 65, 'Valley of the Moon Club': 55,
+  'Sonoma Golf Club': 95, 'Fairgrounds Golf Course': 22, 'Oakmont Golf Club': 40
 };
 
 // Generate demo tee times on-the-fly for a course

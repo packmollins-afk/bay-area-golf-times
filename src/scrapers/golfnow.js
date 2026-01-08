@@ -20,6 +20,7 @@ const SEARCH_LOCATIONS = [
   { lat: 37.8044, lng: -122.2712, name: 'Oakland' },
   { lat: 38.2975, lng: -122.2869, name: 'Napa' },
   { lat: 37.6879, lng: -122.4702, name: 'Pacifica' },
+  { lat: 38.4405, lng: -122.7144, name: 'Santa Rosa' },
 ];
 
 let browser = null;
