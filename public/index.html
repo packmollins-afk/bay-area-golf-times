@@ -1370,10 +1370,15 @@
 
     function formatShortTime(time) {
       if (!time) return '';
+      // Handle "7:30AM" format (GolfNow)
+      if (time.includes('AM') || time.includes('PM')) {
+        return time.toLowerCase().replace('am', 'a').replace('pm', 'p');
+      }
+      // Handle "07:30" format (24-hour)
       const [h, m] = time.split(':').map(Number);
       const ampm = h >= 12 ? 'p' : 'a';
       const hour = h % 12 || 12;
-      return `${hour}:${m.toString().padStart(2, '0')}${ampm}`;
+      return `${hour}:${String(m).padStart(2, '0')}${ampm}`;
     }
 
     // Load prices on page load
