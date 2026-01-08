@@ -2759,6 +2759,9 @@ app.post('/api/track', express.text({ type: '*/*' }), async (req, res) => {
       try { d = JSON.parse(d); } catch (e) { d = {}; }
     }
 
+    // Helper to convert undefined to null (Turso doesn't accept undefined)
+    const n = (v) => v === undefined ? null : v;
+
     // Insert click
     await db.execute({
       sql: `INSERT INTO clicks (
@@ -2773,15 +2776,15 @@ app.post('/api/track', express.text({ type: '*/*' }), async (req, res) => {
         is_golfnow, is_mobile, is_tablet, is_desktop
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        d.course_slug, d.course_name, d.booking_system, d.source,
-        d.visitor_id, d.session_id, d.is_returning_visitor,
-        d.referrer, d.referrer_domain, d.referrer_type,
-        d.utm_source, d.utm_medium, d.utm_campaign, d.utm_term, d.utm_content, d.landing_page,
-        d.ip_hash, d.country, d.country_code, d.region, d.city, d.latitude, d.longitude, d.timezone,
-        d.user_agent, d.device_type, d.device_brand, d.device_model, d.os_name, d.os_version, d.browser, d.browser_version, d.is_bot,
-        d.screen_width, d.screen_height, d.viewport_width, d.viewport_height, d.pixel_ratio, d.color_depth,
-        d.language, d.languages, d.timezone_offset, d.has_touch, d.connection_type,
-        d.is_golfnow, d.is_mobile, d.is_tablet, d.is_desktop
+        n(d.course_slug), n(d.course_name), n(d.booking_system), n(d.source),
+        n(d.visitor_id), n(d.session_id), n(d.is_returning_visitor),
+        n(d.referrer), n(d.referrer_domain), n(d.referrer_type),
+        n(d.utm_source), n(d.utm_medium), n(d.utm_campaign), n(d.utm_term), n(d.utm_content), n(d.landing_page),
+        n(d.ip_hash), n(d.country), n(d.country_code), n(d.region), n(d.city), n(d.latitude), n(d.longitude), n(d.timezone),
+        n(d.user_agent), n(d.device_type), n(d.device_brand), n(d.device_model), n(d.os_name), n(d.os_version), n(d.browser), n(d.browser_version), n(d.is_bot),
+        n(d.screen_width), n(d.screen_height), n(d.viewport_width), n(d.viewport_height), n(d.pixel_ratio), n(d.color_depth),
+        n(d.language), n(d.languages), n(d.timezone_offset), n(d.has_touch), n(d.connection_type),
+        n(d.is_golfnow), n(d.is_mobile), n(d.is_tablet), n(d.is_desktop)
       ]
     });
 
@@ -2794,7 +2797,7 @@ app.post('/api/track', express.text({ type: '*/*' }), async (req, res) => {
                 last_seen = CURRENT_TIMESTAMP,
                 visit_count = visit_count + 1,
                 click_count = click_count + 1`,
-        args: [d.visitor_id, d.country, d.city, d.device_type, d.browser]
+        args: [n(d.visitor_id), n(d.country), n(d.city), n(d.device_type), n(d.browser)]
       });
     }
 
