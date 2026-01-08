@@ -111,6 +111,10 @@ const courses = [
   { name: "The Bridges Golf Club", city: "San Ramon", region: "East Bay", holes: 18, par: 72, yardage: 7104, latitude: 37.7347, longitude: -121.9232, phone_number: "(925) 735-4253", golfnow_id: "5141", booking_url: "https://www.golfnow.com/tee-times/facility/5141-the-bridges-golf-club/search", booking_system: "golfnow" },
   { name: "Eagle Vines Golf Club", city: "American Canyon", region: "North Bay", holes: 18, par: 72, yardage: 7283, latitude: 38.1747, longitude: -122.2332, phone_number: "(707) 257-4470", golfnow_id: "10706", booking_url: "https://www.golfnow.com/tee-times/facility/10706-eagle-vines-golf-club/search", booking_system: "golfnow" },
   { name: "Chardonnay Golf Club", city: "American Canyon", region: "North Bay", holes: 18, par: 72, yardage: 6816, latitude: 38.1747, longitude: -122.2332, phone_number: "(707) 257-8950", golfnow_id: "463", booking_url: "https://www.golfnow.com/tee-times/facility/463-chardonnay-golf-club/search", booking_system: "golfnow" },
+
+  // Sonoma County
+  { name: "Bennett Valley Golf Course", city: "Santa Rosa", region: "Sonoma", holes: 18, par: 72, yardage: 6583, latitude: 38.4226, longitude: -122.6595, phone_number: "(707) 528-3673", golfnow_id: "8367", booking_url: "https://www.golfnow.com/tee-times/facility/8367-bennett-valley-golf-course/search", booking_system: "golfnow" },
+  { name: "Windsor Golf Club", city: "Windsor", region: "Sonoma", holes: 18, par: 72, yardage: 6650, latitude: 38.5285, longitude: -122.8069, phone_number: "(707) 838-7888", golfnow_id: "4725", booking_url: "https://www.golfnow.com/tee-times/facility/4725-the-windsor-golf-club/search", booking_system: "golfnow" },
 ];
 
 // Insert courses if they don't exist
