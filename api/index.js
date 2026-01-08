@@ -651,27 +651,33 @@ app.get('/api/tee-times/next-available', async (req, res) => {
   try {
     await ensureTeeTimesExist();
     const pacificNow = getPacificNow();
+    const region = req.query.region;
 
-    // Get minimum price tee time per course
-    const result = await db.execute({
-      sql: `
-        SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug, c.avg_rating
-        FROM tee_times t
-        JOIN courses c ON t.course_id = c.id
-        WHERE t.id IN (
-          SELECT t2.id FROM tee_times t2
-          WHERE t2.course_id = t.course_id
-            AND t2.datetime >= ?
-            AND t2.price IS NOT NULL
-            AND t2.price > 0
-          ORDER BY t2.price ASC
-          LIMIT 1
-        )
-        ORDER BY c.name
-      `,
-      args: [pacificNow]
-    });
+    // Get minimum price tee time per course, optionally filtered by region
+    let sql = `
+      SELECT t.*, c.name as course_name, c.city, c.region, c.slug as course_slug, c.avg_rating
+      FROM tee_times t
+      JOIN courses c ON t.course_id = c.id
+      WHERE t.id IN (
+        SELECT t2.id FROM tee_times t2
+        WHERE t2.course_id = t.course_id
+          AND t2.datetime >= ?
+          AND t2.price IS NOT NULL
+          AND t2.price > 0
+        ORDER BY t2.price ASC
+        LIMIT 1
+      )
+    `;
+    const args = [pacificNow];
 
+    if (region) {
+      sql += ` AND c.region = ?`;
+      args.push(region);
+    }
+
+    sql += ` ORDER BY c.name`;
+
+    const result = await db.execute({ sql, args });
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
