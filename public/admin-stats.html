@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard - Bay Area Golf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: #f4ebe0;
+      color: #3d2914;
+      min-height: 100vh;
+    }
+    .header {
+      background: #2d5a27;
+      color: #f4f1e8;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #f4f1e8;
+      color: #2d5a27;
+    }
+    .btn-primary:hover { background: #fff; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.15);
+      color: #f4f1e8;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.25); }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    /* Login Form */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .login-box h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      color: #2d5a27;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e8dcc8;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+    .login-box input:focus {
+      outline: none;
+      border-color: #2d5a27;
+    }
+    .login-box .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      background: #2d5a27;
+      color: white;
+    }
+    .login-box .btn:hover { background: #1e3d1a; }
+    .error-msg {
+      color: #c41e3a;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* Dashboard */
+    .dashboard { display: none; }
+    .dashboard.active { display: block; }
+
+    .data-banner {
+      background: #2d5a27;
+      color: #f4f1e8;
+      padding: 16px 24px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .data-banner span { opacity: 0.9; }
+    .data-banner strong { color: #fff; }
+
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .card-label {
+      font-size: 13px;
+      color: #6b5344;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .card-value {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: #2d5a27;
+    }
+    .card-value.small { font-size: 24px; }
+    .card-sub {
+      font-size: 13px;
+      color: #8b7355;
+      margin-top: 4px;
+    }
+    .card.highlight {
+      background: linear-gradient(135deg, #2d5a27 0%, #3d7a37 100%);
+      color: #f4f1e8;
+    }
+    .card.highlight .card-label { color: rgba(255,255,255,0.8); }
+    .card.highlight .card-value { color: #fff; }
+    .card.highlight .card-sub { color: rgba(255,255,255,0.7); }
+
+    .section {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .section-header {
+      background: #f9f6ef;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e8dcc8;
+    }
+    .section-header h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 18px;
+      color: #2d5a27;
+    }
+    .section-body { padding: 20px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #f0e6d8;
+    }
+    th {
+      background: #f9f6ef;
+      font-weight: 600;
+      color: #2d5a27;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+    }
+    tr:hover { background: #fdfbf7; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-golfnow { background: #e8f5e9; color: #2d5a27; }
+    .badge-new { background: #e3f2fd; color: #1565c0; }
+    .badge-returning { background: #fff3e0; color: #e65100; }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 120px;
+      padding: 10px 0;
+    }
+    .bar {
+      flex: 1;
+      background: #2d5a27;
+      border-radius: 4px 4px 0 0;
+      min-width: 20px;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .bar:hover { background: #3d7a37; }
+    .bar-label {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #8b7355;
+      white-space: nowrap;
+    }
+    .bar-value {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: #2d5a27;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 24px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0e6d8;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: #6b5344; }
+    .stat-value { font-weight: 600; color: #2d5a27; }
+
+    .recent-click {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0e6d8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .recent-click:hover { background: #fdfbf7; }
+    .recent-click-info { flex: 1; }
+    .recent-click-course { font-weight: 600; color: #2d5a27; }
+    .recent-click-meta { font-size: 13px; color: #8b7355; margin-top: 4px; }
+    .recent-click-time { font-size: 12px; color: #8b7355; white-space: nowrap; }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #8b7355;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e8dcc8;
+      border-top-color: #2d5a27;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #8b7355;
+    }
+
+    .scroll-table {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+      .header { flex-direction: column; text-align: center; }
+      .cards-row { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .data-banner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Bay Area Golf - Analytics Dashboard</h1>
+    <div class="header-actions" id="headerActions" style="display: none;">
+      <button class="btn btn-secondary" onclick="refreshData()">Refresh</button>
+      <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+      <button class="btn btn-primary" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Login Form -->
+  <div class="login-container" id="loginContainer">
+    <div class="login-box">
+      <h2>Admin Login</h2>
+      <div class="error-msg" id="loginError" style="display: none;"></div>
+      <form onsubmit="login(event)">
+        <input type="password" id="passwordInput" placeholder="Enter admin password" required>
+        <button type="submit" class="btn">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="container dashboard" id="dashboard">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Loading analytics...</p>
+    </div>
+
+    <div id="content" style="display: none;">
+      <!-- Data Range Banner -->
+      <div class="data-banner" id="dataBanner"></div>
+
+      <!-- Summary Cards Row 1 -->
+      <div class="cards-row" id="summaryCards1"></div>
+
+      <!-- Summary Cards Row 2 -->
+      <div class="cards-row" id="summaryCards2"></div>
+
+      <!-- Revenue Estimate -->
+      <div class="cards-row">
+        <div class="card highlight" id="revenueCard"></div>
+      </div>
+
+      <!-- Course Performance -->
+      <div class="section">
+        <div class="section-header"><h3>Course Performance</h3></div>
+        <div class="section-body">
+          <div class="scroll-table">
+            <table id="courseTable">
+              <thead>
+                <tr><th>Course</th><th>Clicks</th><th>Unique</th><th>Deals</th><th>System</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Analysis -->
+      <div class="grid-2">
+        <div class="section">
+          <div class="section-header"><h3>Clicks by Hour</h3></div>
+          <div class="section-body">
+            <div class="bar-chart" id="hourChart"></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>Clicks by Day</h3></div>
+          <div class="section-body">
+            <div class="bar-chart" id="weekdayChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device & Geographic -->
+      <div class="grid-2">
+        <div class="section">
+          <div class="section-header"><h3>Device Types</h3></div>
+          <div class="section-body" id="deviceStats"></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>Top Cities</h3></div>
+          <div class="section-body">
+            <div class="scroll-table" style="max-height: 250px;">
+              <table id="cityTable">
+                <thead><tr><th>City</th><th>Clicks</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Traffic Sources & Browsers -->
+      <div class="grid-2">
+        <div class="section">
+          <div class="section-header"><h3>Traffic Sources</h3></div>
+          <div class="section-body" id="trafficStats"></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><h3>Browsers</h3></div>
+          <div class="section-body">
+            <div class="scroll-table" style="max-height: 250px;">
+              <table id="browserTable">
+                <thead><tr><th>Browser</th><th>Clicks</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Systems -->
+      <div class="section">
+        <div class="section-header"><h3>By Booking System</h3></div>
+        <div class="section-body" id="systemStats"></div>
+      </div>
+
+      <!-- Daily History -->
+      <div class="section">
+        <div class="section-header"><h3>Daily History</h3></div>
+        <div class="section-body">
+          <div class="scroll-table">
+            <table id="dailyTable">
+              <thead>
+                <tr><th>Date</th><th>Total</th><th>GolfNow</th><th>Deals</th><th>Unique</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Clicks -->
+      <div class="section">
+        <div class="section-header"><h3>Recent Clicks (Last 100)</h3></div>
+        <div class="section-body" style="padding: 0;">
+          <div class="scroll-table" id="recentClicks"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let statsData = null;
+
+    // Check if already logged in
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/admin/stats', { credentials: 'include' });
+        if (res.ok) {
+          showDashboard();
+          loadStats();
+        }
+      } catch (e) {}
+    }
+
+    async function login(e) {
+      e.preventDefault();
+      const password = document.getElementById('passwordInput').value;
+      const errorEl = document.getElementById('loginError');
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ password })
+        });
+
+        if (res.ok) {
+          showDashboard();
+          loadStats();
+        } else {
+          errorEl.textContent = 'Invalid password';
+          errorEl.style.display = 'block';
+        }
+      } catch (e) {
+        errorEl.textContent = 'Connection error';
+        errorEl.style.display = 'block';
+      }
+    }
+
+    async function logout() {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+      location.reload();
+    }
+
+    function showDashboard() {
+      document.getElementById('loginContainer').style.display = 'none';
+      document.getElementById('dashboard').classList.add('active');
+      document.getElementById('headerActions').style.display = 'flex';
+    }
+
+    async function loadStats() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
+
+      try {
+        const res = await fetch('/api/admin/stats', { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to load');
+        statsData = await res.json();
+        renderStats();
+      } catch (e) {
+        document.getElementById('loading').innerHTML = '<p style="color: #c41e3a;">Failed to load stats</p>';
+      }
+    }
+
+    function refreshData() {
+      loadStats();
+    }
+
+    function exportCSV() {
+      window.location.href = '/api/admin/export';
+    }
+
+    function formatNumber(n) {
+      return (n || 0).toLocaleString();
+    }
+
+    function formatPercent(n, total) {
+      if (!total) return '0%';
+      return ((n / total) * 100).toFixed(1) + '%';
+    }
+
+    function timeAgo(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diff = Math.floor((now - date) / 1000);
+
+      if (diff < 60) return diff + 's ago';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      return Math.floor(diff / 86400) + 'd ago';
+    }
+
+    function renderStats() {
+      const d = statsData;
+      const humanClicks = d.total_clicks - d.bot_clicks;
+
+      // Data Banner
+      document.getElementById('dataBanner').innerHTML = `
+        <span>Tracking since: <strong>${d.first_click ? new Date(d.first_click).toLocaleDateString() : 'No data'}</strong></span>
+        <span>Last click: <strong>${d.last_click ? timeAgo(d.last_click) : 'Never'}</strong></span>
+        <span>Total clicks: <strong>${formatNumber(d.total_clicks)}</strong> | Bot clicks: <strong>${formatNumber(d.bot_clicks)}</strong> (filtered)</span>
+      `;
+
+      // Summary Cards Row 1
+      document.getElementById('summaryCards1').innerHTML = `
+        <div class="card">
+          <div class="card-label">Total Clicks</div>
+          <div class="card-value">${formatNumber(humanClicks)}</div>
+          <div class="card-sub">Human only</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Unique Visitors</div>
+          <div class="card-value">${formatNumber(d.unique_visitors)}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Total Sessions</div>
+          <div class="card-value">${formatNumber(d.total_sessions)}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Avg Clicks/Visitor</div>
+          <div class="card-value small">${d.unique_visitors ? (humanClicks / d.unique_visitors).toFixed(1) : '0'}</div>
+        </div>
+      `;
+
+      // Summary Cards Row 2
+      document.getElementById('summaryCards2').innerHTML = `
+        <div class="card">
+          <div class="card-label">GolfNow Clicks</div>
+          <div class="card-value">${formatNumber(d.golfnow_clicks)}</div>
+          <div class="card-sub">${formatPercent(d.golfnow_clicks, humanClicks)} of total</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Deal Clicks</div>
+          <div class="card-value">${formatNumber(d.deal_clicks)}</div>
+          <div class="card-sub">${formatPercent(d.deal_clicks, humanClicks)} of total</div>
+        </div>
+        <div class="card">
+          <div class="card-label">New Visitors</div>
+          <div class="card-value">${formatNumber(d.new_visitor_clicks)}</div>
+          <div class="card-sub">${formatPercent(d.new_visitor_clicks, humanClicks)} of clicks</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Returning Visitors</div>
+          <div class="card-value">${formatNumber(d.returning_clicks)}</div>
+          <div class="card-sub">${formatPercent(d.returning_clicks, humanClicks)} of clicks</div>
+        </div>
+      `;
+
+      // Revenue Card
+      const lowEst = (d.golfnow_clicks * 0.10).toFixed(2);
+      const highEst = (d.golfnow_clicks * 3.00).toFixed(2);
+      document.getElementById('revenueCard').innerHTML = `
+        <div class="card-label">Estimated GolfNow Commission</div>
+        <div class="card-value">$${lowEst} - $${highEst}</div>
+        <div class="card-sub">Based on ${formatNumber(d.golfnow_clicks)} GolfNow clicks</div>
+      `;
+
+      // Course Table
+      const courseBody = document.querySelector('#courseTable tbody');
+      courseBody.innerHTML = (d.by_course || []).map(c => `
+        <tr>
+          <td>${c.course_name || c.course_slug}${c.is_golfnow ? ' <span class="badge badge-golfnow">GolfNow</span>' : ''}</td>
+          <td>${formatNumber(c.clicks)}</td>
+          <td>${formatNumber(c.unique_visitors)}</td>
+          <td>${formatNumber(c.deal_clicks)}</td>
+          <td>${c.booking_system || '-'}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" class="empty-state">No data</td></tr>';
+
+      // Hour Chart
+      const hourData = d.by_hour || [];
+      const maxHour = Math.max(...hourData.map(h => h.clicks), 1);
+      document.getElementById('hourChart').innerHTML = Array.from({length: 24}, (_, i) => {
+        const found = hourData.find(h => h.hour === i);
+        const clicks = found ? found.clicks : 0;
+        const height = (clicks / maxHour) * 100;
+        return `<div class="bar" style="height: ${Math.max(height, 2)}%">
+          <span class="bar-value">${clicks || ''}</span>
+          <span class="bar-label">${i}</span>
+        </div>`;
+      }).join('');
+
+      // Weekday Chart
+      const weekdayData = d.by_weekday || [];
+      const maxDay = Math.max(...weekdayData.map(w => w.clicks), 1);
+      document.getElementById('weekdayChart').innerHTML = weekdayData.map(w => {
+        const height = (w.clicks / maxDay) * 100;
+        return `<div class="bar" style="height: ${Math.max(height, 2)}%">
+          <span class="bar-value">${w.clicks}</span>
+          <span class="bar-label">${w.day.substring(0, 3)}</span>
+        </div>`;
+      }).join('');
+
+      // Device Stats
+      document.getElementById('deviceStats').innerHTML = (d.by_device_type || []).map(dt => `
+        <div class="stat-row">
+          <span class="stat-label">${dt.device_type || 'Unknown'}</span>
+          <span class="stat-value">${formatNumber(dt.clicks)} (${formatPercent(dt.clicks, humanClicks)})</span>
+        </div>
+      `).join('') || '<p class="empty-state">No data</p>';
+
+      // City Table
+      const cityBody = document.querySelector('#cityTable tbody');
+      cityBody.innerHTML = (d.by_city || []).slice(0, 15).map(c => `
+        <tr><td>${c.city}${c.region ? ', ' + c.region : ''}</td><td>${formatNumber(c.clicks)}</td></tr>
+      `).join('') || '<tr><td colspan="2" class="empty-state">No data</td></tr>';
+
+      // Traffic Stats
+      document.getElementById('trafficStats').innerHTML = (d.by_referrer_type || []).map(r => `
+        <div class="stat-row">
+          <span class="stat-label">${r.referrer_type || 'Unknown'}</span>
+          <span class="stat-value">${formatNumber(r.clicks)}</span>
+        </div>
+      `).join('') || '<p class="empty-state">No data</p>';
+
+      // Browser Table
+      const browserBody = document.querySelector('#browserTable tbody');
+      browserBody.innerHTML = (d.by_browser || []).slice(0, 10).map(b => `
+        <tr><td>${b.browser} ${b.browser_version || ''}</td><td>${formatNumber(b.clicks)}</td></tr>
+      `).join('') || '<tr><td colspan="2" class="empty-state">No data</td></tr>';
+
+      // Booking System Stats
+      document.getElementById('systemStats').innerHTML = (d.by_booking_system || []).map(s => `
+        <div class="stat-row">
+          <span class="stat-label">${s.booking_system || 'Unknown'}${s.booking_system === 'golfnow' ? ' <span class="badge badge-golfnow">Affiliate</span>' : ''}</span>
+          <span class="stat-value">${formatNumber(s.clicks)} clicks (${formatNumber(s.unique_visitors)} visitors)</span>
+        </div>
+      `).join('') || '<p class="empty-state">No data</p>';
+
+      // Daily Table
+      const dailyBody = document.querySelector('#dailyTable tbody');
+      dailyBody.innerHTML = (d.by_day || []).slice(0, 30).map(day => `
+        <tr>
+          <td>${day.date}</td>
+          <td>${formatNumber(day.clicks)}</td>
+          <td>${formatNumber(day.golfnow_clicks)}</td>
+          <td>${formatNumber(day.deal_clicks)}</td>
+          <td>${formatNumber(day.unique_visitors)}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" class="empty-state">No data</td></tr>';
+
+      // Recent Clicks
+      document.getElementById('recentClicks').innerHTML = (d.recent_clicks || []).map(c => `
+        <div class="recent-click">
+          <div class="recent-click-info">
+            <div class="recent-click-course">${c.course_name || c.course_slug}</div>
+            <div class="recent-click-meta">
+              ${c.city || ''}${c.city && c.country ? ', ' : ''}${c.country || ''}
+              &bull; ${c.device_type || 'desktop'}
+              &bull; ${c.browser || 'Unknown'}
+              &bull; ${c.source === 'deal' ? 'Deal' : 'Regular'}
+              ${c.is_returning_visitor ? '<span class="badge badge-returning">Return</span>' : '<span class="badge badge-new">New</span>'}
+            </div>
+          </div>
+          <div class="recent-click-time">${timeAgo(c.clicked_at)}</div>
+        </div>
+      `).join('') || '<p class="empty-state" style="padding: 40px;">No clicks yet</p>';
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    // Init
+    checkAuth();
+  </script>
+</body>
+</html>

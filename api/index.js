@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
+const UAParser = require('ua-parser-js');
 const { createClient } = require('@libsql/client');
 const { Resend } = require('resend');
 
@@ -167,7 +169,92 @@ const deleteSession = async (token) => {
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Initialize clicks table for tracking
+(async () => {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS clicks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      course_slug TEXT NOT NULL,
+      course_name TEXT,
+      booking_system TEXT,
+      clicked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      source TEXT DEFAULT 'regular',
+      visitor_id TEXT,
+      session_id TEXT,
+      is_returning_visitor INTEGER DEFAULT 0,
+      visit_count INTEGER DEFAULT 1,
+      referrer TEXT,
+      referrer_domain TEXT,
+      referrer_type TEXT,
+      utm_source TEXT,
+      utm_medium TEXT,
+      utm_campaign TEXT,
+      utm_term TEXT,
+      utm_content TEXT,
+      landing_page TEXT,
+      ip_hash TEXT,
+      country TEXT,
+      country_code TEXT,
+      region TEXT,
+      city TEXT,
+      latitude REAL,
+      longitude REAL,
+      timezone TEXT,
+      user_agent TEXT,
+      device_type TEXT,
+      device_brand TEXT,
+      device_model TEXT,
+      os_name TEXT,
+      os_version TEXT,
+      browser TEXT,
+      browser_version TEXT,
+      is_bot INTEGER DEFAULT 0,
+      screen_width INTEGER,
+      screen_height INTEGER,
+      viewport_width INTEGER,
+      viewport_height INTEGER,
+      pixel_ratio REAL,
+      color_depth INTEGER,
+      language TEXT,
+      languages TEXT,
+      timezone_offset INTEGER,
+      has_touch INTEGER,
+      connection_type TEXT,
+      is_golfnow INTEGER DEFAULT 0,
+      is_mobile INTEGER DEFAULT 0,
+      is_tablet INTEGER DEFAULT 0,
+      is_desktop INTEGER DEFAULT 0
+    )
+  `);
+
+  // Indexes for fast queries
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_slug ON clicks(course_slug)');
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_date ON clicks(clicked_at)');
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_golfnow ON clicks(is_golfnow)');
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_visitor ON clicks(visitor_id)');
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_session ON clicks(session_id)');
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_country ON clicks(country_code)');
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_device ON clicks(device_type)');
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_clicks_referrer_type ON clicks(referrer_type)');
+
+  // Visitors table for tracking return visits
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS visitors (
+      id TEXT PRIMARY KEY,
+      first_seen DATETIME DEFAULT CURRENT_TIMESTAMP,
+      last_seen DATETIME DEFAULT CURRENT_TIMESTAMP,
+      visit_count INTEGER DEFAULT 1,
+      click_count INTEGER DEFAULT 0,
+      country TEXT,
+      city TEXT,
+      device_type TEXT,
+      browser TEXT
+    )
+  `);
+})();
 
 // Async user auth middleware
 const userAuth = async (req, res, next) => {
@@ -1403,6 +1490,13 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baygolf2024';
 app.post('/api/admin/login', (req, res) => {
   const { password } = req.body;
   if (password === ADMIN_PASSWORD) {
+    // Set cookie for stats dashboard
+    res.cookie('admin_token', ADMIN_PASSWORD, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
     res.json({ success: true, token: Buffer.from(ADMIN_PASSWORD).toString('base64') });
   } else {
     res.status(401).json({ error: 'Invalid password' });
@@ -1410,13 +1504,24 @@ app.post('/api/admin/login', (req, res) => {
 });
 
 const adminAuth = (req, res, next) => {
+  // Support both Basic auth (from admin.html) and cookie auth (from admin-stats.html)
   const auth = req.headers.authorization;
-  if (!auth) return res.status(401).json({ error: 'Authorization required' });
-  const token = auth.replace('Bearer ', '');
-  if (Buffer.from(token, 'base64').toString() !== ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Invalid token' });
+  const cookieToken = req.cookies?.admin_token;
+
+  // Check cookie first (for stats dashboard)
+  if (cookieToken === ADMIN_PASSWORD) {
+    return next();
   }
-  next();
+
+  // Fall back to Basic auth (for existing admin panel)
+  if (auth) {
+    const token = auth.replace('Bearer ', '');
+    if (Buffer.from(token, 'base64').toString() === ADMIN_PASSWORD) {
+      return next();
+    }
+  }
+
+  return res.status(401).json({ error: 'Authorization required' });
 };
 
 app.get('/api/admin/courses', adminAuth, async (req, res) => {
@@ -2451,6 +2556,559 @@ app.get('/{*splat}', (req, res) => {
   }
 
   res.sendFile(path.join(publicPath, 'app.html'));
+});
+
+// ========== ADVANCED CLICK TRACKING ==========
+
+// Generate unique IDs
+const generateId = () => crypto.randomBytes(16).toString('hex');
+
+// Parse referrer to extract domain and type
+const parseReferrer = (ref) => {
+  if (!ref) return { domain: null, type: 'direct' };
+  try {
+    const url = new URL(ref);
+    const domain = url.hostname.replace('www.', '');
+
+    // Categorize referrer type
+    let type = 'other';
+    if (/google\.|bing\.|yahoo\.|duckduckgo\.|baidu\./i.test(domain)) type = 'search';
+    else if (/facebook\.|instagram\.|twitter\.|x\.com|linkedin\.|tiktok\.|pinterest\./i.test(domain)) type = 'social';
+    else if (/bayareagolf\.now|localhost/i.test(domain)) type = 'internal';
+    else if (/reddit\.|discord\.|slack\./i.test(domain)) type = 'community';
+    else if (/mail\.|outlook\.|gmail\./i.test(domain)) type = 'email';
+
+    return { domain, type };
+  } catch {
+    return { domain: ref.substring(0, 100), type: 'other' };
+  }
+};
+
+// Detect bots from user agent
+const isBot = (ua) => {
+  if (!ua) return false;
+  return /bot|crawler|spider|scraper|headless|phantom|selenium|puppeteer/i.test(ua);
+};
+
+// Tracking page - serves HTML that collects client data then redirects
+app.get('/go/:slug', async (req, res) => {
+  const { slug } = req.params;
+  const isDeal = req.query.deal === 'true';
+
+  try {
+    // Look up course
+    const result = await db.execute({
+      sql: 'SELECT name, booking_url, booking_system, slug FROM courses WHERE slug = ?',
+      args: [slug]
+    });
+
+    const course = result.rows[0];
+    if (!course || !course.booking_url) {
+      return res.redirect('/courses.html');
+    }
+
+    // Build final redirect URL
+    let redirectUrl = course.booking_url;
+    const separator = redirectUrl.includes('?') ? '&' : '?';
+    redirectUrl += `${separator}utm_source=bayareagolf&utm_medium=web&utm_campaign=${slug}&utm_content=${isDeal ? 'deal' : 'regular'}`;
+    if (process.env.GOLFNOW_AFFILIATE_ID && course.booking_system === 'golfnow') {
+      redirectUrl += `&affiliate=${process.env.GOLFNOW_AFFILIATE_ID}`;
+    }
+
+    // Get/create visitor ID from cookie
+    let visitorId = req.cookies?.bag_visitor;
+    let isReturning = false;
+    if (!visitorId) {
+      visitorId = generateId();
+    } else {
+      isReturning = true;
+    }
+
+    // Get/create session ID
+    let sessionId = req.cookies?.bag_session;
+    if (!sessionId) {
+      sessionId = generateId();
+    }
+
+    // Set cookies
+    res.cookie('bag_visitor', visitorId, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 365 * 24 * 60 * 60 * 1000 // 1 year
+    });
+    res.cookie('bag_session', sessionId, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 30 * 60 * 1000 // 30 min session
+    });
+
+    // Collect server-side data
+    const ua = req.headers['user-agent'] || '';
+    const parser = new UAParser(ua);
+    const uaResult = parser.getResult();
+
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.headers['x-real-ip'] || '';
+    const ipHash = ip ? crypto.createHash('sha256').update(ip).digest('hex').substring(0, 16) : null;
+
+    const refInfo = parseReferrer(req.headers.referer);
+
+    // Server-side data object
+    const serverData = {
+      course_slug: slug,
+      course_name: course.name,
+      booking_system: course.booking_system,
+      source: isDeal ? 'deal' : 'regular',
+      visitor_id: visitorId,
+      session_id: sessionId,
+      is_returning_visitor: isReturning ? 1 : 0,
+      referrer: req.headers.referer?.substring(0, 500) || null,
+      referrer_domain: refInfo.domain,
+      referrer_type: refInfo.type,
+      utm_source: req.query.utm_source || null,
+      utm_medium: req.query.utm_medium || null,
+      utm_campaign: req.query.utm_campaign || null,
+      utm_term: req.query.utm_term || null,
+      utm_content: req.query.utm_content || null,
+      landing_page: req.headers.referer?.includes('bayareagolf') ? req.headers.referer : null,
+      ip_hash: ipHash,
+      country: req.headers['x-vercel-ip-country'] || null,
+      country_code: req.headers['x-vercel-ip-country'] || null,
+      region: req.headers['x-vercel-ip-country-region'] || null,
+      city: req.headers['x-vercel-ip-city'] || null,
+      latitude: req.headers['x-vercel-ip-latitude'] ? parseFloat(req.headers['x-vercel-ip-latitude']) : null,
+      longitude: req.headers['x-vercel-ip-longitude'] ? parseFloat(req.headers['x-vercel-ip-longitude']) : null,
+      timezone: req.headers['x-vercel-ip-timezone'] || null,
+      user_agent: ua.substring(0, 500),
+      device_type: uaResult.device.type || 'desktop',
+      device_brand: uaResult.device.vendor || null,
+      device_model: uaResult.device.model || null,
+      os_name: uaResult.os.name || null,
+      os_version: uaResult.os.version || null,
+      browser: uaResult.browser.name || null,
+      browser_version: uaResult.browser.version || null,
+      is_bot: isBot(ua) ? 1 : 0,
+      is_golfnow: course.booking_system === 'golfnow' ? 1 : 0,
+      is_mobile: uaResult.device.type === 'mobile' ? 1 : 0,
+      is_tablet: uaResult.device.type === 'tablet' ? 1 : 0,
+      is_desktop: (!uaResult.device.type || uaResult.device.type === 'desktop') ? 1 : 0
+    };
+
+    // Serve tracking page that collects client-side data and redirects
+    res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex">
+  <title>Redirecting to ${course.name}...</title>
+  <style>
+    body { font-family: Georgia, serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f4ebe0; }
+    .loader { text-align: center; color: #2d5a27; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #e8dcc8; border-top-color: #2d5a27; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <p>Taking you to ${course.name}...</p>
+  </div>
+  <script>
+    (function() {
+      // Collect client-side data
+      var clientData = {
+        screen_width: screen.width,
+        screen_height: screen.height,
+        viewport_width: window.innerWidth,
+        viewport_height: window.innerHeight,
+        pixel_ratio: window.devicePixelRatio || 1,
+        color_depth: screen.colorDepth,
+        language: navigator.language,
+        languages: navigator.languages ? navigator.languages.join(',') : navigator.language,
+        timezone_offset: new Date().getTimezoneOffset(),
+        has_touch: 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 1 : 0,
+        connection_type: navigator.connection ? navigator.connection.effectiveType : null
+      };
+
+      // Merge with server data
+      var data = Object.assign(${JSON.stringify(serverData)}, clientData);
+
+      // Send tracking beacon
+      var sent = false;
+      function sendAndRedirect() {
+        if (sent) return;
+        sent = true;
+
+        // Use sendBeacon if available (doesn't block redirect)
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/api/track', JSON.stringify(data));
+        } else {
+          // Fallback: sync XHR
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/track', false);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify(data));
+        }
+
+        // Redirect
+        window.location.href = '${redirectUrl}';
+      }
+
+      // Send after brief delay to ensure beacon fires
+      setTimeout(sendAndRedirect, 100);
+
+      // Fallback: redirect after 2s no matter what
+      setTimeout(function() { window.location.href = '${redirectUrl}'; }, 2000);
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=${redirectUrl}">
+  </noscript>
+</body>
+</html>`);
+
+  } catch (error) {
+    console.error('Tracking error:', error);
+    res.redirect('/courses.html');
+  }
+});
+
+// Tracking beacon endpoint - receives data from client
+app.post('/api/track', async (req, res) => {
+  try {
+    const d = req.body;
+
+    // Insert click
+    await db.execute({
+      sql: `INSERT INTO clicks (
+        course_slug, course_name, booking_system, source,
+        visitor_id, session_id, is_returning_visitor,
+        referrer, referrer_domain, referrer_type,
+        utm_source, utm_medium, utm_campaign, utm_term, utm_content, landing_page,
+        ip_hash, country, country_code, region, city, latitude, longitude, timezone,
+        user_agent, device_type, device_brand, device_model, os_name, os_version, browser, browser_version, is_bot,
+        screen_width, screen_height, viewport_width, viewport_height, pixel_ratio, color_depth,
+        language, languages, timezone_offset, has_touch, connection_type,
+        is_golfnow, is_mobile, is_tablet, is_desktop
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        d.course_slug, d.course_name, d.booking_system, d.source,
+        d.visitor_id, d.session_id, d.is_returning_visitor,
+        d.referrer, d.referrer_domain, d.referrer_type,
+        d.utm_source, d.utm_medium, d.utm_campaign, d.utm_term, d.utm_content, d.landing_page,
+        d.ip_hash, d.country, d.country_code, d.region, d.city, d.latitude, d.longitude, d.timezone,
+        d.user_agent, d.device_type, d.device_brand, d.device_model, d.os_name, d.os_version, d.browser, d.browser_version, d.is_bot,
+        d.screen_width, d.screen_height, d.viewport_width, d.viewport_height, d.pixel_ratio, d.color_depth,
+        d.language, d.languages, d.timezone_offset, d.has_touch, d.connection_type,
+        d.is_golfnow, d.is_mobile, d.is_tablet, d.is_desktop
+      ]
+    });
+
+    // Update visitor record
+    if (d.visitor_id) {
+      await db.execute({
+        sql: `INSERT INTO visitors (id, country, city, device_type, browser, click_count)
+              VALUES (?, ?, ?, ?, ?, 1)
+              ON CONFLICT(id) DO UPDATE SET
+                last_seen = CURRENT_TIMESTAMP,
+                visit_count = visit_count + 1,
+                click_count = click_count + 1`,
+        args: [d.visitor_id, d.country, d.city, d.device_type, d.browser]
+      });
+    }
+
+    res.status(204).end();
+  } catch (error) {
+    console.error('Track error:', error);
+    res.status(204).end(); // Don't fail the redirect
+  }
+});
+
+// ========== CLICK TRACKING ADMIN STATS ==========
+
+// Admin logout
+app.post('/api/admin/logout', (req, res) => {
+  res.clearCookie('admin_token');
+  res.json({ success: true });
+});
+
+// Admin stats - ALL TIME, comprehensive demographics
+app.get('/api/admin/stats', adminAuth, async (req, res) => {
+  try {
+    // ===== BASIC COUNTS =====
+    const [total, golfnow, deals, bots] = await Promise.all([
+      db.execute('SELECT COUNT(*) as count FROM clicks'),
+      db.execute('SELECT COUNT(*) as count FROM clicks WHERE is_golfnow = 1'),
+      db.execute({ sql: 'SELECT COUNT(*) as count FROM clicks WHERE source = ?', args: ['deal'] }),
+      db.execute('SELECT COUNT(*) as count FROM clicks WHERE is_bot = 1')
+    ]);
+
+    // Date range
+    const dateRange = await db.execute('SELECT MIN(clicked_at) as first, MAX(clicked_at) as last FROM clicks');
+
+    // ===== VISITOR METRICS =====
+    const visitorStats = await db.execute(`
+      SELECT
+        COUNT(DISTINCT visitor_id) as unique_visitors,
+        COUNT(DISTINCT session_id) as total_sessions,
+        SUM(CASE WHEN is_returning_visitor = 1 THEN 1 ELSE 0 END) as returning_clicks,
+        SUM(CASE WHEN is_returning_visitor = 0 THEN 1 ELSE 0 END) as new_clicks
+      FROM clicks WHERE visitor_id IS NOT NULL
+    `);
+
+    // Top returning visitors
+    const topVisitors = await db.execute(`
+      SELECT visitor_id, COUNT(*) as clicks, MIN(clicked_at) as first_click, MAX(clicked_at) as last_click
+      FROM clicks WHERE visitor_id IS NOT NULL
+      GROUP BY visitor_id
+      HAVING clicks > 1
+      ORDER BY clicks DESC
+      LIMIT 20
+    `);
+
+    // ===== BY COURSE =====
+    const byCourse = await db.execute(`
+      SELECT course_slug, course_name, booking_system,
+             COUNT(*) as clicks,
+             SUM(CASE WHEN source = 'deal' THEN 1 ELSE 0 END) as deal_clicks,
+             COUNT(DISTINCT visitor_id) as unique_visitors,
+             MAX(is_golfnow) as is_golfnow
+      FROM clicks
+      GROUP BY course_slug
+      ORDER BY clicks DESC
+    `);
+
+    // ===== BY BOOKING SYSTEM =====
+    const bySystem = await db.execute(`
+      SELECT booking_system, COUNT(*) as clicks, COUNT(DISTINCT visitor_id) as unique_visitors
+      FROM clicks
+      GROUP BY booking_system
+      ORDER BY clicks DESC
+    `);
+
+    // ===== TIME ANALYSIS =====
+    const byDay = await db.execute(`
+      SELECT DATE(clicked_at) as date,
+             COUNT(*) as clicks,
+             SUM(CASE WHEN is_golfnow = 1 THEN 1 ELSE 0 END) as golfnow_clicks,
+             SUM(CASE WHEN source = 'deal' THEN 1 ELSE 0 END) as deal_clicks,
+             COUNT(DISTINCT visitor_id) as unique_visitors
+      FROM clicks
+      GROUP BY DATE(clicked_at)
+      ORDER BY date DESC
+    `);
+
+    const byHour = await db.execute(`
+      SELECT CAST(strftime('%H', clicked_at) AS INTEGER) as hour, COUNT(*) as clicks
+      FROM clicks GROUP BY hour ORDER BY hour
+    `);
+
+    const byWeekday = await db.execute(`
+      SELECT CAST(strftime('%w', clicked_at) AS INTEGER) as day, COUNT(*) as clicks
+      FROM clicks GROUP BY day ORDER BY day
+    `);
+    const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    // ===== DEVICE & PLATFORM =====
+    const byDeviceType = await db.execute(`
+      SELECT device_type, COUNT(*) as clicks, COUNT(DISTINCT visitor_id) as unique_visitors
+      FROM clicks GROUP BY device_type ORDER BY clicks DESC
+    `);
+
+    const byOS = await db.execute(`
+      SELECT os_name, os_version, COUNT(*) as clicks
+      FROM clicks WHERE os_name IS NOT NULL
+      GROUP BY os_name, os_version ORDER BY clicks DESC LIMIT 20
+    `);
+
+    const byBrowser = await db.execute(`
+      SELECT browser, browser_version, COUNT(*) as clicks
+      FROM clicks WHERE browser IS NOT NULL
+      GROUP BY browser, browser_version ORDER BY clicks DESC LIMIT 20
+    `);
+
+    const byDeviceBrand = await db.execute(`
+      SELECT device_brand, device_model, COUNT(*) as clicks
+      FROM clicks WHERE device_brand IS NOT NULL
+      GROUP BY device_brand, device_model ORDER BY clicks DESC LIMIT 20
+    `);
+
+    // ===== SCREEN & VIEWPORT =====
+    const byScreenSize = await db.execute(`
+      SELECT screen_width, screen_height, COUNT(*) as clicks
+      FROM clicks WHERE screen_width IS NOT NULL
+      GROUP BY screen_width, screen_height ORDER BY clicks DESC LIMIT 20
+    `);
+
+    const avgViewport = await db.execute(`
+      SELECT
+        AVG(viewport_width) as avg_width,
+        AVG(viewport_height) as avg_height,
+        AVG(pixel_ratio) as avg_pixel_ratio
+      FROM clicks WHERE viewport_width IS NOT NULL
+    `);
+
+    // ===== GEOGRAPHIC =====
+    const byCountry = await db.execute(`
+      SELECT country, country_code, COUNT(*) as clicks, COUNT(DISTINCT visitor_id) as unique_visitors
+      FROM clicks WHERE country IS NOT NULL
+      GROUP BY country, country_code ORDER BY clicks DESC
+    `);
+
+    const byCity = await db.execute(`
+      SELECT city, region, country, COUNT(*) as clicks, COUNT(DISTINCT visitor_id) as unique_visitors
+      FROM clicks WHERE city IS NOT NULL
+      GROUP BY city, region, country ORDER BY clicks DESC LIMIT 30
+    `);
+
+    const byTimezone = await db.execute(`
+      SELECT timezone, COUNT(*) as clicks
+      FROM clicks WHERE timezone IS NOT NULL
+      GROUP BY timezone ORDER BY clicks DESC LIMIT 20
+    `);
+
+    // ===== TRAFFIC SOURCES =====
+    const byReferrerType = await db.execute(`
+      SELECT referrer_type, COUNT(*) as clicks, COUNT(DISTINCT visitor_id) as unique_visitors
+      FROM clicks GROUP BY referrer_type ORDER BY clicks DESC
+    `);
+
+    const byReferrerDomain = await db.execute(`
+      SELECT referrer_domain, referrer_type, COUNT(*) as clicks
+      FROM clicks WHERE referrer_domain IS NOT NULL
+      GROUP BY referrer_domain ORDER BY clicks DESC LIMIT 30
+    `);
+
+    const byUTMSource = await db.execute(`
+      SELECT utm_source, utm_medium, utm_campaign, COUNT(*) as clicks
+      FROM clicks WHERE utm_source IS NOT NULL
+      GROUP BY utm_source, utm_medium, utm_campaign ORDER BY clicks DESC LIMIT 20
+    `);
+
+    // ===== LANGUAGE & LOCALE =====
+    const byLanguage = await db.execute(`
+      SELECT language, COUNT(*) as clicks
+      FROM clicks WHERE language IS NOT NULL
+      GROUP BY language ORDER BY clicks DESC LIMIT 20
+    `);
+
+    // ===== CONNECTION =====
+    const byConnection = await db.execute(`
+      SELECT connection_type, COUNT(*) as clicks
+      FROM clicks WHERE connection_type IS NOT NULL
+      GROUP BY connection_type ORDER BY clicks DESC
+    `);
+
+    const touchVsNonTouch = await db.execute(`
+      SELECT
+        SUM(CASE WHEN has_touch = 1 THEN 1 ELSE 0 END) as touch,
+        SUM(CASE WHEN has_touch = 0 THEN 1 ELSE 0 END) as non_touch
+      FROM clicks WHERE has_touch IS NOT NULL
+    `);
+
+    // ===== RECENT CLICKS =====
+    const recent = await db.execute(`
+      SELECT course_name, course_slug, source, booking_system, clicked_at,
+             city, region, country, device_type, browser, os_name,
+             is_returning_visitor, referrer_type, screen_width, screen_height
+      FROM clicks
+      ORDER BY clicked_at DESC
+      LIMIT 100
+    `);
+
+    res.json({
+      // Summary
+      first_click: dateRange.rows[0]?.first,
+      last_click: dateRange.rows[0]?.last,
+      total_clicks: total.rows[0]?.count || 0,
+      golfnow_clicks: golfnow.rows[0]?.count || 0,
+      deal_clicks: deals.rows[0]?.count || 0,
+      bot_clicks: bots.rows[0]?.count || 0,
+
+      // Visitor metrics
+      unique_visitors: visitorStats.rows[0]?.unique_visitors || 0,
+      total_sessions: visitorStats.rows[0]?.total_sessions || 0,
+      returning_clicks: visitorStats.rows[0]?.returning_clicks || 0,
+      new_visitor_clicks: visitorStats.rows[0]?.new_clicks || 0,
+      top_returning_visitors: topVisitors.rows,
+
+      // By course
+      by_course: byCourse.rows,
+
+      // By system
+      by_booking_system: bySystem.rows,
+
+      // Time analysis
+      by_day: byDay.rows,
+      by_hour: byHour.rows,
+      by_weekday: byWeekday.rows.map(r => ({ day: weekdayNames[r.day], clicks: r.clicks })),
+
+      // Device & platform
+      by_device_type: byDeviceType.rows,
+      by_os: byOS.rows,
+      by_browser: byBrowser.rows,
+      by_device_brand: byDeviceBrand.rows,
+
+      // Screen & viewport
+      by_screen_size: byScreenSize.rows,
+      avg_viewport: avgViewport.rows[0],
+
+      // Geographic
+      by_country: byCountry.rows,
+      by_city: byCity.rows,
+      by_timezone: byTimezone.rows,
+
+      // Traffic sources
+      by_referrer_type: byReferrerType.rows,
+      by_referrer_domain: byReferrerDomain.rows,
+      by_utm: byUTMSource.rows,
+
+      // Language & connection
+      by_language: byLanguage.rows,
+      by_connection: byConnection.rows,
+      touch_stats: touchVsNonTouch.rows[0],
+
+      // Recent
+      recent_clicks: recent.rows
+    });
+
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin CSV export - all fields
+app.get('/api/admin/export', adminAuth, async (req, res) => {
+  try {
+    const result = await db.execute(`
+      SELECT * FROM clicks ORDER BY clicked_at DESC
+    `);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No data to export' });
+    }
+
+    const headers = Object.keys(result.rows[0]);
+    let csv = headers.join(',') + '\n';
+
+    for (const row of result.rows) {
+      csv += headers.map(h => {
+        const val = row[h];
+        if (val === null || val === undefined) return '';
+        const str = String(val).replace(/"/g, '""');
+        return str.includes(',') || str.includes('"') || str.includes('\n') ? `"${str}"` : str;
+      }).join(',') + '\n';
+    }
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=bayareagolf-clicks-full.csv');
+    res.send(csv);
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Only start server if not being imported (for Vercel)
