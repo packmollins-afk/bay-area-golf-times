@@ -1827,14 +1827,14 @@
       const isMobile = window.innerWidth < 768;
 
       const config = {
-        // Zoom limits - desktop can zoom out more
-        minZoom: isMobile ? 0.5 : 0.2,    // Mobile stays closer, desktop can see full coast
+        // Zoom limits - allow zooming out to see all courses
+        minZoom: 0.5,                      // Both can zoom out to see everything
         maxZoom: 2.5,                      // How far in
-        defaultZoom: isMobile ? 1.0 : 0.8, // Mobile starts on Bay Area, desktop slightly out
+        defaultZoom: isMobile ? 0.55 : 0.5, // Start zoomed out to show all courses
 
         // Button zoom steps (per click)
-        zoomInStep: 0.12,        // + button increment
-        zoomOutStep: 0.06,       // - button increment (gentler)
+        zoomInStep: 0.1,         // + button increment
+        zoomOutStep: 0.1,        // - button increment (same for symmetry)
 
         // Scroll wheel sensitivity
         wheelZoomSpeed: 0.05,    // Mouse wheel zoom speed
@@ -1851,15 +1851,15 @@
         momentumDecay: 0.92,     // How quickly momentum slows (0-1)
         momentumThreshold: 0.1,  // Min velocity to apply momentum
 
-        // Initial position (center on courses)
-        startX: isMobile ? 8 : 5,   // Mobile centered on Bay Area
-        startY: isMobile ? 0 : -5,  // Desktop slightly north to show more coast
+        // Initial position (centered on all courses)
+        startX: 12,              // Centered horizontally on course cluster
+        startY: 5,               // Centered vertically on course cluster
 
-        // Pan bounds - asymmetric to keep courses centered
-        boundsWest: -5,          // Limit Pacific (can't go far west)
-        boundsEast: 70,          // Allow inland (east)
-        boundsNorth: -50,        // Allow north (Sonoma coast)
-        boundsSouth: 60          // Allow south (Monterey+)
+        // Pan bounds - keep courses in view when zooming
+        boundsWest: -10,         // Limit Pacific
+        boundsEast: 50,          // Allow inland (east)
+        boundsNorth: -30,        // Allow north (Sonoma)
+        boundsSouth: 40          // Allow south (Santa Cruz)
       };
 
       let isDragging = false;
