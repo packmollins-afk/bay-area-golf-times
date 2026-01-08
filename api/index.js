@@ -168,7 +168,13 @@ const deleteSession = async (token) => {
 };
 
 app.use(cors());
-app.use(express.json({ limit: '5mb' }));
+// Skip JSON parsing for /api/track (it uses text/plain from sendBeacon)
+app.use((req, res, next) => {
+  if (req.path === '/api/track') {
+    return next();
+  }
+  express.json({ limit: '5mb' })(req, res, next);
+});
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
