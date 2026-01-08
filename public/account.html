@@ -336,6 +336,103 @@
     }
 
     .hidden { display: none !important; }
+
+    /* Favorites Section */
+    .favorites-section {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 2px solid var(--border-light);
+    }
+    .favorites-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .favorites-header h3 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      color: var(--primary-dark);
+    }
+    .favorites-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .favorites-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .favorite-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg-paper);
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .favorite-item:hover {
+      border-color: var(--primary);
+      background: white;
+    }
+    .favorite-info {
+      flex: 1;
+    }
+    .favorite-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .favorite-location {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .favorite-remove {
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .favorite-remove:hover {
+      background: var(--error);
+      border-color: var(--error);
+      color: white;
+    }
+    .favorites-empty {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .favorites-empty a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .favorites-empty a:hover {
+      text-decoration: underline;
+    }
+    .add-favorite-section {
+      margin-top: 16px;
+    }
+    .add-favorite-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: white;
+      cursor: pointer;
+    }
+    .add-favorite-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
   </style>
 </head>
 <body>
@@ -442,6 +539,22 @@
           <div class="profile-saved-msg" id="profile-saved-msg">Profile saved!</div>
         </div>
 
+        <!-- Favorite Courses Section -->
+        <div class="favorites-section">
+          <div class="favorites-header">
+            <h3>My Favorite Courses</h3>
+            <span class="favorites-count" id="favorites-count">0 courses</span>
+          </div>
+          <div class="favorites-list" id="favorites-list">
+            <div class="favorites-empty">Loading...</div>
+          </div>
+          <div class="add-favorite-section">
+            <select class="add-favorite-select" id="add-favorite-select" onchange="addFavorite(this.value)">
+              <option value="">+ Add a course to favorites...</option>
+            </select>
+          </div>
+        </div>
+
         <button class="logout-btn" onclick="handleLogout()" style="margin-top: 24px;">Log Out</button>
       </div>
     </div>
@@ -522,8 +635,9 @@
         document.getElementById('handicap-input').value = user.handicap;
       }
 
-      // Load courses for home course select
+      // Load courses for home course select and favorites
       await loadCoursesForSelect(user.homeCourseId);
+      await loadFavorites();
 
       // Load user stats
       try {
@@ -541,15 +655,80 @@
       }
     }
 
+    let allCourses = [];
+
     async function loadCoursesForSelect(selectedId) {
       try {
         const res = await fetch(`${API_BASE}/courses?all=true`);
-        const courses = await res.json();
+        allCourses = await res.json();
         const select = document.getElementById('home-course-select');
         select.innerHTML = '<option value="">Select your home course...</option>' +
-          courses.map(c => `<option value="${c.id}" ${c.id == selectedId ? 'selected' : ''}>${c.name} - ${c.city}</option>`).join('');
+          allCourses.map(c => `<option value="${c.id}" ${c.id == selectedId ? 'selected' : ''}>${c.name} - ${c.city}</option>`).join('');
       } catch (e) {
         console.error('Error loading courses:', e);
+      }
+    }
+
+    // Favorites management (stored in localStorage)
+    function getFavorites() {
+      try {
+        return JSON.parse(localStorage.getItem('golfFavorites') || '[]');
+      } catch (e) { return []; }
+    }
+
+    function saveFavorites(favorites) {
+      localStorage.setItem('golfFavorites', JSON.stringify(favorites));
+    }
+
+    async function loadFavorites() {
+      const favorites = getFavorites();
+      const listEl = document.getElementById('favorites-list');
+      const countEl = document.getElementById('favorites-count');
+      const addSelect = document.getElementById('add-favorite-select');
+
+      countEl.textContent = `${favorites.length} course${favorites.length !== 1 ? 's' : ''}`;
+
+      if (favorites.length === 0) {
+        listEl.innerHTML = `<div class="favorites-empty">No favorite courses yet.<br><a href="/app.html">Browse courses</a> and click the heart icon to add favorites.</div>`;
+      } else {
+        // Get course details for favorites
+        const favCourses = allCourses.filter(c => favorites.includes(c.id));
+        listEl.innerHTML = favCourses.map(c => `
+          <div class="favorite-item">
+            <div class="favorite-info">
+              <div class="favorite-name">${c.name}</div>
+              <div class="favorite-location">${c.city}, ${c.region}</div>
+            </div>
+            <button class="favorite-remove" onclick="removeFavorite(${c.id})">Remove</button>
+          </div>
+        `).join('');
+      }
+
+      // Update add-favorite dropdown (exclude already favorited)
+      const nonFavCourses = allCourses.filter(c => !favorites.includes(c.id));
+      addSelect.innerHTML = '<option value="">+ Add a course to favorites...</option>' +
+        nonFavCourses.map(c => `<option value="${c.id}">${c.name} - ${c.city}</option>`).join('');
+    }
+
+    function addFavorite(courseId) {
+      if (!courseId) return;
+      const favorites = getFavorites();
+      const id = parseInt(courseId);
+      if (!favorites.includes(id)) {
+        favorites.push(id);
+        saveFavorites(favorites);
+        loadFavorites();
+      }
+      document.getElementById('add-favorite-select').value = '';
+    }
+
+    function removeFavorite(courseId) {
+      const favorites = getFavorites();
+      const idx = favorites.indexOf(courseId);
+      if (idx > -1) {
+        favorites.splice(idx, 1);
+        saveFavorites(favorites);
+        loadFavorites();
       }
     }
 

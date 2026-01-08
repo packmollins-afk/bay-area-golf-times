@@ -1722,6 +1722,13 @@
           </svg>
           Search Tee Times
         </button>
+        <!-- My Courses button for logged-in users -->
+        <button class="btn" id="my-courses-btn" onclick="searchMyCourses()" style="margin-top: 20px; display: none; background: linear-gradient(135deg, #b8860b, #d4a017);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right: 6px;">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          My Courses
+        </button>
       </div>
 
       <div class="filter-tabs" style="display: none;">
@@ -1919,12 +1926,72 @@
       const authToken = localStorage.getItem('authToken');
       const navBtn = document.getElementById('account-nav-btn');
       const navText = document.getElementById('account-nav-text');
+      const myCoursesBtn = document.getElementById('my-courses-btn');
+
       if (navBtn && navText) {
         if (authToken) {
           navText.textContent = 'Account';
+          // Show My Courses button if user has favorites
+          const favorites = getFavorites();
+          if (myCoursesBtn && favorites.length > 0) {
+            myCoursesBtn.style.display = 'inline-flex';
+          }
         } else {
           navText.textContent = 'Sign In';
+          if (myCoursesBtn) myCoursesBtn.style.display = 'none';
         }
+      }
+    }
+
+    // Search tee times for user's favorite courses (bypasses region requirement)
+    async function searchMyCourses() {
+      const favorites = getFavorites();
+      if (favorites.length === 0) {
+        alert('Add some favorite courses first! Go to Account to manage your favorites.');
+        return;
+      }
+
+      const resultsEl = document.getElementById('results');
+      resultsEl.setAttribute('aria-busy', 'true');
+      resultsEl.innerHTML = `<div class="loading" role="status"><div class="loading-spinner" aria-hidden="true"></div><p>Searching your favorite courses...</p></div>`;
+
+      // Get date from dropdown, or default to today
+      const dateSelect = document.getElementById('date-select');
+      const reqDate = dateSelect?.value || getPacificDate();
+
+      try {
+        // Fetch tee times using next_available mode (bypasses region requirement)
+        const params = new URLSearchParams();
+        params.set('next_available', 'true');
+        params.set('limit', '200');
+
+        const res = await fetch(`${API_BASE}/tee-times?${params}&_t=${Date.now()}`);
+        if (!res.ok) throw new Error('Failed to fetch');
+
+        let teeTimes = await res.json();
+
+        // Filter to only favorite courses
+        teeTimes = teeTimes.filter(tt => favorites.includes(tt.course_id));
+
+        // Optionally filter by date if selected
+        if (reqDate) {
+          teeTimes = teeTimes.filter(tt => tt.date === reqDate);
+        }
+
+        document.getElementById('results-count').textContent = `${teeTimes.length} tee times at your favorite courses`;
+
+        if (teeTimes.length === 0) {
+          resultsEl.innerHTML = `<div class="no-results"><h3>No tee times found</h3><p>No tee times available at your favorite courses. Try a different date or add more favorites in your Account.</p></div>`;
+          resultsEl.setAttribute('aria-busy', 'false');
+          return;
+        }
+
+        resultsEl.innerHTML = renderGroupedTeeTimes(teeTimes);
+        resultsEl.setAttribute('aria-busy', 'false');
+      } catch (e) {
+        console.error('Error:', e);
+        resultsEl.innerHTML = `<div class="no-results"><h3>Error loading</h3><p>Please try again.</p></div>`;
+        resultsEl.setAttribute('aria-busy', 'false');
       }
     }
 
