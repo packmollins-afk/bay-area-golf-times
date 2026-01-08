@@ -1333,10 +1333,16 @@
 
     function formatTeeTimeTime(timeStr) {
       if (!timeStr) return '';
+      // Handle "7:30AM" format (GolfNow)
+      if (timeStr.includes('AM') || timeStr.includes('PM')) {
+        // Add space before AM/PM if not present
+        return timeStr.replace(/(\d)(AM|PM)/i, '$1 $2').toUpperCase();
+      }
+      // Handle "07:30" format (24-hour)
       const [h, m] = timeStr.split(':').map(Number);
       const ampm = h >= 12 ? 'PM' : 'AM';
       const hour = h % 12 || 12;
-      return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`;
+      return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
     }
 
     function getWeatherCondition(code) {
