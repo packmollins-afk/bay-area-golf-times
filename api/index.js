@@ -2528,36 +2528,6 @@ app.get('/api/bookings', userAuth, async (req, res) => {
   }
 });
 
-// SPA fallback (Express 5 compatible)
-app.get('/{*splat}', (req, res) => {
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'Not found' });
-  }
-
-  const publicPath = path.join(__dirname, '../public');
-
-  if (req.path.startsWith('/course/')) {
-    return res.sendFile(path.join(publicPath, 'course.html'));
-  }
-  if (req.path === '/courses') {
-    return res.sendFile(path.join(publicPath, 'courses.html'));
-  }
-  if (req.path === '/scorebook') {
-    return res.sendFile(path.join(publicPath, 'scorebook.html'));
-  }
-  if (req.path === '/community') {
-    return res.sendFile(path.join(publicPath, 'community.html'));
-  }
-  if (req.path === '/account') {
-    return res.sendFile(path.join(publicPath, 'account.html'));
-  }
-  if (req.path === '/admin') {
-    return res.sendFile(path.join(publicPath, 'admin.html'));
-  }
-
-  res.sendFile(path.join(publicPath, 'app.html'));
-});
-
 // ========== ADVANCED CLICK TRACKING ==========
 
 // Generate unique IDs
@@ -3109,6 +3079,36 @@ app.get('/api/admin/export', adminAuth, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// SPA fallback (Express 5 compatible) - MUST be last route
+app.get('/{*splat}', (req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  const publicPath = path.join(__dirname, '../public');
+
+  if (req.path.startsWith('/course/')) {
+    return res.sendFile(path.join(publicPath, 'course.html'));
+  }
+  if (req.path === '/courses') {
+    return res.sendFile(path.join(publicPath, 'courses.html'));
+  }
+  if (req.path === '/scorebook') {
+    return res.sendFile(path.join(publicPath, 'scorebook.html'));
+  }
+  if (req.path === '/community') {
+    return res.sendFile(path.join(publicPath, 'community.html'));
+  }
+  if (req.path === '/account') {
+    return res.sendFile(path.join(publicPath, 'account.html'));
+  }
+  if (req.path === '/admin') {
+    return res.sendFile(path.join(publicPath, 'admin.html'));
+  }
+
+  res.sendFile(path.join(publicPath, 'app.html'));
 });
 
 // Only start server if not being imported (for Vercel)
