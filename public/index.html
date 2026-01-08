@@ -470,113 +470,92 @@
     .fw-silverado-n .price-tag { --counter-rotate: 10deg; }
     .fw-silverado-s .price-tag { --counter-rotate: 12deg; }
 
-    /* Map title cartouche - pass through clicks to courses */
-    .cartouche {
+    /* Top title bar - minimal */
+    .title-bar {
       position: absolute;
-      top: 50%;
-      left: 45%;
-      transform: translate(-50%, -50%);
-      text-align: center;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 20;
-      padding: 1rem 1.5rem;
-      background: rgba(244, 235, 224, 0.75);
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-      border: 2px solid rgba(139, 115, 85, 0.6);
-      border-radius: 4px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      pointer-events: none; /* Allow clicking through to courses */
-    }
-
-    .cartouche::before {
-      content: '';
-      position: absolute;
-      inset: 4px;
-      border: 1px solid rgba(139, 115, 85, 0.3);
-      border-radius: 2px;
-      pointer-events: none;
-    }
-
-    .cartouche * {
-      pointer-events: auto; /* Re-enable clicks for buttons/links */
+      padding: 0.75rem 1rem;
+      background: linear-gradient(180deg, rgba(244, 235, 224, 0.95) 0%, rgba(244, 235, 224, 0.8) 70%, transparent 100%);
+      text-align: center;
     }
 
     .map-title {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-size: 1.4rem;
       font-weight: 700;
       color: var(--text-dark);
       letter-spacing: 0.05em;
-      margin-bottom: 0.3rem;
+      margin: 0;
     }
 
     .map-subtitle {
-      font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+      font-size: 0.65rem;
       color: var(--text-muted);
-      letter-spacing: 0.1em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      margin-bottom: 1rem;
+      margin: 0;
       font-weight: 400;
     }
 
-    .map-year {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-      font-style: italic;
-    }
-
-    /* Navigation buttons */
-    .nav-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      width: 100%;
-      max-width: 320px;
+    /* Bottom navigation bar */
+    .nav-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: 0.5rem 1rem 0.75rem;
+      background: linear-gradient(0deg, rgba(244, 235, 224, 0.98) 0%, rgba(244, 235, 224, 0.9) 80%, transparent 100%);
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .nav-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      padding: 0.9rem 0.5rem;
+      gap: 4px;
+      padding: 0.5rem 1rem;
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 0.85rem;
+      font-size: 0.7rem;
       font-weight: 600;
       color: var(--text-dark);
-      background: rgba(255, 255, 255, 0.5);
-      border: 2px solid var(--contour-light);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--contour-light);
       border-radius: 6px;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.25s ease;
-      letter-spacing: 0.02em;
+      transition: all 0.2s ease;
+      min-width: 70px;
     }
 
     .nav-btn:hover {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.95);
       border-color: var(--contour);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     }
 
     .nav-btn.primary {
       background: var(--fairway);
       color: #fff;
       border-color: var(--fairway);
-      box-shadow: 0 3px 10px rgba(90, 143, 74, 0.3);
+      box-shadow: 0 2px 8px rgba(90, 143, 74, 0.3);
     }
 
     .nav-btn.primary:hover {
       background: var(--fairway-light);
       border-color: var(--fairway-light);
-      box-shadow: 0 5px 16px rgba(90, 143, 74, 0.4);
+      box-shadow: 0 4px 12px rgba(90, 143, 74, 0.4);
     }
 
     .nav-btn svg {
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       fill: none;
       stroke: currentColor;
       stroke-width: 1.8;
@@ -676,6 +655,42 @@
     .compass-rose svg {
       width: 100%;
       height: 100%;
+    }
+
+    /* Login button near compass */
+    .login-btn {
+      position: absolute;
+      top: 2rem;
+      right: 7rem;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.4rem 0.7rem;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--contour-light);
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .login-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      border-color: var(--contour);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
     }
 
     /* Region labels */
@@ -1011,10 +1026,39 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-      .cartouche {
-        padding: 1rem 1.5rem;
-        width: 85%;
-        max-width: 300px;
+      .title-bar {
+        padding: 0.5rem 0.75rem;
+      }
+
+      .map-title {
+        font-size: 1.1rem;
+      }
+
+      .map-subtitle {
+        font-size: 0.55rem;
+      }
+
+      .nav-bar {
+        padding: 0.4rem 0.5rem 0.6rem;
+        gap: 0.3rem;
+      }
+
+      .nav-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.6rem;
+        min-width: 60px;
+      }
+
+      .nav-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .login-btn {
+        top: 0.5rem;
+        right: 4rem;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.6rem;
       }
 
       .legend, .scale-bar {
@@ -1022,10 +1066,10 @@
       }
 
       .compass-rose {
-        width: 50px;
-        height: 50px;
-        top: 1rem;
-        right: 1rem;
+        width: 40px;
+        height: 40px;
+        top: 0.5rem;
+        right: 0.5rem;
       }
 
       .fairway {
@@ -1235,48 +1279,55 @@
     <div class="region-label label-napa">Napa</div>
     <div class="region-label label-pacific">Pacific Ocean</div>
 
-    <!-- Central cartouche with title and nav -->
-    <div class="cartouche">
+    <!-- Top title bar -->
+    <div class="title-bar">
       <h1 class="map-title">Bay Area Golf</h1>
-      <p class="map-subtitle">San Francisco & Vicinity</p>
-      <p class="map-year">40+ Public Courses</p>
-
-      <nav class="nav-buttons">
-        <a href="/app.html" class="nav-btn primary">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          Tee Times
-        </a>
-        <a href="/courses.html" class="nav-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 21h18M5 21V7l8-4 8 4v14"></path>
-            <path d="M9 21v-6h6v6"></path>
-          </svg>
-          Courses
-        </a>
-        <a href="/scorebook.html" class="nav-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10 9 9 9 8 9"></polyline>
-          </svg>
-          Scorebook
-        </a>
-        <a href="/community.html" class="nav-btn">
-          <svg viewBox="0 0 24 24">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          Community
-        </a>
-      </nav>
+      <p class="map-subtitle">San Francisco & Vicinity • 40+ Public Courses</p>
     </div>
+
+    <!-- Login button (top right, near compass) -->
+    <a href="/account.html" class="login-btn" id="login-btn">
+      <svg viewBox="0 0 24 24">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span id="login-text">Log In</span>
+    </a>
+
+    <!-- Bottom navigation bar -->
+    <nav class="nav-bar">
+      <a href="/app.html" class="nav-btn primary">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Tee Times
+      </a>
+      <a href="/courses.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 21h18M5 21V7l8-4 8 4v14"></path>
+          <path d="M9 21v-6h6v6"></path>
+        </svg>
+        Courses
+      </a>
+      <a href="/scorebook.html" class="nav-btn">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        Scorebook
+      </a>
+      <a href="/community.html" class="nav-btn">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        </svg>
+        Community
+      </a>
+    </nav>
 
     <!-- Legend -->
     <div class="legend">
@@ -1388,6 +1439,16 @@
 
     // Load prices on page load
     document.addEventListener('DOMContentLoaded', loadPrices);
+
+    // Check auth state and update login button
+    function updateLoginBtn() {
+      const authToken = localStorage.getItem('authToken');
+      const loginText = document.getElementById('login-text');
+      if (loginText) {
+        loginText.textContent = authToken ? 'Account' : 'Log In';
+      }
+    }
+    document.addEventListener('DOMContentLoaded', updateLoginBtn);
 
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
