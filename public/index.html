@@ -131,12 +131,24 @@
       background: var(--paper);
     }
 
-    /* Zoom out the map content */
+    /* Draggable map content - larger than viewport */
     .map-content {
       position: absolute;
-      inset: 0;
-      transform: scale(0.6);
-      transform-origin: center center;
+      width: 200%;
+      height: 200%;
+      left: -50%;
+      top: -50%;
+      cursor: grab;
+      transition: none;
+      user-select: none;
+    }
+
+    .map-content:active {
+      cursor: grabbing;
+    }
+
+    .map-content.dragging {
+      cursor: grabbing;
     }
 
     /* Aged paper texture */
@@ -199,13 +211,13 @@
     .contour-sb-1 { top: 60%; left: 22%; width: 35%; height: 38%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
     .contour-sb-2 { top: 68%; left: 28%; width: 26%; height: 28%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
 
-    /* San Francisco Bay - more accurate shape */
+    /* San Francisco Bay - centered in visible area (200% map) */
     .bay-water {
       position: absolute;
-      top: 22%;
-      left: 38%;
-      width: 22%;
-      height: 52%;
+      top: 36%;
+      left: 44%;
+      width: 9%;
+      height: 19%;
       background: var(--water);
       border-radius: 45% 55% 30% 20% / 25% 30% 70% 75%;
       transform: rotate(-5deg);
@@ -215,10 +227,10 @@
     /* South Bay extension (narrower) */
     .south-bay {
       position: absolute;
-      top: 58%;
-      left: 40%;
-      width: 14%;
-      height: 32%;
+      top: 49%;
+      left: 45%;
+      width: 6%;
+      height: 14%;
       background: var(--water);
       border-radius: 50% 50% 30% 30%;
       transform: rotate(8deg);
@@ -228,10 +240,10 @@
     /* San Pablo Bay (north) */
     .san-pablo-bay {
       position: absolute;
-      top: 18%;
-      left: 42%;
-      width: 12%;
-      height: 12%;
+      top: 34%;
+      left: 47%;
+      width: 5%;
+      height: 5%;
       background: var(--water);
       border-radius: 60% 40% 50% 50%;
       box-shadow: inset 0 0 15px rgba(123, 163, 189, 0.4);
@@ -240,20 +252,20 @@
     /* Golden Gate strait */
     .golden-gate-strait {
       position: absolute;
-      top: 24%;
-      left: 28%;
-      width: 14%;
-      height: 4%;
+      top: 37%;
+      left: 38%;
+      width: 7%;
+      height: 1.5%;
       background: var(--water);
       transform: rotate(-8deg);
     }
 
-    /* Pacific Ocean - west edge */
+    /* Pacific Ocean - fully west against edge */
     .pacific {
       position: absolute;
       top: 0;
-      left: -5%;
-      width: 22%;
+      left: 0;
+      width: 28%;
       height: 100%;
       background: linear-gradient(90deg, var(--water) 0%, var(--water) 60%, transparent 100%);
     }
@@ -261,14 +273,39 @@
     /* Tomales Bay (where Bodega is) */
     .tomales-bay {
       position: absolute;
-      top: 5%;
-      left: 18%;
-      width: 3%;
-      height: 12%;
+      top: 28%;
+      left: 33%;
+      width: 1%;
+      height: 5%;
       background: var(--water);
       border-radius: 50%;
       transform: rotate(-35deg);
       opacity: 0.8;
+    }
+
+    /* Monterey Bay (south - drag down to see) */
+    .monterey-bay {
+      position: absolute;
+      top: 78%;
+      left: 26%;
+      width: 8%;
+      height: 8%;
+      background: var(--water);
+      border-radius: 0 60% 50% 0;
+      box-shadow: inset 0 0 20px rgba(123, 163, 189, 0.4);
+    }
+
+    /* Sacramento River Delta (drag right/up to see) */
+    .sac-delta {
+      position: absolute;
+      top: 28%;
+      left: 54%;
+      width: 5%;
+      height: 8%;
+      background: var(--water);
+      border-radius: 40% 60% 50% 50%;
+      opacity: 0.6;
+      box-shadow: inset 0 0 15px rgba(123, 163, 189, 0.3);
     }
 
     /* Golf course fairway shapes */
@@ -340,71 +377,71 @@
       pointer-events: none;
     }
 
-    /* SF Courses - on SF Peninsula (west side of bay) - larger markers */
-    .fw-harding { top: 36%; left: 24%; width: 28px; height: 42px; border-radius: 40% 60% 55% 45%; transform: rotate(-30deg); }
-    .fw-lincoln { top: 28%; left: 20%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-25deg); }
-    .fw-presidio { top: 24%; left: 26%; width: 24px; height: 36px; border-radius: 45% 55% 50% 50%; transform: rotate(-15deg); }
-    .fw-sharp { top: 46%; left: 18%; width: 24px; height: 38px; border-radius: 55% 45% 50% 50%; transform: rotate(-25deg); }
-    .fw-gleneagles { top: 40%; left: 28%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-20deg); }
-    .fw-olympic { top: 32%; left: 18%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-40deg); }
+    /* SF Courses - centered in visible area of 200% map */
+    .fw-harding { top: 43%; left: 37%; width: 28px; height: 42px; border-radius: 40% 60% 55% 45%; transform: rotate(-30deg); }
+    .fw-lincoln { top: 39%; left: 35%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-25deg); }
+    .fw-presidio { top: 37%; left: 38%; width: 24px; height: 36px; border-radius: 45% 55% 50% 50%; transform: rotate(-15deg); }
+    .fw-sharp { top: 48%; left: 34%; width: 24px; height: 38px; border-radius: 55% 45% 50% 50%; transform: rotate(-25deg); }
+    .fw-gleneagles { top: 45%; left: 39%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-20deg); }
+    .fw-olympic { top: 41%; left: 34%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-40deg); }
 
-    /* South Bay Courses - south of the bay, peninsula side */
-    .fw-paloalto { top: 62%; left: 32%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(10deg); }
-    .fw-baylands { top: 58%; left: 36%; width: 22px; height: 34px; border-radius: 50% 50% 48% 52%; transform: rotate(5deg); }
-    .fw-santateresa { top: 82%; left: 48%; width: 24px; height: 40px; border-radius: 50% 50% 55% 45%; transform: rotate(25deg); }
-    .fw-cinnabar { top: 88%; left: 56%; width: 28px; height: 44px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
-    .fw-coyote { top: 92%; left: 62%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(20deg); }
-    .fw-sunnyvale { top: 68%; left: 38%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(5deg); }
-    .fw-deepcliff { top: 72%; left: 34%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
-    .fw-sanjose { top: 78%; left: 52%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(12deg); }
+    /* South Bay Courses */
+    .fw-paloalto { top: 56%; left: 41%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(10deg); }
+    .fw-baylands { top: 54%; left: 43%; width: 22px; height: 34px; border-radius: 50% 50% 48% 52%; transform: rotate(5deg); }
+    .fw-santateresa { top: 66%; left: 49%; width: 24px; height: 40px; border-radius: 50% 50% 55% 45%; transform: rotate(25deg); }
+    .fw-cinnabar { top: 69%; left: 53%; width: 28px; height: 44px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
+    .fw-coyote { top: 71%; left: 56%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(20deg); }
+    .fw-sunnyvale { top: 59%; left: 44%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(5deg); }
+    .fw-deepcliff { top: 61%; left: 42%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
+    .fw-sanjose { top: 64%; left: 51%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(12deg); }
 
-    /* East Bay Courses - east side of bay */
-    .fw-corica { top: 38%; left: 62%; width: 28px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
-    .fw-tilden { top: 28%; left: 66%; width: 24px; height: 38px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
-    .fw-boundary { top: 34%; left: 74%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(8deg); }
-    .fw-metropolitan { top: 42%; left: 58%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(-15deg); }
-    .fw-lakechabot { top: 48%; left: 66%; width: 24px; height: 34px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
-    .fw-poppy { top: 56%; left: 82%; width: 24px; height: 38px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
-    .fw-laspositas { top: 62%; left: 86%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(18deg); }
-    .fw-wente { top: 66%; left: 84%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(15deg); }
-    .fw-diablo { top: 38%; left: 82%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-8deg); }
+    /* East Bay Courses */
+    .fw-corica { top: 44%; left: 56%; width: 28px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    .fw-tilden { top: 39%; left: 58%; width: 24px; height: 38px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
+    .fw-boundary { top: 42%; left: 62%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(8deg); }
+    .fw-metropolitan { top: 46%; left: 54%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(-15deg); }
+    .fw-lakechabot { top: 49%; left: 58%; width: 24px; height: 34px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
+    .fw-poppy { top: 53%; left: 66%; width: 24px; height: 38px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
+    .fw-laspositas { top: 56%; left: 68%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(18deg); }
+    .fw-wente { top: 58%; left: 67%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(15deg); }
+    .fw-diablo { top: 44%; left: 66%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-8deg); }
 
-    /* North Bay Courses - north of Golden Gate */
-    .fw-peacock { top: 16%; left: 42%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-25deg); }
-    .fw-indian { top: 10%; left: 36%; width: 22px; height: 34px; border-radius: 50% 50% 45% 55%; transform: rotate(-20deg); }
-    .fw-stonetree { top: 6%; left: 40%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-15deg); }
-    .fw-millvalley { top: 18%; left: 32%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-30deg); }
-    .fw-bodega { top: 4%; left: 20%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(-35deg); }
-    .fw-northwood { top: 2%; left: 14%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-40deg); }
+    /* North Bay Courses */
+    .fw-peacock { top: 33%; left: 46%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-25deg); }
+    .fw-indian { top: 30%; left: 43%; width: 22px; height: 34px; border-radius: 50% 50% 45% 55%; transform: rotate(-20deg); }
+    .fw-stonetree { top: 28%; left: 45%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-15deg); }
+    .fw-millvalley { top: 34%; left: 41%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-30deg); }
+    .fw-bodega { top: 27%; left: 35%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(-35deg); }
+    .fw-northwood { top: 26%; left: 32%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-40deg); }
 
     /* Additional SF/Peninsula Courses */
-    .fw-fleming { top: 38%; left: 26%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-28deg); }
-    .fw-crystal { top: 52%; left: 22%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
-    .fw-hmb-old { top: 58%; left: 14%; width: 22px; height: 34px; border-radius: 50% 50% 55% 45%; transform: rotate(-20deg); }
-    .fw-hmb-ocean { top: 62%; left: 12%; width: 22px; height: 32px; border-radius: 45% 55% 50% 50%; transform: rotate(-25deg); }
+    .fw-fleming { top: 44%; left: 38%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-28deg); }
+    .fw-crystal { top: 51%; left: 36%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
+    .fw-hmb-old { top: 54%; left: 32%; width: 22px; height: 34px; border-radius: 50% 50% 55% 45%; transform: rotate(-20deg); }
+    .fw-hmb-ocean { top: 56%; left: 31%; width: 22px; height: 32px; border-radius: 45% 55% 50% 50%; transform: rotate(-25deg); }
 
-    /* Additional South Bay Course */
-    .fw-pasatiempo { top: 90%; left: 28%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(5deg); }
+    /* Additional South Bay Course - drag down to see */
+    .fw-pasatiempo { top: 75%; left: 39%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(5deg); }
 
     /* Additional East Bay Course */
-    .fw-corica-n { top: 36%; left: 60%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
+    .fw-corica-n { top: 43%; left: 55%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
 
     /* New East Bay Courses */
-    .fw-bridges { top: 52%; left: 78%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(10deg); }
-    .fw-sanramon { top: 48%; left: 80%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(5deg); }
-    .fw-callippe { top: 58%; left: 74%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
-    .fw-redwood { top: 44%; left: 64%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-5deg); }
+    .fw-bridges { top: 51%; left: 64%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(10deg); }
+    .fw-sanramon { top: 49%; left: 65%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(5deg); }
+    .fw-callippe { top: 54%; left: 62%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
+    .fw-redwood { top: 47%; left: 57%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-5deg); }
 
     /* New North Bay Course */
-    .fw-mcinnis { top: 14%; left: 38%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-22deg); }
+    .fw-mcinnis { top: 32%; left: 44%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-22deg); }
 
     /* Napa Valley Courses */
-    .fw-chardonnay { top: 6%; left: 56%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(-5deg); }
-    .fw-eaglevines { top: 4%; left: 62%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-8deg); }
-    .fw-napakennedy { top: 10%; left: 58%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-3deg); }
-    .fw-vintners { top: 8%; left: 64%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-6deg); }
-    .fw-silverado-n { top: 2%; left: 68%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
-    .fw-silverado-s { top: 6%; left: 72%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
+    .fw-chardonnay { top: 28%; left: 53%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(-5deg); }
+    .fw-eaglevines { top: 27%; left: 56%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-8deg); }
+    .fw-napakennedy { top: 30%; left: 54%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-3deg); }
+    .fw-vintners { top: 29%; left: 57%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-6deg); }
+    .fw-silverado-n { top: 26%; left: 59%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    .fw-silverado-s { top: 28%; left: 61%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
 
     /* Price tags under fairways */
     .fairway .price-tag {
@@ -1114,13 +1151,15 @@
       <div class="contour contour-sb-2"></div>
     </div>
 
-    <!-- Water bodies - more accurate Bay Area geography -->
+    <!-- Water bodies - expanded California geography -->
     <div class="pacific"></div>
     <div class="tomales-bay"></div>
     <div class="golden-gate-strait"></div>
     <div class="san-pablo-bay"></div>
     <div class="bay-water"></div>
     <div class="south-bay"></div>
+    <div class="monterey-bay"></div>
+    <div class="sac-delta"></div>
 
     <!-- Bay Area Landmarks -->
     <div class="landmarks">
@@ -1460,6 +1499,78 @@
       }
     }
     document.addEventListener('DOMContentLoaded', updateLoginBtn);
+
+    // Draggable map functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const mapContent = document.querySelector('.map-content');
+      const container = document.querySelector('.map-container');
+
+      let isDragging = false;
+      let startX, startY;
+      let currentX = 0, currentY = 0;
+
+      // Bounds to prevent dragging too far
+      const bounds = { minX: -50, maxX: 50, minY: -50, maxY: 50 };
+
+      function updatePosition() {
+        // Clamp to bounds
+        currentX = Math.max(bounds.minX, Math.min(bounds.maxX, currentX));
+        currentY = Math.max(bounds.minY, Math.min(bounds.maxY, currentY));
+        mapContent.style.left = `calc(-50% + ${currentX}%)`;
+        mapContent.style.top = `calc(-50% + ${currentY}%)`;
+      }
+
+      // Mouse events
+      mapContent.addEventListener('mousedown', (e) => {
+        if (e.target.closest('a')) return; // Don't drag when clicking links
+        isDragging = true;
+        mapContent.classList.add('dragging');
+        startX = e.clientX;
+        startY = e.clientY;
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = (e.clientX - startX) / container.offsetWidth * 100;
+        const dy = (e.clientY - startY) / container.offsetHeight * 100;
+        currentX += dx;
+        currentY += dy;
+        startX = e.clientX;
+        startY = e.clientY;
+        updatePosition();
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        mapContent.classList.remove('dragging');
+      });
+
+      // Touch events
+      mapContent.addEventListener('touchstart', (e) => {
+        if (e.target.closest('a')) return;
+        isDragging = true;
+        mapContent.classList.add('dragging');
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const dx = (e.touches[0].clientX - startX) / container.offsetWidth * 100;
+        const dy = (e.touches[0].clientY - startY) / container.offsetHeight * 100;
+        currentX += dx;
+        currentY += dy;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        updatePosition();
+      }, { passive: true });
+
+      document.addEventListener('touchend', () => {
+        isDragging = false;
+        mapContent.classList.remove('dragging');
+      });
+    });
 
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
