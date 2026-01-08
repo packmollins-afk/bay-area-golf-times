@@ -261,39 +261,82 @@
       transform: rotate(-8deg);
     }
 
-    /* Pacific Ocean - west edge */
-    .pacific {
+    /* California Coastline - SVG-based accurate coast */
+    .california-coast {
       position: absolute;
-      top: 0;
+      top: -20%;
       left: 0;
-      width: 38%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--water) 0%, var(--water) 70%, transparent 100%);
+      width: 100%;
+      height: 140%;
+      pointer-events: none;
     }
 
-    /* Tomales Bay: ~38.15, -122.88 */
+    .california-coast svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Tomales Bay - long narrow inlet between Pt Reyes and mainland */
     .tomales-bay {
       position: absolute;
-      top: 20%;
-      left: 18%;
-      width: 1.5%;
-      height: 6%;
+      top: 16%;
+      left: 22%;
+      width: 0.6%;
+      height: 7%;
       background: var(--water);
-      border-radius: 50%;
-      transform: rotate(-35deg);
+      border-radius: 40% 40% 50% 50%;
+      transform: rotate(-25deg);
+      box-shadow: inset 0 0 8px rgba(123, 163, 189, 0.5);
+    }
+
+    /* Drakes Bay - inside Point Reyes peninsula */
+    .drakes-bay {
+      position: absolute;
+      top: 28%;
+      left: 14%;
+      width: 4%;
+      height: 2.5%;
+      background: var(--water);
+      border-radius: 0 60% 60% 40%;
+      transform: rotate(-10deg);
       opacity: 0.8;
     }
 
-    /* Monterey Bay: ~36.8, -122.0 */
+    /* Bodega Bay - small harbor inlet */
+    .bodega-bay {
+      position: absolute;
+      top: 9%;
+      left: 22%;
+      width: 2%;
+      height: 1.5%;
+      background: var(--water);
+      border-radius: 60% 40% 50% 50%;
+      transform: rotate(-20deg);
+      box-shadow: inset 0 0 6px rgba(123, 163, 189, 0.4);
+    }
+
+    /* Half Moon Bay - coastal indent */
+    .half-moon-bay-water {
+      position: absolute;
+      top: 63%;
+      left: 19%;
+      width: 2.5%;
+      height: 2%;
+      background: var(--water);
+      border-radius: 50% 50% 60% 40%;
+      opacity: 0.7;
+    }
+
+    /* Monterey Bay - large curved bay */
     .monterey-bay {
       position: absolute;
-      top: 95%;
-      left: 55%;
-      width: 12%;
-      height: 10%;
+      top: 88%;
+      left: 30%;
+      width: 26%;
+      height: 12%;
       background: var(--water);
-      border-radius: 0 60% 50% 0;
-      box-shadow: inset 0 0 20px rgba(123, 163, 189, 0.4);
+      border-radius: 50% 50% 0 0;
+      box-shadow: inset 0 0 30px rgba(123, 163, 189, 0.4);
     }
 
     /* Sacramento River Delta: ~38.05, -121.7 */
@@ -440,9 +483,9 @@
     /* Mill Valley: 37.90, -122.54 */
     .fw-millvalley { top: 35.3%; left: 38.8%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-30deg); }
     /* Bodega Harbour: 38.314, -123.017 */
-    .fw-bodega { top: 10.9%; left: 10.8%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(-35deg); }
+    .fw-bodega { top: 9%; left: 24%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(-35deg); }
     /* Northwood: 38.43, -122.98 */
-    .fw-northwood { top: 4.1%; left: 12.9%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-40deg); }
+    .fw-northwood { top: 3%; left: 26%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-40deg); }
 
     /* Additional SF/Peninsula Courses - Based on GPS */
     /* Fleming 9 (same location as Harding): 37.724, -122.493 - offset from Harding to avoid overlap */
@@ -1260,13 +1303,89 @@
       <div class="contour contour-sb-2"></div>
     </div>
 
-    <!-- Water bodies - expanded California geography -->
-    <div class="pacific"></div>
+    <!-- California Coastline - accurate SVG trace -->
+    <div class="california-coast">
+      <svg viewBox="0 -20 100 140" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#a8c5d8;stop-opacity:1" />
+            <stop offset="75%" style="stop-color:#a8c5d8;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#a8c5d8;stop-opacity:0" />
+          </linearGradient>
+        </defs>
+        <!-- Pacific Ocean: Extended California coastline from Fort Bragg to Big Sur -->
+        <path fill="url(#oceanGradient)" d="
+          M 0,-20
+          L 20,-20
+          L 19,-15
+          L 18,-10
+          L 17,-5
+          L 16,0
+          C 15,2 14,4 15,6
+          L 14,8
+          C 13,10 12,11 13,13
+          L 12,15
+          C 10,17 8,19 6,22
+          L 4,25
+          C 3,27 5,29 8,30
+          L 12,31
+          C 15,32 18,32 21,33
+          L 24,34
+          C 26,35 27,37 26,39
+          L 24,41
+          C 22,43 20,45 19,48
+          L 18,51
+          C 17,54 18,57 19,60
+          L 20,63
+          C 19,66 18,69 19,72
+          L 21,75
+          C 24,78 28,81 33,84
+          L 40,87
+          C 46,89 52,91 55,92
+          L 58,93
+          C 60,94 58,96 54,98
+          L 48,100
+          C 44,102 40,104 36,106
+          L 30,110
+          C 26,112 24,114 22,116
+          L 20,120
+          L 0,120
+          Z
+        "/>
+        <!-- Point Reyes Peninsula - distinctive hook shape -->
+        <path fill="#a8c5d8" d="
+          M 6,22
+          L 4,25
+          C 2,27 0,29 2,31
+          L 6,33
+          C 10,34 14,33 17,32
+          L 19,31
+          L 16,29
+          L 12,27
+          L 8,25
+          Z
+        "/>
+        <!-- Bodega Head - small peninsula -->
+        <path fill="#a8c5d8" d="
+          M 13,13
+          L 11,14
+          C 9,15 10,16 12,17
+          L 14,16
+          L 13,14
+          Z
+        "/>
+      </svg>
+    </div>
+
+    <!-- Water bodies -->
     <div class="tomales-bay"></div>
+    <div class="drakes-bay"></div>
+    <div class="bodega-bay"></div>
     <div class="golden-gate-strait"></div>
     <div class="san-pablo-bay"></div>
     <div class="bay-water"></div>
     <div class="south-bay"></div>
+    <div class="half-moon-bay-water"></div>
     <div class="monterey-bay"></div>
     <div class="sac-delta"></div>
 
@@ -1624,101 +1743,182 @@
       const zoomInBtn = document.getElementById('zoom-in');
       const zoomOutBtn = document.getElementById('zoom-out');
 
+      // === TUNING PARAMETERS ===
+      const isMobile = window.innerWidth < 768;
+
+      const config = {
+        // Zoom limits - desktop can zoom out more
+        minZoom: isMobile ? 0.5 : 0.2,    // Mobile stays closer, desktop can see full coast
+        maxZoom: 2.5,                      // How far in
+        defaultZoom: isMobile ? 1.0 : 0.8, // Mobile starts on Bay Area, desktop slightly out
+
+        // Button zoom steps (per click)
+        zoomInStep: 0.12,        // + button increment
+        zoomOutStep: 0.06,       // - button increment (gentler)
+
+        // Scroll wheel sensitivity
+        wheelZoomSpeed: 0.05,    // Mouse wheel zoom speed
+
+        // Pinch zoom sensitivity
+        pinchZoomSpeed: 0.003,   // Touch pinch sensitivity
+
+        // Drag sensitivity (higher = faster panning)
+        dragSpeed: 1.2,          // Mouse drag multiplier
+        touchDragSpeed: 1.0,     // Touch drag multiplier
+
+        // Momentum/inertia after drag release
+        momentumEnabled: true,
+        momentumDecay: 0.92,     // How quickly momentum slows (0-1)
+        momentumThreshold: 0.1,  // Min velocity to apply momentum
+
+        // Initial position (center on courses)
+        startX: isMobile ? 8 : 5,   // Mobile centered on Bay Area
+        startY: isMobile ? 0 : -5,  // Desktop slightly north to show more coast
+
+        // Pan bounds - asymmetric to keep courses centered
+        boundsWest: -5,          // Limit Pacific (can't go far west)
+        boundsEast: 70,          // Allow inland (east)
+        boundsNorth: -50,        // Allow north (Sonoma coast)
+        boundsSouth: 60          // Allow south (Monterey+)
+      };
+
       let isDragging = false;
       let startX, startY;
-      let currentX = 0, currentY = 0;
-      let currentZoom = 1; // 1 = 200% base, range 0.5 to 2
-      const minZoom = 0.5;
-      const maxZoom = 2.5;
-      const zoomStep = 0.25;
+      let currentX = config.startX;
+      let currentY = config.startY;
+      let currentZoom = config.defaultZoom;
+      let velocityX = 0, velocityY = 0;
+      let lastMoveTime = 0;
+      let animationFrame = null;
 
-      // Bounds adjust based on zoom level
+      // Get pan bounds adjusted for zoom level
       function getBounds() {
-        const bound = 50 * currentZoom;
-        return { minX: -bound, maxX: bound, minY: -bound, maxY: bound };
+        return {
+          minX: config.boundsWest * currentZoom,
+          maxX: config.boundsEast * currentZoom,
+          minY: config.boundsNorth * currentZoom,
+          maxY: config.boundsSouth * currentZoom
+        };
       }
 
-      function updatePosition() {
+      function updatePosition(animate = false) {
         const bounds = getBounds();
         currentX = Math.max(bounds.minX, Math.min(bounds.maxX, currentX));
         currentY = Math.max(bounds.minY, Math.min(bounds.maxY, currentY));
-        mapContent.style.left = `calc(-50% + ${currentX}%)`;
-        mapContent.style.top = `calc(-50% + ${currentY}%)`;
-      }
 
-      function updateZoom() {
-        const baseSize = 200 * currentZoom;
+        // Map size - always fills viewport
+        const baseSize = Math.max(100, 200 * currentZoom);
+        const offset = (baseSize - 100) / 2;
+
+        if (animate) {
+          mapContent.style.transition = 'all 0.2s ease-out';
+        } else {
+          mapContent.style.transition = 'none';
+        }
+
         mapContent.style.width = `${baseSize}%`;
         mapContent.style.height = `${baseSize}%`;
-        updatePosition();
+        mapContent.style.left = `calc(-${offset}% + ${currentX}%)`;
+        mapContent.style.top = `calc(-${offset}% + ${currentY}%)`;
       }
 
-      // Zoom with center preservation
-      function zoomTo(newZoom) {
+      // Smooth animated zoom
+      function zoomTo(newZoom, animate = true) {
         const oldZoom = currentZoom;
-        currentZoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
-        // Scale position to keep view centered on same point
+        currentZoom = Math.max(config.minZoom, Math.min(config.maxZoom, newZoom));
+        // Scale position to keep view centered
         const scale = currentZoom / oldZoom;
         currentX *= scale;
         currentY *= scale;
-        updateZoom();
+        updatePosition(animate);
       }
 
-      // Zoom controls
-      zoomInBtn.addEventListener('click', () => {
-        if (currentZoom < maxZoom) {
-          zoomTo(currentZoom + zoomStep);
+      // Momentum animation loop
+      function applyMomentum() {
+        if (!config.momentumEnabled) return;
+
+        if (Math.abs(velocityX) > config.momentumThreshold ||
+            Math.abs(velocityY) > config.momentumThreshold) {
+          currentX += velocityX;
+          currentY += velocityY;
+          velocityX *= config.momentumDecay;
+          velocityY *= config.momentumDecay;
+          updatePosition();
+          animationFrame = requestAnimationFrame(applyMomentum);
         }
+      }
+
+      function stopMomentum() {
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
+        velocityX = 0;
+        velocityY = 0;
+      }
+
+      // === ZOOM BUTTON CONTROLS ===
+      zoomInBtn.addEventListener('click', () => {
+        zoomTo(currentZoom + config.zoomInStep);
       });
 
       zoomOutBtn.addEventListener('click', () => {
-        if (currentZoom > minZoom) {
-          zoomTo(currentZoom - zoomStep);
-        }
+        zoomTo(currentZoom - config.zoomOutStep);
       });
 
-      // Mouse wheel zoom
+      // === MOUSE WHEEL ZOOM ===
       container.addEventListener('wheel', (e) => {
         e.preventDefault();
-        if (e.deltaY < 0 && currentZoom < maxZoom) {
-          zoomTo(currentZoom + zoomStep * 0.5);
-        } else if (e.deltaY > 0 && currentZoom > minZoom) {
-          zoomTo(currentZoom - zoomStep * 0.5);
-        }
+        const delta = e.deltaY < 0 ? config.wheelZoomSpeed : -config.wheelZoomSpeed;
+        zoomTo(currentZoom + delta, false);
       }, { passive: false });
 
-      // Mouse events for drag
+      // === MOUSE DRAG ===
       mapContent.addEventListener('mousedown', (e) => {
         if (e.target.closest('a')) return;
+        stopMomentum();
         isDragging = true;
         mapContent.classList.add('dragging');
         startX = e.clientX;
         startY = e.clientY;
+        lastMoveTime = Date.now();
         e.preventDefault();
       });
 
       document.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        const dx = (e.clientX - startX) / container.offsetWidth * 100;
-        const dy = (e.clientY - startY) / container.offsetHeight * 100;
+        const now = Date.now();
+        const dt = Math.max(1, now - lastMoveTime);
+
+        const dx = (e.clientX - startX) / container.offsetWidth * 100 * config.dragSpeed;
+        const dy = (e.clientY - startY) / container.offsetHeight * 100 * config.dragSpeed;
+
+        // Track velocity for momentum
+        velocityX = dx / dt * 16; // Normalize to ~60fps
+        velocityY = dy / dt * 16;
+
         currentX += dx;
         currentY += dy;
         startX = e.clientX;
         startY = e.clientY;
+        lastMoveTime = now;
         updatePosition();
       });
 
       document.addEventListener('mouseup', () => {
-        isDragging = false;
-        mapContent.classList.remove('dragging');
+        if (isDragging) {
+          isDragging = false;
+          mapContent.classList.remove('dragging');
+          applyMomentum();
+        }
       });
 
-      // Touch events
+      // === TOUCH EVENTS ===
       let lastTouchDistance = 0;
 
       mapContent.addEventListener('touchstart', (e) => {
+        stopMomentum();
         if (e.touches.length === 2) {
-          // Pinch zoom start
           lastTouchDistance = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
@@ -1729,37 +1929,51 @@
           mapContent.classList.add('dragging');
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
+          lastMoveTime = Date.now();
         }
       }, { passive: true });
 
       document.addEventListener('touchmove', (e) => {
         if (e.touches.length === 2) {
-          // Pinch zoom
           const distance = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
           );
           if (lastTouchDistance > 0) {
-            const delta = (distance - lastTouchDistance) * 0.005;
-            zoomTo(currentZoom + delta);
+            const delta = (distance - lastTouchDistance) * config.pinchZoomSpeed;
+            zoomTo(currentZoom + delta, false);
           }
           lastTouchDistance = distance;
         } else if (isDragging && e.touches.length === 1) {
-          const dx = (e.touches[0].clientX - startX) / container.offsetWidth * 100;
-          const dy = (e.touches[0].clientY - startY) / container.offsetHeight * 100;
+          const now = Date.now();
+          const dt = Math.max(1, now - lastMoveTime);
+
+          const dx = (e.touches[0].clientX - startX) / container.offsetWidth * 100 * config.touchDragSpeed;
+          const dy = (e.touches[0].clientY - startY) / container.offsetHeight * 100 * config.touchDragSpeed;
+
+          velocityX = dx / dt * 16;
+          velocityY = dy / dt * 16;
+
           currentX += dx;
           currentY += dy;
           startX = e.touches[0].clientX;
           startY = e.touches[0].clientY;
+          lastMoveTime = now;
           updatePosition();
         }
       }, { passive: true });
 
       document.addEventListener('touchend', () => {
-        isDragging = false;
+        if (isDragging) {
+          isDragging = false;
+          mapContent.classList.remove('dragging');
+          applyMomentum();
+        }
         lastTouchDistance = 0;
-        mapContent.classList.remove('dragging');
       });
+
+      // Apply initial position
+      updatePosition();
     });
 
     // Register Service Worker for PWA
