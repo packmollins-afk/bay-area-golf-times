@@ -160,6 +160,22 @@ async function scrapeLocation(location, date) {
 // DATABASE OPERATIONS
 // ============================================================================
 
+// Convert "7:30AM" to "07:30" for proper datetime sorting
+function convertTo24Hour(timeStr) {
+  if (!timeStr) return null;
+  const match = timeStr.match(/(\d{1,2}):(\d{2})(AM|PM)/i);
+  if (!match) return timeStr; // Already in 24-hour or unknown format
+
+  let hours = parseInt(match[1]);
+  const minutes = match[2];
+  const period = match[3].toUpperCase();
+
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+
+  return `${hours.toString().padStart(2, '0')}:${minutes}`;
+}
+
 async function getCourseMappings() {
   // Get courses from database and create mapping by golfnow_id
   // Note: Multiple courses can share the same golfnow_id (e.g., TPC Harding Park & Fleming 9)
@@ -196,6 +212,8 @@ async function insertTeeTimes(teeTimes, courseMappings) {
     // Insert tee time for all courses that share this GolfNow facility ID
     for (const course of courses) {
       try {
+        // Convert time to 24-hour format for proper datetime sorting
+        const time24 = convertTo24Hour(tt.firstTime);
         // Insert a representative tee time (first available time at min price)
         await db.execute({
           sql: `INSERT OR REPLACE INTO tee_times
@@ -204,8 +222,8 @@ async function insertTeeTimes(teeTimes, courseMappings) {
           args: [
             course.id,
             tt.date,
-            tt.firstTime,
-            `${tt.date} ${tt.firstTime}`,
+            time24,
+            `${tt.date} ${time24}`,
             18,
             4,
             tt.minPrice,
