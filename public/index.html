@@ -211,97 +211,98 @@
     .contour-sb-1 { top: 60%; left: 22%; width: 35%; height: 38%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
     .contour-sb-2 { top: 68%; left: 28%; width: 26%; height: 28%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
 
-    /* San Francisco Bay - centered in visible area (200% map) */
+    /* San Francisco Bay - GPS-based positioning */
+    /* Bay center: ~37.55, -122.15 -> top: 55.9%, left: 61.8% */
     .bay-water {
       position: absolute;
-      top: 36%;
-      left: 44%;
-      width: 9%;
-      height: 19%;
+      top: 42%;
+      left: 50%;
+      width: 12%;
+      height: 22%;
       background: var(--water);
       border-radius: 45% 55% 30% 20% / 25% 30% 70% 75%;
       transform: rotate(-5deg);
       box-shadow: inset 0 0 30px rgba(123, 163, 189, 0.5);
     }
 
-    /* South Bay extension (narrower) */
+    /* South Bay extension - goes toward San Jose */
     .south-bay {
       position: absolute;
-      top: 49%;
-      left: 45%;
-      width: 6%;
-      height: 14%;
+      top: 55%;
+      left: 58%;
+      width: 8%;
+      height: 18%;
       background: var(--water);
       border-radius: 50% 50% 30% 30%;
-      transform: rotate(8deg);
+      transform: rotate(15deg);
       box-shadow: inset 0 0 20px rgba(123, 163, 189, 0.4);
     }
 
-    /* San Pablo Bay (north) */
+    /* San Pablo Bay (north of main bay): ~38.0, -122.4 */
     .san-pablo-bay {
       position: absolute;
-      top: 34%;
-      left: 47%;
-      width: 5%;
-      height: 5%;
+      top: 28%;
+      left: 46%;
+      width: 7%;
+      height: 6%;
       background: var(--water);
       border-radius: 60% 40% 50% 50%;
       box-shadow: inset 0 0 15px rgba(123, 163, 189, 0.4);
     }
 
-    /* Golden Gate strait */
+    /* Golden Gate strait: ~37.82, -122.47 */
     .golden-gate-strait {
       position: absolute;
-      top: 37%;
-      left: 38%;
-      width: 7%;
-      height: 1.5%;
+      top: 40%;
+      left: 42%;
+      width: 9%;
+      height: 2%;
       background: var(--water);
       transform: rotate(-8deg);
     }
 
-    /* Pacific Ocean - fully west against edge */
+    /* Pacific Ocean - west edge */
     .pacific {
       position: absolute;
       top: 0;
       left: 0;
-      width: 28%;
+      width: 38%;
       height: 100%;
-      background: linear-gradient(90deg, var(--water) 0%, var(--water) 60%, transparent 100%);
+      background: linear-gradient(90deg, var(--water) 0%, var(--water) 70%, transparent 100%);
     }
 
-    /* Tomales Bay (where Bodega is) */
+    /* Tomales Bay: ~38.15, -122.88 */
     .tomales-bay {
       position: absolute;
-      top: 28%;
-      left: 33%;
-      width: 1%;
-      height: 5%;
+      top: 20%;
+      left: 18%;
+      width: 1.5%;
+      height: 6%;
       background: var(--water);
       border-radius: 50%;
       transform: rotate(-35deg);
       opacity: 0.8;
     }
 
-    /* Monterey Bay (south - drag down to see) */
+    /* Monterey Bay: ~36.8, -122.0 */
     .monterey-bay {
       position: absolute;
-      top: 78%;
-      left: 26%;
-      width: 8%;
-      height: 8%;
+      top: 95%;
+      left: 55%;
+      width: 12%;
+      height: 10%;
       background: var(--water);
       border-radius: 0 60% 50% 0;
       box-shadow: inset 0 0 20px rgba(123, 163, 189, 0.4);
     }
 
-    /* Sacramento River Delta (drag right/up to see) */
+    /* Sacramento River Delta: ~38.05, -121.7 */
     .sac-delta {
       position: absolute;
-      top: 28%;
-      left: 54%;
-      width: 5%;
-      height: 8%;
+      top: 25%;
+      left: 85%;
+      width: 8%;
+      height: 10%;
       background: var(--water);
       border-radius: 40% 60% 50% 50%;
       opacity: 0.6;
@@ -377,71 +378,114 @@
       pointer-events: none;
     }
 
-    /* SF Courses - west of bay, near Golden Gate */
-    .fw-harding { top: 42%; left: 38%; width: 28px; height: 42px; border-radius: 40% 60% 55% 45%; transform: rotate(-30deg); }
-    .fw-lincoln { top: 40%; left: 36%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-25deg); }
-    .fw-presidio { top: 38%; left: 37%; width: 24px; height: 36px; border-radius: 45% 55% 50% 50%; transform: rotate(-15deg); }
-    .fw-sharp { top: 46%; left: 33%; width: 24px; height: 38px; border-radius: 55% 45% 50% 50%; transform: rotate(-25deg); }
-    .fw-gleneagles { top: 43%; left: 39%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-20deg); }
-    .fw-olympic { top: 41%; left: 35%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-40deg); }
+    /* SF Courses - Based on GPS coordinates */
+    /* TPC Harding Park: 37.724, -122.493 */
+    .fw-harding { top: 45.6%; left: 41.6%; width: 28px; height: 42px; border-radius: 40% 60% 55% 45%; transform: rotate(-30deg); }
+    /* Lincoln Park: 37.784, -122.499 */
+    .fw-lincoln { top: 42.1%; left: 41.2%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-25deg); }
+    /* Presidio: 37.790, -122.466 */
+    .fw-presidio { top: 41.7%; left: 43.2%; width: 24px; height: 36px; border-radius: 45% 55% 50% 50%; transform: rotate(-15deg); }
+    /* Sharp Park (Pacifica): 37.624, -122.491 */
+    .fw-sharp { top: 51.5%; left: 41.7%; width: 24px; height: 38px; border-radius: 55% 45% 50% 50%; transform: rotate(-25deg); }
+    /* Golden Gate Park: 37.770, -122.490 */
+    .fw-gleneagles { top: 42.9%; left: 41.8%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-20deg); }
+    /* Olympic Club area: 37.71, -122.50 */
+    .fw-olympic { top: 46.5%; left: 41.2%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-40deg); }
 
-    /* South Bay Courses - south of bay */
-    .fw-paloalto { top: 55%; left: 42%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(10deg); }
-    .fw-baylands { top: 53%; left: 44%; width: 22px; height: 34px; border-radius: 50% 50% 48% 52%; transform: rotate(5deg); }
-    .fw-santateresa { top: 64%; left: 48%; width: 24px; height: 40px; border-radius: 50% 50% 55% 45%; transform: rotate(25deg); }
-    .fw-cinnabar { top: 67%; left: 51%; width: 28px; height: 44px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
-    .fw-coyote { top: 69%; left: 53%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(20deg); }
-    .fw-sunnyvale { top: 57%; left: 45%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(5deg); }
-    .fw-deepcliff { top: 59%; left: 43%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
-    .fw-sanjose { top: 62%; left: 49%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(12deg); }
+    /* South Bay Courses - Based on GPS */
+    /* Palo Alto: 37.42, -122.11 */
+    .fw-paloalto { top: 63.5%; left: 64.1%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(10deg); }
+    /* Baylands: 37.43, -122.10 */
+    .fw-baylands { top: 62.9%; left: 64.7%; width: 22px; height: 34px; border-radius: 50% 50% 48% 52%; transform: rotate(5deg); }
+    /* Santa Teresa: 37.221, -121.777 */
+    .fw-santateresa { top: 75.2%; left: 83.7%; width: 24px; height: 40px; border-radius: 50% 50% 55% 45%; transform: rotate(25deg); }
+    /* Cinnabar Hills: 37.161, -121.751 */
+    .fw-cinnabar { top: 78.8%; left: 85.2%; width: 28px; height: 44px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
+    /* Coyote Creek: 37.24, -121.76 */
+    .fw-coyote { top: 74.1%; left: 84.7%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(20deg); }
+    /* Sunnyvale: 37.39, -122.04 */
+    .fw-sunnyvale { top: 65.3%; left: 68.2%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(5deg); }
+    /* Deep Cliff: 37.33, -122.01 */
+    .fw-deepcliff { top: 68.8%; left: 70.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
+    /* San Jose Muni: 37.32, -121.86 */
+    .fw-sanjose { top: 69.4%; left: 78.8%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(12deg); }
 
-    /* East Bay Courses - east of bay */
-    .fw-corica { top: 44%; left: 54%; width: 28px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
-    .fw-tilden { top: 40%; left: 56%; width: 24px; height: 38px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
-    .fw-boundary { top: 42%; left: 60%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(8deg); }
-    .fw-metropolitan { top: 46%; left: 52%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(-15deg); }
-    .fw-lakechabot { top: 48%; left: 55%; width: 24px; height: 34px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
-    .fw-poppy { top: 52%; left: 64%; width: 24px; height: 38px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
-    .fw-laspositas { top: 54%; left: 66%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(18deg); }
-    .fw-wente { top: 56%; left: 65%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(15deg); }
-    .fw-diablo { top: 43%; left: 63%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-8deg); }
+    /* East Bay Courses - Based on GPS */
+    /* Corica Park South: 37.739, -122.233 */
+    .fw-corica { top: 44.8%; left: 56.9%; width: 28px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    /* Tilden Park: 37.888, -122.244 */
+    .fw-tilden { top: 36.0%; left: 56.2%; width: 24px; height: 38px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
+    /* Boundary Oak: 37.924, -121.999 */
+    .fw-boundary { top: 33.9%; left: 70.6%; width: 24px; height: 38px; border-radius: 52% 48% 50% 50%; transform: rotate(8deg); }
+    /* Metropolitan: 37.72, -122.20 */
+    .fw-metropolitan { top: 45.9%; left: 58.8%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(-15deg); }
+    /* Lake Chabot: 37.72, -122.08 */
+    .fw-lakechabot { top: 45.9%; left: 65.9%; width: 24px; height: 34px; border-radius: 48% 52% 55% 45%; transform: rotate(5deg); }
+    /* Poppy Ridge: 37.652, -121.682 */
+    .fw-poppy { top: 49.9%; left: 89.3%; width: 24px; height: 38px; border-radius: 50% 50% 52% 48%; transform: rotate(12deg); }
+    /* Las Positas: 37.68, -121.76 */
+    .fw-laspositas { top: 48.2%; left: 84.7%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(18deg); }
+    /* Wente Vineyards: 37.63, -121.72 */
+    .fw-wente { top: 51.2%; left: 87.1%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(15deg); }
+    /* Diablo Creek: 37.95, -121.95 */
+    .fw-diablo { top: 32.4%; left: 73.5%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-8deg); }
 
-    /* North Bay Courses - Marin, north of Golden Gate */
-    .fw-peacock { top: 34%; left: 47%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-25deg); }
-    .fw-indian { top: 31%; left: 44%; width: 22px; height: 34px; border-radius: 50% 50% 45% 55%; transform: rotate(-20deg); }
-    .fw-stonetree { top: 29%; left: 46%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-15deg); }
-    .fw-millvalley { top: 35%; left: 40%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-30deg); }
-    .fw-bodega { top: 25%; left: 34%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(-35deg); }
-    .fw-northwood { top: 23%; left: 31%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-40deg); }
+    /* North Bay Courses - Based on GPS */
+    /* Peacock Gap: 37.99, -122.47 */
+    .fw-peacock { top: 30.0%; left: 42.9%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-25deg); }
+    /* Indian Valley: 37.98, -122.54 */
+    .fw-indian { top: 30.6%; left: 38.8%; width: 22px; height: 34px; border-radius: 50% 50% 45% 55%; transform: rotate(-20deg); }
+    /* StoneTree: 38.00, -122.51 */
+    .fw-stonetree { top: 29.4%; left: 40.6%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-15deg); }
+    /* Mill Valley: 37.90, -122.54 */
+    .fw-millvalley { top: 35.3%; left: 38.8%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-30deg); }
+    /* Bodega Harbour: 38.314, -123.017 */
+    .fw-bodega { top: 10.9%; left: 10.8%; width: 24px; height: 38px; border-radius: 45% 55% 52% 48%; transform: rotate(-35deg); }
+    /* Northwood: 38.43, -122.98 */
+    .fw-northwood { top: 4.1%; left: 12.9%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-40deg); }
 
-    /* Additional SF/Peninsula Courses */
-    .fw-fleming { top: 43%; left: 38.5%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-28deg); }
-    .fw-crystal { top: 50%; left: 37%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
-    .fw-hmb-old { top: 52%; left: 32%; width: 22px; height: 34px; border-radius: 50% 50% 55% 45%; transform: rotate(-20deg); }
-    .fw-hmb-ocean { top: 54%; left: 31%; width: 22px; height: 32px; border-radius: 45% 55% 50% 50%; transform: rotate(-25deg); }
+    /* Additional SF/Peninsula Courses - Based on GPS */
+    /* Fleming 9 (same location as Harding): 37.724, -122.493 */
+    .fw-fleming { top: 46.2%; left: 41.2%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-28deg); }
+    /* Crystal Springs: 37.519, -122.365 */
+    .fw-crystal { top: 57.7%; left: 49.1%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
+    /* Half Moon Bay Old: 37.436, -122.441 */
+    .fw-hmb-old { top: 62.6%; left: 44.6%; width: 22px; height: 34px; border-radius: 50% 50% 55% 45%; transform: rotate(-20deg); }
+    /* Half Moon Bay Ocean: 37.434, -122.440 */
+    .fw-hmb-ocean { top: 62.7%; left: 44.7%; width: 22px; height: 32px; border-radius: 45% 55% 50% 50%; transform: rotate(-25deg); }
 
-    /* Pasatiempo - near Santa Cruz, drag down to see */
-    .fw-pasatiempo { top: 72%; left: 38%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(5deg); }
+    /* Pasatiempo: 37.004, -122.025 - near Santa Cruz */
+    .fw-pasatiempo { top: 88.0%; left: 69.1%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(5deg); }
 
-    /* Additional East Bay Course */
-    .fw-corica-n { top: 43%; left: 53%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
+    /* Corica North: 37.745, -122.235 */
+    .fw-corica-n { top: 44.4%; left: 56.8%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
 
-    /* Tri-Valley East Bay Courses */
-    .fw-bridges { top: 50%; left: 62%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(10deg); }
-    .fw-sanramon { top: 48%; left: 61%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(5deg); }
-    .fw-callippe { top: 52%; left: 59%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
-    .fw-redwood { top: 46%; left: 56%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-5deg); }
+    /* Tri-Valley East Bay Courses - Based on GPS */
+    /* The Bridges: 37.70, -121.91 */
+    .fw-bridges { top: 47.1%; left: 75.9%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(10deg); }
+    /* San Ramon: 37.77, -121.96 */
+    .fw-sanramon { top: 42.9%; left: 72.9%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(5deg); }
+    /* Callippe Preserve: 37.66, -121.90 */
+    .fw-callippe { top: 49.4%; left: 76.5%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(15deg); }
+    /* Redwood Canyon: 37.81, -122.16 */
+    .fw-redwood { top: 40.6%; left: 61.2%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-5deg); }
 
-    /* McInnis - San Rafael */
-    .fw-mcinnis { top: 33%; left: 45%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-22deg); }
+    /* McInnis - San Rafael: 38.03, -122.50 */
+    .fw-mcinnis { top: 27.6%; left: 41.2%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-22deg); }
 
-    /* Napa Valley Courses - northeast */
-    .fw-chardonnay { top: 27%; left: 52%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(-5deg); }
-    .fw-eaglevines { top: 26%; left: 54%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-8deg); }
-    .fw-napakennedy { top: 29%; left: 53%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-3deg); }
-    .fw-vintners { top: 28%; left: 55%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-6deg); }
-    .fw-silverado-n { top: 25%; left: 56%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
-    .fw-silverado-s { top: 27%; left: 57%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
+    /* Napa Valley Courses - Based on GPS */
+    /* Chardonnay: 38.26, -122.22 */
+    .fw-chardonnay { top: 14.1%; left: 57.6%; width: 24px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(-5deg); }
+    /* Eagle Vines: 38.23, -122.25 */
+    .fw-eaglevines { top: 15.9%; left: 55.9%; width: 22px; height: 34px; border-radius: 48% 52% 50% 50%; transform: rotate(-8deg); }
+    /* Napa Kennedy: 38.27, -122.27 */
+    .fw-napakennedy { top: 13.5%; left: 54.7%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-3deg); }
+    /* Vintner's: 38.32, -122.35 */
+    .fw-vintners { top: 10.6%; left: 50.0%; width: 18px; height: 26px; border-radius: 50%; transform: rotate(-6deg); }
+    /* Silverado North: 38.350, -122.264 */
+    .fw-silverado-n { top: 8.8%; left: 55.1%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    /* Silverado South: 38.35, -122.26 */
+    .fw-silverado-s { top: 8.8%; left: 55.3%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
 
     /* Price tags under fairways */
     .fairway .price-tag {
@@ -738,7 +782,7 @@
       fill: none;
     }
 
-    /* Region labels */
+    /* Region labels - GPS-based positioning */
     .region-label {
       position: absolute;
       font-family: 'Source Serif 4', Georgia, serif;
@@ -751,12 +795,17 @@
       z-index: 10;
     }
 
-    .label-sf { top: 38%; left: 16%; transform: rotate(-10deg); }
-    .label-sb { top: 84%; left: 44%; }
-    .label-eb { top: 44%; left: 68%; }
-    .label-ma { top: 8%; left: 32%; transform: rotate(-5deg); }
-    .label-napa { top: 4%; left: 66%; color: #722F37; font-style: italic; }
-    .label-pacific { top: 50%; left: 4%; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.3em; color: var(--water-dark); }
+    /* SF: ~37.77, -122.45 -> top: 43%, left: 43% */
+    .label-sf { top: 43%; left: 36%; transform: rotate(-10deg); }
+    /* South Bay: ~37.3, -121.9 -> top: 70%, left: 76% */
+    .label-sb { top: 72%; left: 76%; }
+    /* East Bay: ~37.8, -122.1 -> top: 41%, left: 65% */
+    .label-eb { top: 38%; left: 68%; }
+    /* Marin/North Bay: ~38.0, -122.5 -> top: 29%, left: 41% */
+    .label-ma { top: 25%; left: 35%; transform: rotate(-5deg); }
+    /* Napa: ~38.3, -122.3 -> top: 12%, left: 53% */
+    .label-napa { top: 6%; left: 52%; color: #722F37; font-style: italic; }
+    .label-pacific { top: 50%; left: 8%; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.3em; color: var(--water-dark); }
 
     /* Landmarks */
     .landmarks {
@@ -771,10 +820,10 @@
       opacity: 0.75;
     }
 
-    /* Golden Gate Bridge - spans the strait */
+    /* Golden Gate Bridge - spans the strait: ~37.82, -122.48 */
     .landmark-ggb {
-      top: 22%;
-      left: 26%;
+      top: 39%;
+      left: 42%;
       width: 55px;
       height: 28px;
     }
@@ -787,10 +836,10 @@
       stroke-width: 1.5;
     }
 
-    /* North Bay Redwoods / Muir Woods */
+    /* North Bay Redwoods / Muir Woods: ~37.9, -122.58 */
     .landmark-redwoods {
-      top: 14%;
-      left: 22%;
+      top: 34%;
+      left: 36%;
     }
 
     .landmark-redwoods svg {
@@ -798,10 +847,10 @@
       opacity: 0.6;
     }
 
-    /* Google Campus label - Mountain View */
+    /* Google Campus label - Mountain View: ~37.42, -122.08 */
     .landmark-google {
-      top: 70%;
-      left: 40%;
+      top: 63%;
+      left: 66%;
       font-family: 'Arial', sans-serif;
       font-size: 6px;
       font-weight: 700;
@@ -817,131 +866,151 @@
     .landmark-google span:nth-child(5) { color: #34a853; }
     .landmark-google span:nth-child(6) { color: #ea4335; }
 
-    /* East Bay Landmarks */
+    /* East Bay Landmarks - GPS-based */
+    /* Oakland: ~37.8, -122.27 -> top: 41%, left: 55% */
     .landmark-oakland {
-      top: 36%; left: 56%;
+      top: 42%; left: 55%;
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 8px; font-weight: 600;
       color: var(--text-dark); opacity: 0.7;
     }
+    /* Mt Diablo: ~37.88, -121.91 -> top: 36%, left: 76% */
     .landmark-diablo {
-      top: 28%; left: 80%;
+      top: 30%; left: 78%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 7px; font-style: italic;
       color: var(--contour); opacity: 0.8;
       transform: rotate(-8deg);
     }
+    /* Walnut Creek: ~37.9, -122.06 -> top: 35%, left: 67% */
     .landmark-walnutcreek {
-      top: 32%; left: 70%;
+      top: 34%; left: 68%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 6px; color: var(--text-muted); opacity: 0.6;
     }
+    /* Livermore: ~37.68, -121.77 -> top: 48%, left: 84% */
     .landmark-livermore {
-      top: 58%; left: 88%;
+      top: 50%; left: 86%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 6px; color: var(--text-muted); opacity: 0.6;
     }
+    /* Pleasanton: ~37.66, -121.87 -> top: 49%, left: 78% */
     .landmark-pleasanton {
-      top: 54%; left: 72%;
+      top: 50%; left: 78%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 5px; color: var(--text-muted); opacity: 0.6;
     }
+    /* Fremont: ~37.55, -121.98 -> top: 56%, left: 72% */
     .landmark-fremont {
-      top: 58%; left: 58%;
+      top: 57%; left: 72%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 6px; color: var(--text-muted); opacity: 0.6;
     }
+    /* Hayward: ~37.67, -122.08 -> top: 49%, left: 66% */
     .landmark-hayward {
-      top: 50%; left: 60%;
+      top: 50%; left: 66%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 5px; color: var(--text-muted); opacity: 0.5;
     }
+    /* Lake Merritt: ~37.8, -122.26 -> top: 41%, left: 55% */
     .landmark-lakemerritt {
-      top: 38%; left: 54%;
+      top: 42%; left: 56%;
       width: 8px; height: 6px;
       background: var(--water);
       border-radius: 50%;
       opacity: 0.6;
     }
+    /* Coliseum: ~37.75, -122.20 -> top: 44%, left: 59% */
     .landmark-coliseum {
-      top: 44%; left: 56%;
+      top: 45%; left: 59%;
       font-family: 'Arial', sans-serif;
       font-size: 4px; font-weight: 700;
       color: #006341; opacity: 0.5;
     }
 
-    /* South Bay Landmarks */
+    /* South Bay Landmarks - GPS-based */
+    /* San Jose: ~37.34, -121.89 -> top: 68%, left: 77% */
     .landmark-sanjose {
-      top: 82%; left: 56%;
+      top: 70%; left: 78%;
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 8px; font-weight: 600;
       color: var(--text-dark); opacity: 0.7;
     }
+    /* Apple Park: ~37.33, -122.01 -> top: 69%, left: 70% */
     .landmark-apple {
-      top: 72%; left: 38%;
+      top: 67%; left: 68%;
       opacity: 0.5;
     }
     .landmark-apple svg { fill: #555; }
+    /* Santa Cruz: ~36.97, -122.03 -> top: 90%, left: 69% */
     .landmark-santacruz {
-      top: 92%; left: 22%;
+      top: 92%; left: 65%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 6px; color: var(--text-muted); opacity: 0.6;
       transform: rotate(-5deg);
     }
 
-    /* North Bay Landmarks */
+    /* North Bay Landmarks - GPS-based */
+    /* Napa city: ~38.3, -122.29 -> top: 12%, left: 54% */
     .landmark-napa {
-      top: 4%; left: 58%;
+      top: 10%; left: 54%;
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 7px; font-weight: 600;
       color: #722F37; opacity: 0.7;
       font-style: italic;
     }
+    /* Sausalito: ~37.86, -122.48 -> top: 38%, left: 42% */
     .landmark-sausalito {
-      top: 24%; left: 28%;
+      top: 38%; left: 41%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 5px; color: var(--text-muted); opacity: 0.5;
     }
+    /* San Rafael: ~37.97, -122.53 -> top: 31%, left: 39% */
     .landmark-sanrafael {
-      top: 16%; left: 34%;
+      top: 30%; left: 39%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 5px; color: var(--text-muted); opacity: 0.6;
     }
+    /* Wine Country label: ~38.4, -122.45 */
     .landmark-winecountry {
-      top: 2%; left: 48%;
+      top: 5%; left: 44%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 5px; font-style: italic;
       color: #722F37; opacity: 0.5;
       letter-spacing: 2px;
     }
+    /* Point Reyes: ~38.07, -122.87 */
     .landmark-pointreyes {
-      top: 8%; left: 8%;
+      top: 24%; left: 18%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 5px; font-style: italic;
       color: var(--text-muted); opacity: 0.5;
       transform: rotate(-15deg);
     }
 
-    /* Other Landmarks */
+    /* Other Landmarks - GPS-based */
+    /* Oakland Airport: ~37.72, -122.22 */
     .landmark-oaklandairport {
-      top: 46%; left: 52%;
+      top: 46%; left: 58%;
       font-family: 'Arial', sans-serif;
       font-size: 5px; font-weight: 700;
       color: var(--text-muted); opacity: 0.5;
     }
+    /* Bay Bridge: ~37.79, -122.38 */
     .landmark-baybridge {
-      top: 34%; left: 44%;
+      top: 42%; left: 48%;
       opacity: 0.6;
     }
+    /* Mission District: ~37.76, -122.42 */
     .landmark-mission {
-      top: 40%; left: 28%;
+      top: 44%; left: 46%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 4px; color: var(--text-muted); opacity: 0.4;
     }
 
-    /* Oakland Port Cranes - on east side of bay */
+    /* Oakland Port Cranes: ~37.8, -122.32 */
     .landmark-cranes {
-      top: 36%;
+      top: 41%;
       left: 52%;
     }
 
@@ -952,10 +1021,10 @@
       opacity: 0.6;
     }
 
-    /* Transamerica Pyramid - downtown SF */
+    /* Transamerica Pyramid - downtown SF: ~37.795, -122.40 */
     .landmark-pyramid {
-      top: 28%;
-      left: 32%;
+      top: 41%;
+      left: 47%;
     }
 
     .landmark-pyramid svg {
@@ -965,10 +1034,10 @@
       opacity: 0.6;
     }
 
-    /* Mt. Tamalpais */
+    /* Mt. Tamalpais: ~37.92, -122.60 */
     .landmark-tamalpais {
-      top: 10%;
-      left: 28%;
+      top: 34%;
+      left: 35%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 6px;
       font-style: italic;
@@ -977,10 +1046,10 @@
       transform: rotate(-5deg);
     }
 
-    /* Alcatraz Island */
+    /* Alcatraz Island: ~37.83, -122.42 */
     .landmark-alcatraz {
-      top: 26%;
-      left: 36%;
+      top: 39%;
+      left: 46%;
       width: 10px;
       height: 8px;
       background: var(--paper-dark);
@@ -988,10 +1057,10 @@
       border: 1px solid var(--contour-light);
     }
 
-    /* Candlestick Point (historic) */
+    /* Candlestick Point: ~37.71, -122.39 */
     .landmark-candlestick {
-      top: 42%;
-      left: 32%;
+      top: 46%;
+      left: 48%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 5px;
       color: var(--text-muted);
@@ -1009,13 +1078,15 @@
       white-space: nowrap;
     }
 
-    .landmark-innout-mv { top: 72%; left: 36%; }
-    .landmark-innout-sf { top: 38%; left: 20%; transform: rotate(-5deg); }
+    /* In-N-Out Mountain View: ~37.41, -122.08 */
+    .landmark-innout-mv { top: 64%; left: 66%; }
+    /* In-N-Out SF Fisherman's Wharf: ~37.81, -122.42 */
+    .landmark-innout-sf { top: 40%; left: 46%; transform: rotate(-5deg); }
 
-    /* Stanford University */
+    /* Stanford University: ~37.43, -122.17 */
     .landmark-stanford {
-      top: 64%;
-      left: 30%;
+      top: 63%;
+      left: 61%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 6px;
       font-weight: 600;
@@ -1023,10 +1094,10 @@
       opacity: 0.6;
     }
 
-    /* UC Berkeley */
+    /* UC Berkeley: ~37.87, -122.26 */
     .landmark-berkeley {
-      top: 26%;
-      left: 58%;
+      top: 37%;
+      left: 55%;
       font-family: 'Source Serif 4', Georgia, serif;
       font-size: 6px;
       font-weight: 600;
@@ -1034,10 +1105,10 @@
       opacity: 0.6;
     }
 
-    /* SFO Airport */
+    /* SFO Airport: ~37.62, -122.38 */
     .landmark-sfo {
-      top: 50%;
-      left: 24%;
+      top: 52%;
+      left: 48%;
       font-family: 'Arial', sans-serif;
       font-size: 5px;
       font-weight: 700;
@@ -1045,10 +1116,10 @@
       opacity: 0.6;
     }
 
-    /* Golden Gate Park */
+    /* Golden Gate Park: ~37.77, -122.49 */
     .landmark-ggpark {
-      top: 30%;
-      left: 18%;
+      top: 43%;
+      left: 41%;
       width: 28px;
       height: 8px;
       background: var(--fairway);
@@ -1057,10 +1128,10 @@
       transform: rotate(-5deg);
     }
 
-    /* Presidio */
+    /* Presidio: ~37.80, -122.47 */
     .landmark-presidio {
-      top: 24%;
-      left: 22%;
+      top: 41%;
+      left: 43%;
       width: 18px;
       height: 12px;
       background: var(--fairway);
