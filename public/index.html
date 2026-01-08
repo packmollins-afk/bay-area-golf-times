@@ -411,8 +411,8 @@
     .fw-sanjose { top: 69.4%; left: 78.8%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(12deg); }
 
     /* East Bay Courses - Based on GPS */
-    /* Corica Park South: 37.739, -122.233 */
-    .fw-corica { top: 44.8%; left: 56.9%; width: 28px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
+    /* Corica Park South: 37.739, -122.233 - offset to avoid overlap with North */
+    .fw-corica { top: 45.8%; left: 57.5%; width: 28px; height: 44px; border-radius: 50% 50% 55% 45%; transform: rotate(-10deg); }
     /* Tilden Park: 37.888, -122.244 */
     .fw-tilden { top: 36.0%; left: 56.2%; width: 24px; height: 38px; border-radius: 45% 55% 50% 50%; transform: rotate(-5deg); }
     /* Boundary Oak: 37.924, -121.999 */
@@ -445,20 +445,20 @@
     .fw-northwood { top: 4.1%; left: 12.9%; width: 22px; height: 32px; border-radius: 50% 50% 45% 55%; transform: rotate(-40deg); }
 
     /* Additional SF/Peninsula Courses - Based on GPS */
-    /* Fleming 9 (same location as Harding): 37.724, -122.493 */
-    .fw-fleming { top: 46.2%; left: 41.2%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-28deg); }
+    /* Fleming 9 (same location as Harding): 37.724, -122.493 - offset from Harding to avoid overlap */
+    .fw-fleming { top: 47.5%; left: 42.8%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-28deg); }
     /* Crystal Springs: 37.519, -122.365 */
     .fw-crystal { top: 57.7%; left: 49.1%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
-    /* Half Moon Bay Old: 37.436, -122.441 */
-    .fw-hmb-old { top: 62.6%; left: 44.6%; width: 22px; height: 34px; border-radius: 50% 50% 55% 45%; transform: rotate(-20deg); }
-    /* Half Moon Bay Ocean: 37.434, -122.440 */
-    .fw-hmb-ocean { top: 62.7%; left: 44.7%; width: 22px; height: 32px; border-radius: 45% 55% 50% 50%; transform: rotate(-25deg); }
+    /* Half Moon Bay Old: 37.436, -122.441 - offset to avoid overlap with Ocean */
+    .fw-hmb-old { top: 61.0%; left: 43.5%; width: 22px; height: 34px; border-radius: 50% 50% 55% 45%; transform: rotate(-20deg); }
+    /* Half Moon Bay Ocean: 37.434, -122.440 - offset to avoid overlap with Old */
+    .fw-hmb-ocean { top: 64.0%; left: 45.8%; width: 22px; height: 32px; border-radius: 45% 55% 50% 50%; transform: rotate(-25deg); }
 
     /* Pasatiempo: 37.004, -122.025 - near Santa Cruz */
     .fw-pasatiempo { top: 88.0%; left: 69.1%; width: 24px; height: 38px; border-radius: 50% 50% 55% 45%; transform: rotate(5deg); }
 
-    /* Corica North: 37.745, -122.235 */
-    .fw-corica-n { top: 44.4%; left: 56.8%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
+    /* Corica North: 37.745, -122.235 - offset to avoid overlap with South */
+    .fw-corica-n { top: 43.2%; left: 56.0%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(-8deg); }
 
     /* Tri-Valley East Bay Courses - Based on GPS */
     /* The Bridges: 37.70, -121.91 */

@@ -569,6 +569,20 @@
       border-bottom: 3px solid var(--border);
     }
     .course-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .course-card-img .logo-overlay {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      width: 64px;
+      height: auto;
+      max-height: 64px;
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 6px;
+      padding: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      pointer-events: none;
+    }
     .course-card-body { padding: 18px; }
     .course-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .course-card-header h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 0; }
@@ -2354,6 +2368,7 @@
           <article class="course-card" data-id="${course.id}" onclick="openCourseDetail(${course.id})" itemscope itemtype="https://schema.org/GolfCourse">
             <div class="course-card-img">
               <img src="${imgUrl}" alt="${altText}" loading="lazy" itemprop="image">
+              ${course.logo_url ? `<img src="${course.logo_url}" alt="${course.name} logo" class="logo-overlay">` : ''}
             </div>
             <div class="course-card-body">
               <div class="course-card-header">
