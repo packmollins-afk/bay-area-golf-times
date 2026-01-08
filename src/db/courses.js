@@ -67,7 +67,7 @@ const courses = [
   { name: "Northwood Golf Club", city: "Monte Rio", region: "North Bay", holes: 9, par: 36, yardage: 2893, latitude: 38.4680, longitude: -123.0140, phone_number: "(707) 865-1116", golfnow_id: null, booking_url: "https://www.northwoodgolf.com/", booking_system: "other" },
 
   // Santa Cruz / South Bay Extended
-  { name: "Pasatiempo Golf Club", city: "Santa Cruz", region: "South Bay", holes: 18, par: 70, yardage: 6439, latitude: 37.0050, longitude: -122.0560, phone_number: "(831) 459-9155", golfnow_id: null, booking_url: "https://www.pasatiempo.com/tee-times/", booking_system: "other" },
+  { name: "Pasatiempo Golf Club", city: "Santa Cruz", region: "South Bay", holes: 18, par: 70, yardage: 6439, latitude: 37.0050, longitude: -122.0560, phone_number: "(831) 459-9155", golfnow_id: "4759", booking_url: "https://www.golfnow.com/tee-times/facility/4759-pasatiempo-golf-club/search", booking_system: "golfnow" },
 
   // East Bay - Additional
   { name: "Diablo Creek Golf Course", city: "Concord", region: "East Bay", holes: 18, par: 71, yardage: 6830, latitude: 37.9540, longitude: -121.9350, phone_number: "(925) 686-6262", golfnow_id: "1448", booking_url: "https://www.golfnow.com/tee-times/facility/1448-diablo-creek-golf-course/search", booking_system: "golfnow" },
