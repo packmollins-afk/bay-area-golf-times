@@ -71,6 +71,23 @@ async function scrapeTimes(page, siteUrl, dayOffset = 0, timeout = 30000) {
     await page.goto(siteUrl, { waitUntil: 'networkidle2', timeout });
     await new Promise(r => setTimeout(r, 2000));
 
+    // Dismiss any popup modals (e.g., "Attention Players" at Valley of the Moon)
+    // Some sites have multiple modals, so click all Dismiss buttons
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const buttons = await page.$$('button');
+        for (const btn of buttons) {
+          const text = await page.evaluate(el => el.textContent, btn);
+          if (text && text.includes('Dismiss')) {
+            await btn.click();
+            await new Promise(r => setTimeout(r, 500));
+          }
+        }
+      } catch (e) {
+        // No modal to dismiss
+      }
+    }
+
     // Navigate to correct day using chevron buttons
     for (let i = 0; i < dayOffset; i++) {
       try {
