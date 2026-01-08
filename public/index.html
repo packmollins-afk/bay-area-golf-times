@@ -250,15 +250,17 @@
       box-shadow: inset 0 0 15px rgba(123, 163, 189, 0.4);
     }
 
-    /* Golden Gate strait: ~37.82, -122.47 */
+    /* Golden Gate strait: ~37.82, -122.47 - where Pacific meets SF Bay */
     .golden-gate-strait {
       position: absolute;
-      top: 40%;
-      left: 42%;
-      width: 9%;
-      height: 2%;
-      background: var(--water);
-      transform: rotate(-8deg);
+      top: 38.5%;
+      left: 40%;
+      width: 12%;
+      height: 4%;
+      background: linear-gradient(90deg, var(--water) 0%, var(--water-dark) 50%, var(--water) 100%);
+      transform: rotate(-5deg);
+      border-radius: 0 50% 50% 0;
+      box-shadow: inset 0 0 15px rgba(123, 163, 189, 0.6);
     }
 
     /* California Coastline - SVG-based accurate coast */
@@ -917,20 +919,43 @@
       opacity: 0.75;
     }
 
-    /* Golden Gate Bridge - spans the strait: ~37.82, -122.48 */
+    /* Golden Gate Bridge - BIG iconic red bridge spanning the strait */
     .landmark-ggb {
-      top: 39%;
-      left: 42%;
-      width: 55px;
-      height: 28px;
+      top: 35%;
+      left: 38%;
+      width: 120px;
+      height: 60px;
+      z-index: 50;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+      animation: bridge-glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes bridge-glow {
+      0% { filter: drop-shadow(0 4px 8px rgba(196, 85, 58, 0.3)); }
+      100% { filter: drop-shadow(0 6px 16px rgba(196, 85, 58, 0.5)); }
     }
 
     .landmark-ggb svg {
       width: 100%;
       height: 100%;
       fill: none;
-      stroke: var(--accent);
+      stroke: #c4553a;
+      stroke-width: 2.5;
+    }
+
+    .landmark-ggb svg .bridge-tower {
+      stroke: #c4553a;
+      stroke-width: 3;
+    }
+
+    .landmark-ggb svg .bridge-cable {
+      stroke: #d4654a;
       stroke-width: 1.5;
+    }
+
+    .landmark-ggb svg .bridge-deck {
+      stroke: #c4553a;
+      stroke-width: 4;
     }
 
     /* North Bay Redwoods / Muir Woods: ~37.9, -122.58 */
@@ -1331,69 +1356,79 @@
         <defs>
           <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color:#a8c5d8;stop-opacity:1" />
-            <stop offset="75%" style="stop-color:#a8c5d8;stop-opacity:1" />
+            <stop offset="70%" style="stop-color:#a8c5d8;stop-opacity:1" />
             <stop offset="100%" style="stop-color:#a8c5d8;stop-opacity:0" />
           </linearGradient>
         </defs>
-        <!-- Pacific Ocean: Extended California coastline from Fort Bragg to Big Sur -->
+        <!-- Pacific Ocean: California coastline from Sonoma to Big Sur -->
         <path fill="url(#oceanGradient)" d="
           M 0,-20
-          L 20,-20
-          L 19,-15
-          L 18,-10
-          L 17,-5
-          L 16,0
-          C 15,2 14,4 15,6
-          L 14,8
-          C 13,10 12,11 13,13
-          L 12,15
-          C 10,17 8,19 6,22
-          L 4,25
-          C 3,27 5,29 8,30
-          L 12,31
-          C 15,32 18,32 21,33
-          L 24,34
-          C 26,35 27,37 26,39
-          L 24,41
-          C 22,43 20,45 19,48
-          L 18,51
-          C 17,54 18,57 19,60
-          L 20,63
-          C 19,66 18,69 19,72
-          L 21,75
-          C 24,78 28,81 33,84
-          L 40,87
-          C 46,89 52,91 55,92
-          L 58,93
-          C 60,94 58,96 54,98
-          L 48,100
-          C 44,102 40,104 36,106
-          L 30,110
-          C 26,112 24,114 22,116
-          L 20,120
+          L 22,-20
+          L 20,-10
+          L 18,0
+          C 16,4 14,8 13,12
+          L 11,16
+          C 8,20 5,24 3,28
+          L 2,32
+          C 1,34 3,36 8,38
+          L 16,40
+          C 22,41 28,40 32,39
+          L 36,38
+          C 38,38 40,40 38,42
+          L 34,44
+          C 30,46 26,48 24,52
+          L 22,56
+          C 20,60 22,64 26,66
+          L 30,67
+          C 32,67 30,69 26,72
+          L 22,76
+          C 18,80 20,84 24,87
+          L 30,90
+          C 38,93 46,95 52,96
+          L 56,97
+          C 58,98 56,100 50,103
+          L 42,107
+          C 36,110 30,113 26,116
+          L 22,120
           L 0,120
           Z
         "/>
-        <!-- Point Reyes Peninsula - distinctive hook shape -->
+        <!-- Point Reyes Peninsula - distinctive hook -->
         <path fill="#a8c5d8" d="
-          M 6,22
-          L 4,25
-          C 2,27 0,29 2,31
-          L 6,33
-          C 10,34 14,33 17,32
-          L 19,31
-          L 16,29
-          L 12,27
-          L 8,25
+          M 3,28
+          L 0,32
+          C -2,36 0,38 4,40
+          L 10,41
+          C 14,41 18,40 20,39
+          L 18,37
+          L 12,35
+          L 6,32
           Z
         "/>
-        <!-- Bodega Head - small peninsula -->
+        <!-- Bodega Head -->
         <path fill="#a8c5d8" d="
-          M 13,13
-          L 11,14
-          C 9,15 10,16 12,17
-          L 14,16
-          L 13,14
+          M 13,12
+          L 10,14
+          C 8,16 10,18 13,18
+          L 15,16
+          Z
+        "/>
+        <!-- Half Moon Bay indent - the bay where the golf courses are -->
+        <path fill="#a8c5d8" opacity="0.7" d="
+          M 22,56
+          C 20,58 18,62 20,65
+          L 24,66
+          L 26,64
+          L 24,60
+          Z
+        "/>
+        <!-- Golden Gate opening - where Pacific meets SF Bay -->
+        <path fill="var(--water-dark)" opacity="0.6" d="
+          M 32,39
+          L 36,38
+          C 38,38 40,40 38,42
+          L 34,44
+          C 32,44 32,42 32,40
           Z
         "/>
       </svg>
@@ -1417,14 +1452,32 @@
       <div class="landmark landmark-presidio"></div>
       <div class="landmark landmark-ggpark"></div>
 
-      <!-- Golden Gate Bridge -->
+      <!-- Golden Gate Bridge - Big, iconic, happy red bridge! -->
       <div class="landmark landmark-ggb">
-        <svg viewBox="0 0 55 28">
-          <path d="M4,24 L10,6 L15,24 M40,24 L46,6 L51,24" stroke-linecap="round"/>
-          <path d="M10,6 L46,6" stroke-linecap="round"/>
-          <path d="M0,24 L55,24" stroke-width="2"/>
-          <path d="M10,12 L46,12" stroke-width="0.5"/>
-          <path d="M10,18 L46,18" stroke-width="0.5"/>
+        <svg viewBox="0 0 120 60">
+          <!-- Road deck -->
+          <path class="bridge-deck" d="M 0,52 L 120,52" stroke-linecap="round"/>
+
+          <!-- Left tower -->
+          <path class="bridge-tower" d="M 25,52 L 25,12 M 32,52 L 32,12" stroke-linecap="round"/>
+          <path class="bridge-tower" d="M 23,12 L 34,12 M 23,22 L 34,22 M 23,32 L 34,32 M 23,42 L 34,42" stroke-width="2"/>
+
+          <!-- Right tower -->
+          <path class="bridge-tower" d="M 88,52 L 88,12 M 95,52 L 95,12" stroke-linecap="round"/>
+          <path class="bridge-tower" d="M 86,12 L 97,12 M 86,22 L 97,22 M 86,32 L 97,32 M 86,42 L 97,42" stroke-width="2"/>
+
+          <!-- Main cables (catenary curves) -->
+          <path class="bridge-cable" d="M 0,20 Q 28,8 60,6 Q 92,8 120,20" fill="none"/>
+
+          <!-- Suspender cables from main cable to deck -->
+          <path class="bridge-cable" d="M 15,17 L 15,52" stroke-width="0.8"/>
+          <path class="bridge-cable" d="M 28,10 L 28,52" stroke-width="0.8"/>
+          <path class="bridge-cable" d="M 40,8 L 40,52" stroke-width="0.8"/>
+          <path class="bridge-cable" d="M 52,7 L 52,52" stroke-width="0.8"/>
+          <path class="bridge-cable" d="M 68,7 L 68,52" stroke-width="0.8"/>
+          <path class="bridge-cable" d="M 80,8 L 80,52" stroke-width="0.8"/>
+          <path class="bridge-cable" d="M 92,10 L 92,52" stroke-width="0.8"/>
+          <path class="bridge-cable" d="M 105,17 L 105,52" stroke-width="0.8"/>
         </svg>
       </div>
 
