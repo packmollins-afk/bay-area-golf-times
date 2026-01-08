@@ -1648,24 +1648,32 @@
 
       function updateZoom() {
         const baseSize = 200 * currentZoom;
-        const offset = -50 * currentZoom;
         mapContent.style.width = `${baseSize}%`;
         mapContent.style.height = `${baseSize}%`;
         updatePosition();
       }
 
+      // Zoom with center preservation
+      function zoomTo(newZoom) {
+        const oldZoom = currentZoom;
+        currentZoom = Math.max(minZoom, Math.min(maxZoom, newZoom));
+        // Scale position to keep view centered on same point
+        const scale = currentZoom / oldZoom;
+        currentX *= scale;
+        currentY *= scale;
+        updateZoom();
+      }
+
       // Zoom controls
       zoomInBtn.addEventListener('click', () => {
         if (currentZoom < maxZoom) {
-          currentZoom = Math.min(maxZoom, currentZoom + zoomStep);
-          updateZoom();
+          zoomTo(currentZoom + zoomStep);
         }
       });
 
       zoomOutBtn.addEventListener('click', () => {
         if (currentZoom > minZoom) {
-          currentZoom = Math.max(minZoom, currentZoom - zoomStep);
-          updateZoom();
+          zoomTo(currentZoom - zoomStep);
         }
       });
 
@@ -1673,11 +1681,10 @@
       container.addEventListener('wheel', (e) => {
         e.preventDefault();
         if (e.deltaY < 0 && currentZoom < maxZoom) {
-          currentZoom = Math.min(maxZoom, currentZoom + zoomStep * 0.5);
+          zoomTo(currentZoom + zoomStep * 0.5);
         } else if (e.deltaY > 0 && currentZoom > minZoom) {
-          currentZoom = Math.max(minZoom, currentZoom - zoomStep * 0.5);
+          zoomTo(currentZoom - zoomStep * 0.5);
         }
-        updateZoom();
       }, { passive: false });
 
       // Mouse events for drag
@@ -1734,8 +1741,7 @@
           );
           if (lastTouchDistance > 0) {
             const delta = (distance - lastTouchDistance) * 0.005;
-            currentZoom = Math.max(minZoom, Math.min(maxZoom, currentZoom + delta));
-            updateZoom();
+            zoomTo(currentZoom + delta);
           }
           lastTouchDistance = distance;
         } else if (isDragging && e.touches.length === 1) {
