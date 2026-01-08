@@ -466,10 +466,16 @@ const COURSE_BASE_PRICES = {
   'Bennett Valley Golf Course': 55, 'Windsor Golf Club': 65, 'Valley of the Moon Club': 55,
   'Sonoma Golf Club': 95, 'Fairgrounds Golf Course': 22, 'Oakmont Golf Club': 40,
   // Monterey
-  'Pacific Grove Golf Links': 55, 'Bayonet Golf Course': 95, 'Black Horse Golf Club': 95,
+  'Pacific Grove Golf Links': 52, 'Bayonet Golf Course': 95, 'Black Horse Golf Club': 95,
   'Del Monte Golf Course': 120, 'Laguna Seca Golf Ranch': 75, 'The Quail Golf Club': 175,
   'Carmel Valley Ranch': 195, 'Corral de Tierra Country Club': 85, 'Twin Creeks Golf Course': 20,
-  'The Club at Crazy Horse Ranch': 65, 'Salinas Fairways Golf Course': 18, 'Monterey Pines Golf Club': 45
+  'The Club at Crazy Horse Ranch': 65, 'Salinas Fairways Golf Course': 18, 'Monterey Pines Golf Club': 45,
+  // Napa - CourseCo
+  'Napa Golf Course': 65,
+  // Sacramento - CourseCo
+  'Ancil Hoffman Golf Course': 52,
+  'Mather Golf Course': 48,
+  'Cherry Island Golf Course': 45
 };
 
 // Generate demo tee times on-the-fly for a course

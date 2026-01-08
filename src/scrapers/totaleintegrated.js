@@ -1,6 +1,6 @@
 /**
  * TotaleIntegrated Fast Scraper
- * Only scrapes courses NOT on GolfNow: Boundary Oak, Metropolitan, San Jose Muni
+ * Scrapes CourseCo courses NOT on GolfNow: Bay Area, Monterey, Napa, Sacramento
  * Gets first available tee time for today only (fast like GolfNow scraper)
  */
 
@@ -19,6 +19,37 @@ const TOTALE_COURSES = {
   'san-jose-municipal-golf-course': {
     url: 'https://sanjose.totaleintegrated.net/web/tee-times',
     name: 'San Jose Municipal Golf Course'
+  },
+  // Monterey Region (CourseCo - no GolfNow inventory)
+  'pacific-grove-golf-links': {
+    url: 'https://playpacificgrove.totaleintegrated.com/',
+    name: 'Pacific Grove Golf Links'
+  },
+  'laguna-seca-golf-ranch': {
+    url: 'https://lagunasecagolf.totaleintegrated.com/',
+    name: 'Laguna Seca Golf Ranch'
+  },
+  // North Bay / Napa Region (CourseCo - no GolfNow inventory)
+  'valley-of-the-moon-club': {
+    url: 'https://vom.totaleintegrated.net/web/tee-times',
+    name: 'Valley of the Moon Club'
+  },
+  'napa-golf-course': {
+    url: 'https://playnapa.totaleintegrated.com/',
+    name: 'Napa Golf Course'
+  },
+  // Sacramento Region (CourseCo - no GolfNow inventory)
+  'ancil-hoffman-golf-course': {
+    url: 'https://playancilhoffman.totaleintegrated.com/',
+    name: 'Ancil Hoffman Golf Course'
+  },
+  'mather-golf-course': {
+    url: 'https://playmather.totaleintegrated.com/',
+    name: 'Mather Golf Course'
+  },
+  'cherry-island-golf-course': {
+    url: 'https://playgolfcherryisland.totaleintegrated.com/',
+    name: 'Cherry Island Golf Course'
   }
 };
 
