@@ -1886,12 +1886,12 @@
         momentumThreshold: 0.1,  // Min velocity to apply momentum
 
         // Initial position (centered on Bay Area courses)
-        startX: isMobile ? 15 : 10,  // Mobile slightly more east
-        startY: isMobile ? 8 : 5,    // Mobile slightly more south to center Bay
+        startX: isMobile ? 10 : 8,   // Start at coast edge
+        startY: isMobile ? 8 : 5,    // Centered vertically on Bay
 
         // Pan bounds - keep courses in view when zooming
-        boundsWest: 20,          // Hard lock Pacific edge
-        boundsEast: 60,          // Allow inland (east)
+        boundsWest: -10,         // Allow panning east (inland)
+        boundsEast: 18,          // LOCK Pacific - can't pan west past coast
         boundsNorth: -20,        // Allow north (Sonoma)
         boundsSouth: 50          // Allow south (Santa Cruz)
       };
