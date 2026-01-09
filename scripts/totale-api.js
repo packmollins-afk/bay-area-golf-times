@@ -22,32 +22,13 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
 }
 
 // Course configurations with API parameters
-// Note: Boundary Oak and Metropolitan removed - they now use GolfNow
+// Note: Courses also on GolfNow removed to avoid duplicates (GolfNow has lower prices):
+// - Boundary Oak, Metropolitan, Pacific Grove, Laguna Seca, Valley of the Moon, Napa
 const TOTALE_COURSES_API = {
   'san-jose-municipal-golf-course': {
     courseId: 'SANJOSE',
     origin: 'https://sanjose.totaleintegrated.net',
     name: 'San Jose Municipal Golf Course'
-  },
-  'pacific-grove-golf-links': {
-    courseId: 'PACIFIC GROVE',
-    origin: 'https://pacificgrove.totaleintegrated.net',
-    name: 'Pacific Grove Golf Links'
-  },
-  'laguna-seca-golf-ranch': {
-    courseId: 'LAGUNASECA',
-    origin: 'https://lagunaseca.totaleintegrated.net',
-    name: 'Laguna Seca Golf Ranch'
-  },
-  'valley-of-the-moon-club': {
-    courseId: 'VM',
-    origin: 'https://vom.totaleintegrated.net',
-    name: 'Valley of the Moon Club'
-  },
-  'napa-golf-course': {
-    courseId: 'NAPA',
-    origin: 'https://napa.totaleintegrated.net',
-    name: 'Napa Golf Course'
   },
   'ancil-hoffman-golf-course': {
     courseId: 'ANCIL',
