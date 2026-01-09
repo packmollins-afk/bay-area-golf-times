@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/api/server.js",
     "dev": "node --watch src/api/server.js",
-    "scrape": "node src/scripts/scrape.js",
+    "scrape": "node scripts/full-scrape-parallel.js",
+    "scrape:scheduled": "node scripts/scheduled-scrape.js",
+    "scrape:old": "node src/scripts/scrape.js",
     "demo": "node src/scripts/generate-demo-data.js",
     "setup": "node src/scripts/setup.js"
   },
