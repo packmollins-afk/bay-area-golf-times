@@ -56,7 +56,7 @@ const CHRONOGOLF_COURSES = {
     name: 'Canyon Lakes Golf Course',
     clubUrl: 'https://www.chronogolf.com/club/canyon-lakes-golf-course-and-brewery'
   },
-  'blue-rock-springs-golf-club': {
+  'blue-rock-springs-golf-club-east': {
     uuid: '039d1b9b-2723-4b50-b02c-2925ae207f83',
     name: 'Blue Rock Springs Golf Club (East)',
     clubUrl: 'https://www.chronogolf.com/club/blue-rock-springs-golf-club'
