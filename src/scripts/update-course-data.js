@@ -386,7 +386,7 @@ const courseData = [
   },
   {
     id: 333, // Half Moon Bay Old
-    name: 'Half Moon Bay - Old Course',
+    name: 'Half Moon Bay Golf Links - Old Course',
     par: 72,
     yardage: 7100,
     slope_rating: 134,
@@ -403,7 +403,7 @@ const courseData = [
   },
   {
     id: 334, // Half Moon Bay Ocean
-    name: 'Half Moon Bay - Ocean Course',
+    name: 'Half Moon Bay Golf Links - Ocean Course',
     par: 72,
     yardage: 6732,
     slope_rating: 132,

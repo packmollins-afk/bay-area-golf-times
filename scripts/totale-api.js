@@ -8,6 +8,19 @@
 
 const https = require('https');
 
+async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempt === maxRetries - 1) throw error;
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`  [Retry] Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+}
+
 // Course configurations with API parameters
 const TOTALE_COURSES_API = {
   'boundary-oak-golf-course': {
@@ -75,57 +88,146 @@ function getPacificDate(dayOffset = 0) {
   return `${year}-${month}-${day}`;
 }
 
-function convertTo24Hour(timeStr) {
-  // Handle "1:33 PM" format
-  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return null;
+/**
+ * Robust time parser that handles multiple formats:
+ * - "7:30 AM" or "7:30AM" (with/without space)
+ * - "7:30 A" or "7:30 P" (truncated AM/PM)
+ * - "7 AM" or "7AM" (no minutes)
+ * - "07:30" (already 24-hour format)
+ * - "7:30" (ambiguous, returned as-is with padded hours)
+ */
+function convertTo24Hour(timeStr, context = null) {
+  if (!timeStr) return null;
 
-  let hours = parseInt(match[1]);
-  const minutes = match[2];
-  const period = match[3].toUpperCase();
+  const original = timeStr;
+  const normalized = timeStr.trim().toUpperCase();
 
-  if (period === 'PM' && hours !== 12) hours += 12;
-  if (period === 'AM' && hours === 12) hours = 0;
+  // Pattern 1: Already in 24-hour format (HH:MM)
+  const match24 = normalized.match(/^(\d{2}):(\d{2})$/);
+  if (match24) {
+    const hours = parseInt(match24[1]);
+    if (hours >= 0 && hours <= 23) {
+      return `${match24[1]}:${match24[2]}`;
+    }
+  }
 
-  return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  // Pattern 2: Full format with optional space - "7:30 AM", "7:30AM", "7:30 PM", "7:30PM"
+  const matchFull = normalized.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+  if (matchFull) {
+    let hours = parseInt(matchFull[1]);
+    const minutes = matchFull[2];
+    const period = matchFull[3];
+
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  // Pattern 3: Truncated period - "7:30 A", "7:30 P", "7:30A", "7:30P"
+  const matchTruncated = normalized.match(/^(\d{1,2}):(\d{2})\s*([AP])$/);
+  if (matchTruncated) {
+    let hours = parseInt(matchTruncated[1]);
+    const minutes = matchTruncated[2];
+    const period = matchTruncated[3];
+
+    if (period === 'P' && hours !== 12) hours += 12;
+    if (period === 'A' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  // Pattern 4: Hour only with period - "7 AM", "7AM", "7 PM", "7PM"
+  const matchHourOnly = normalized.match(/^(\d{1,2})\s*(AM|PM)$/);
+  if (matchHourOnly) {
+    let hours = parseInt(matchHourOnly[1]);
+    const period = matchHourOnly[2];
+
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:00`;
+  }
+
+  // Pattern 5: Hour only with truncated period - "7 A", "7A", "7 P", "7P"
+  const matchHourTruncated = normalized.match(/^(\d{1,2})\s*([AP])$/);
+  if (matchHourTruncated) {
+    let hours = parseInt(matchHourTruncated[1]);
+    const period = matchHourTruncated[2];
+
+    if (period === 'P' && hours !== 12) hours += 12;
+    if (period === 'A' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:00`;
+  }
+
+  // Pattern 6: Time without period - "7:30" (ambiguous, but pad hours)
+  const matchNoPeriod = normalized.match(/^(\d{1,2}):(\d{2})$/);
+  if (matchNoPeriod) {
+    const hours = parseInt(matchNoPeriod[1]);
+    const minutes = matchNoPeriod[2];
+    // If context provides AM/PM info, use it
+    if (context) {
+      const ctxUpper = context.toUpperCase();
+      if (ctxUpper === 'PM' || ctxUpper === 'P') {
+        const adjHours = hours !== 12 ? hours + 12 : hours;
+        return `${adjHours.toString().padStart(2, '0')}:${minutes}`;
+      } else if (ctxUpper === 'AM' || ctxUpper === 'A') {
+        const adjHours = hours === 12 ? 0 : hours;
+        return `${adjHours.toString().padStart(2, '0')}:${minutes}`;
+      }
+    }
+    // Return as-is with padded hours
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  // Could not parse - log and return null
+  console.warn(`[TotaleIntegrated] Unable to parse time: "${original}"`);
+  return null;
 }
 
 /**
  * Fetch tee times from the TotaleIntegrated API
  */
 function fetchTeeTimes(course, dateStr) {
-  return new Promise((resolve, reject) => {
-    const courseIdEncoded = encodeURIComponent(course.courseId);
-    const url = `https://courseco-gateway.totaleintegrated.net/Booking/Teetimes?IsInitTeeTimeRequest=false&TeeTimeDate=${dateStr}&CourseID=${courseIdEncoded}&StartTime=05:00&EndTime=20:00&NumOfPlayers=4&Holes=18&IsNineHole=0&StartPrice=0&EndPrice=&CartIncluded=false&SpecialsOnly=0&IsClosest=0&PlayerIDs=&DateFilterChange=false&DateFilterChangeNoSearch=false&SearchByGroups=true&IsPrepaidOnly=0&QueryStringFilters=null`;
+  return retryWithBackoff(async () => {
+    return new Promise((resolve, reject) => {
+      const courseIdEncoded = encodeURIComponent(course.courseId);
+      const url = `https://courseco-gateway.totaleintegrated.net/Booking/Teetimes?IsInitTeeTimeRequest=false&TeeTimeDate=${dateStr}&CourseID=${courseIdEncoded}&StartTime=05:00&EndTime=20:00&NumOfPlayers=4&Holes=18&IsNineHole=0&StartPrice=0&EndPrice=&CartIncluded=false&SpecialsOnly=0&IsClosest=0&PlayerIDs=&DateFilterChange=false&DateFilterChangeNoSearch=false&SearchByGroups=true&IsPrepaidOnly=0&QueryStringFilters=null`;
 
-    const req = https.get(url, {
-      headers: {
-        'Accept': 'application/json',
-        'Origin': course.origin,
-        'Referer': course.origin + '/web/tee-times',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-      }
-    }, res => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          const teeTimes = (json.TeeTimeData || []).map(tt => ({
-            time: tt.Title,        // "1:33 PM"
-            price: tt.PerPlayerCost,
-            holes: tt.Holes,
-            players: 4,
-            time24: tt.Time?.split(':').slice(0, 2).join(':') || convertTo24Hour(tt.Title)
-          }));
-          resolve(teeTimes);
-        } catch (e) {
-          resolve([]);
+      const req = https.get(url, {
+        headers: {
+          'Accept': 'application/json',
+          'Origin': course.origin,
+          'Referer': course.origin + '/web/tee-times',
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
         }
+      }, res => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`HTTP ${res.statusCode} for ${course.courseId}`));
+          return;
+        }
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            const json = JSON.parse(data);
+            const teeTimes = (json.TeeTimeData || []).map(tt => ({
+              time: tt.Title,        // "1:33 PM"
+              price: tt.PerPlayerCost,
+              holes: tt.Holes,
+              players: 4,
+              time24: tt.Time?.split(':').slice(0, 2).join(':') || convertTo24Hour(tt.Title)
+            }));
+            resolve(teeTimes);
+          } catch (e) {
+            reject(new Error(`JSON parse error for ${course.courseId}: ${e.message}`));
+          }
+        });
       });
+      req.on('error', (err) => reject(new Error(`Network error for ${course.courseId}: ${err.message}`)));
+      req.end();
     });
-    req.on('error', () => resolve([]));
-    req.end();
   });
 }
 
@@ -159,8 +261,8 @@ async function scrapeAllAPI(db, coursesBySlug, days = 7) {
   console.log(`[TotaleIntegrated API] Starting scrape...`);
   const startTime = Date.now();
 
-  // Clear old data
-  await db.execute({ sql: 'DELETE FROM tee_times WHERE source = ?', args: ['totaleintegrated'] });
+  // NOTE: We no longer delete before scraping - the orchestrator handles cleanup
+  // after successful scrape using scraped_at timestamps
 
   // Build list of all tasks (course + date combinations)
   const tasks = [];
@@ -185,8 +287,13 @@ async function scrapeAllAPI(db, coursesBySlug, days = 7) {
 
   // Execute all fetches with concurrency limit
   const fetchTasks = tasks.map(t => async () => {
-    const teeTimes = await t.fetch();
-    return { ...t, teeTimes };
+    try {
+      const teeTimes = await t.fetch();
+      return { ...t, teeTimes };
+    } catch (error) {
+      console.log(`  [TotaleIntegrated API] Failed after retries: ${error.message}`);
+      return { ...t, teeTimes: [] };
+    }
   });
 
   const results = await runWithConcurrency(fetchTasks, MAX_CONCURRENT_REQUESTS);
@@ -210,7 +317,7 @@ async function scrapeAllAPI(db, coursesBySlug, days = 7) {
       if (!time24) continue;
 
       inserts.push({
-        sql: `INSERT OR IGNORE INTO tee_times
+        sql: `INSERT OR REPLACE INTO tee_times
               (course_id, date, time, datetime, holes, players, price, has_cart, booking_url, source, scraped_at)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
         args: [

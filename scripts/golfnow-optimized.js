@@ -29,6 +29,20 @@ const CONFIG = {
   maxConcurrentDays: 4,  // Increased from 3
 };
 
+// Retry utility with exponential backoff
+async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempt === maxRetries - 1) throw error;
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`  [Retry] Attempt ${attempt + 1} failed, retrying in ${delay}ms...`);
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+}
+
 const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 // Reduced from 6 to 4 locations - these cover the Bay Area well with less overlap
@@ -104,32 +118,37 @@ async function scrapeSearchResults(page, date) {
 }
 
 async function scrapeLocationWithPage(browser, location, date) {
-  const page = await browser.newPage();
-  await page.setUserAgent(USER_AGENT);
-  await page.setViewport({ width: 1280, height: 800 });
-
   const dateStr = date.toISOString().split('T')[0];
   const searchUrl = `https://www.golfnow.com/tee-times/search#q=location&latitude=${location.lat}&longitude=${location.lng}&radius=50&date=${dateStr}`;
 
-  try {
-    await page.goto(searchUrl, { waitUntil: 'networkidle2', timeout: CONFIG.pageTimeout });
-    await page.waitForSelector('[class*="course"], [class*="tile"]', { timeout: CONFIG.waitTimeout }).catch(() => {});
-    await new Promise(r => setTimeout(r, CONFIG.postLoadWait));
+  return retryWithBackoff(async () => {
+    const page = await browser.newPage();
+    await page.setUserAgent(USER_AGENT);
+    await page.setViewport({ width: 1280, height: 800 });
 
-    // Scroll to load more results (reduced scrolls)
-    for (let i = 0; i < CONFIG.numScrolls; i++) {
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await new Promise(r => setTimeout(r, CONFIG.scrollDelay));
+    try {
+      await page.goto(searchUrl, { waitUntil: 'networkidle2', timeout: CONFIG.pageTimeout });
+      await page.waitForSelector('[class*="course"], [class*="tile"]', { timeout: CONFIG.waitTimeout }).catch(() => {});
+      await new Promise(r => setTimeout(r, CONFIG.postLoadWait));
+
+      // Scroll to load more results (reduced scrolls)
+      for (let i = 0; i < CONFIG.numScrolls; i++) {
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await new Promise(r => setTimeout(r, CONFIG.scrollDelay));
+      }
+
+      const teeTimes = await scrapeSearchResults(page, date);
+      await page.close();
+      return teeTimes;
+
+    } catch (error) {
+      await page.close().catch(() => {});
+      throw error; // Re-throw to trigger retry
     }
-
-    const teeTimes = await scrapeSearchResults(page, date);
-    await page.close();
-    return teeTimes;
-
-  } catch (error) {
-    await page.close().catch(() => {});
-    return [];
-  }
+  }, 3, 1000).catch((error) => {
+    console.log(`  [GolfNow] Failed to scrape ${location.name} for ${dateStr} after retries: ${error.message}`);
+    return []; // Return empty array only after all retries exhausted
+  });
 }
 
 /**
@@ -160,23 +179,108 @@ async function scrapeDayParallel(browser, date, dateStr) {
 // DATABASE OPERATIONS
 // ============================================================================
 
-function convertTo24Hour(timeStr) {
+/**
+ * Robust time parser that handles multiple formats:
+ * - "7:30 AM" or "7:30AM" (with/without space)
+ * - "7:30 A" or "7:30 P" (truncated AM/PM)
+ * - "7 AM" or "7AM" (no minutes)
+ * - "07:30" (already 24-hour format)
+ * - "7:30" (ambiguous, returned as-is with padded hours)
+ */
+function convertTo24Hour(timeStr, context = null) {
   if (!timeStr) return null;
-  const match = timeStr.match(/(\d{1,2}):(\d{2})(AM|PM)/i);
-  if (!match) return timeStr;
 
-  let hours = parseInt(match[1]);
-  const minutes = match[2];
-  const period = match[3].toUpperCase();
+  const original = timeStr;
+  const normalized = timeStr.trim().toUpperCase();
 
-  if (period === 'PM' && hours !== 12) hours += 12;
-  if (period === 'AM' && hours === 12) hours = 0;
+  // Pattern 1: Already in 24-hour format (HH:MM)
+  const match24 = normalized.match(/^(\d{2}):(\d{2})$/);
+  if (match24) {
+    const hours = parseInt(match24[1]);
+    if (hours >= 0 && hours <= 23) {
+      return `${match24[1]}:${match24[2]}`;
+    }
+  }
 
-  return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  // Pattern 2: Full format with optional space - "7:30 AM", "7:30AM", "7:30 PM", "7:30PM"
+  const matchFull = normalized.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+  if (matchFull) {
+    let hours = parseInt(matchFull[1]);
+    const minutes = matchFull[2];
+    const period = matchFull[3];
+
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  // Pattern 3: Truncated period - "7:30 A", "7:30 P", "7:30A", "7:30P"
+  const matchTruncated = normalized.match(/^(\d{1,2}):(\d{2})\s*([AP])$/);
+  if (matchTruncated) {
+    let hours = parseInt(matchTruncated[1]);
+    const minutes = matchTruncated[2];
+    const period = matchTruncated[3];
+
+    if (period === 'P' && hours !== 12) hours += 12;
+    if (period === 'A' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  // Pattern 4: Hour only with period - "7 AM", "7AM", "7 PM", "7PM"
+  const matchHourOnly = normalized.match(/^(\d{1,2})\s*(AM|PM)$/);
+  if (matchHourOnly) {
+    let hours = parseInt(matchHourOnly[1]);
+    const period = matchHourOnly[2];
+
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:00`;
+  }
+
+  // Pattern 5: Hour only with truncated period - "7 A", "7A", "7 P", "7P"
+  const matchHourTruncated = normalized.match(/^(\d{1,2})\s*([AP])$/);
+  if (matchHourTruncated) {
+    let hours = parseInt(matchHourTruncated[1]);
+    const period = matchHourTruncated[2];
+
+    if (period === 'P' && hours !== 12) hours += 12;
+    if (period === 'A' && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, '0')}:00`;
+  }
+
+  // Pattern 6: Time without period - "7:30" (ambiguous, but pad hours)
+  const matchNoPeriod = normalized.match(/^(\d{1,2}):(\d{2})$/);
+  if (matchNoPeriod) {
+    const hours = parseInt(matchNoPeriod[1]);
+    const minutes = matchNoPeriod[2];
+    // If context provides AM/PM info, use it
+    if (context) {
+      const ctxUpper = context.toUpperCase();
+      if (ctxUpper === 'PM' || ctxUpper === 'P') {
+        const adjHours = hours !== 12 ? hours + 12 : hours;
+        return `${adjHours.toString().padStart(2, '0')}:${minutes}`;
+      } else if (ctxUpper === 'AM' || ctxUpper === 'A') {
+        const adjHours = hours === 12 ? 0 : hours;
+        return `${adjHours.toString().padStart(2, '0')}:${minutes}`;
+      }
+    }
+    // Return as-is with padded hours
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+
+  // Could not parse - log and return null
+  console.warn(`[GolfNow] Unable to parse time: "${original}"`);
+  return null;
 }
 
 async function getCourseMappings() {
-  const result = await db.execute('SELECT id, name, golfnow_id FROM courses WHERE golfnow_id IS NOT NULL');
+  const result = await retryWithBackoff(async () => {
+    return await db.execute('SELECT id, name, golfnow_id FROM courses WHERE golfnow_id IS NOT NULL');
+  }, 3, 1000);
   const mapping = {};
   result.rows.forEach(c => {
     if (!mapping[c.golfnow_id]) {
@@ -190,10 +294,12 @@ async function getCourseMappings() {
 async function clearOldTeeTimes(dates) {
   if (dates.length === 0) return;
   const placeholders = dates.map(() => '?').join(', ');
-  await db.execute({
-    sql: `DELETE FROM tee_times WHERE date IN (${placeholders}) AND source = 'golfnow'`,
-    args: dates
-  });
+  await retryWithBackoff(async () => {
+    await db.execute({
+      sql: `DELETE FROM tee_times WHERE date IN (${placeholders}) AND source = 'golfnow'`,
+      args: dates
+    });
+  }, 3, 1000);
 }
 
 /**
@@ -232,22 +338,28 @@ async function insertTeeTimesBatch(teeTimes, courseMappings) {
     }
   }
 
-  // Batch insert in chunks
+  // Batch insert in chunks with retry logic
   const BATCH_SIZE = 50;
   let inserted = 0;
 
   for (let i = 0; i < inserts.length; i += BATCH_SIZE) {
     const batch = inserts.slice(i, i + BATCH_SIZE);
     try {
-      await db.batch(batch);
+      await retryWithBackoff(async () => {
+        await db.batch(batch);
+      }, 3, 500);
       inserted += batch.length;
     } catch (e) {
-      // Fallback to individual inserts
+      // Fallback to individual inserts with retry
       for (const stmt of batch) {
         try {
-          await db.execute(stmt);
+          await retryWithBackoff(async () => {
+            await db.execute(stmt);
+          }, 2, 500);
           inserted++;
-        } catch (e2) {}
+        } catch (e2) {
+          console.log(`  [GolfNow] Failed to insert tee time after retries: ${e2.message}`);
+        }
       }
     }
   }
@@ -277,7 +389,8 @@ async function runScraperOptimized(daysAhead = 7) {
     dateObjects.push(date);
   }
 
-  await clearOldTeeTimes(dates);
+  // NOTE: We no longer delete before scraping - the orchestrator handles cleanup
+  // after successful scrape using scraped_at timestamps
 
   // Launch browser
   const browser = await puppeteer.launch({

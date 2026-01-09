@@ -699,7 +699,7 @@ const COURSE_BASE_PRICES = {
   'Metropolitan Golf Links': 68, 'Tilden Park Golf Course': 52, 'Boundary Oak Golf Course': 54,
   'Poppy Ridge Golf Course': 72, 'Peacock Gap Golf Club': 75, 'Indian Valley Golf Club': 55,
   'StoneTree Golf Club': 89, 'Mill Valley Golf Course': 32, 'TPC Harding Park - Fleming 9': 42,
-  'Crystal Springs Golf Course': 85, 'Half Moon Bay - Old Course': 175, 'Half Moon Bay - Ocean Course': 195,
+  'Crystal Springs Golf Course': 85, 'Half Moon Bay Golf Links - Old Course': 175, 'Half Moon Bay Golf Links - Ocean Course': 195,
   'The Links at Bodega Harbour': 85, 'Northwood Golf Club': 55, 'Pasatiempo Golf Club': 295,
   'Diablo Creek Golf Course': 52, 'The Bridges Golf Club': 95, 'San Ramon Golf Club': 65,
   'Las Positas Golf Course': 58, 'Callippe Preserve Golf Course': 72, 'McInnis Park Golf Center': 52,

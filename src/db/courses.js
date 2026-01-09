@@ -64,7 +64,11 @@ const courses = [
   { name: "McInnis Park Golf Center", city: "San Rafael", region: "North Bay", holes: 9, par: 31, yardage: 2130, latitude: 38.0140, longitude: -122.5320, phone_number: "(415) 492-1800", golfnow_id: "566", booking_url: "https://www.golfnow.com/tee-times/facility/566-mcinnis-park-golf-center/search", booking_system: "golfnow" },
   { name: "Mill Valley Golf Course", city: "Mill Valley", region: "North Bay", holes: 9, par: 29, yardage: 1620, latitude: 37.9060, longitude: -122.5280, phone_number: "(415) 388-9982", golfnow_id: "572", booking_url: "https://www.golfnow.com/tee-times/facility/572-mill-valley-golf-course/search", booking_system: "golfnow" },
   { name: "The Links at Bodega Harbour", city: "Bodega Bay", region: "North Bay", holes: 18, par: 70, yardage: 6275, latitude: 38.3340, longitude: -123.0470, phone_number: "(707) 875-3538", golfnow_id: "149", booking_url: "https://www.golfnow.com/tee-times/facility/149-the-links-at-bodega-harbour/search", booking_system: "golfnow" },
-  { name: "Northwood Golf Club", city: "Monte Rio", region: "North Bay", holes: 9, par: 36, yardage: 2893, latitude: 38.4680, longitude: -123.0140, phone_number: "(707) 865-1116", golfnow_id: null, booking_url: "https://www.northwoodgolf.com/", booking_system: "other" },
+  { name: "Northwood Golf Club", city: "Monte Rio", region: "North Bay", holes: 9, par: 36, yardage: 2893, latitude: 38.4680, longitude: -123.0140, phone_number: "(707) 865-1116", golfnow_id: null, booking_url: "https://www.northwoodgolf.com/bookteetimes", booking_system: "cpsgolf" },
+
+  // Peninsula - Half Moon Bay
+  { name: "Half Moon Bay Golf Links - Old Course", city: "Half Moon Bay", region: "South Bay", holes: 18, par: 72, yardage: 7007, latitude: 37.4328, longitude: -122.4542, phone_number: "(650) 726-1800", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links", booking_system: "chronogolf" },
+  { name: "Half Moon Bay Golf Links - Ocean Course", city: "Half Moon Bay", region: "South Bay", holes: 18, par: 72, yardage: 6732, latitude: 37.4328, longitude: -122.4542, phone_number: "(650) 726-1800", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links", booking_system: "chronogolf" },
 
   // Santa Cruz / South Bay Extended
   { name: "Pasatiempo Golf Club", city: "Santa Cruz", region: "South Bay", holes: 18, par: 70, yardage: 6439, latitude: 37.0050, longitude: -122.0560, phone_number: "(831) 459-9155", golfnow_id: "4759", booking_url: "https://www.golfnow.com/tee-times/facility/4759-pasatiempo-golf-club/search", booking_system: "golfnow" },
@@ -179,7 +183,7 @@ const staffPickCourseNames = [
   "TPC Harding Park",
   "Pasatiempo Golf Club",
   "Presidio Golf Course",
-  "Half Moon Bay - Ocean Course",
+  "Half Moon Bay Golf Links - Ocean Course",
   "Corica Park - South Course",
   "Cinnabar Hills Golf Club",
   "Tilden Park Golf Course",
@@ -356,8 +360,8 @@ const coursePhotoUrls = {
   // Extended
   "Pasatiempo Golf Club": "https://www.pasatiempo.com/images/uploads/34/hole-1.jpg",
   "Crystal Springs Golf Course": "https://www.playcrystalsprings.com/images/slideshows/001-startingimage-1.jpg",
-  "Half Moon Bay - Ocean Course": "https://golf-pass-brightspot.s3.amazonaws.com/u9/v0/w1x2y3z4a5b6c7d8e9f0g1h2i3j4/92400.jpg",
-  "Half Moon Bay - Old Course": "https://golf-pass-brightspot.s3.amazonaws.com/w7/x8/y9z0a1b2c3d4e5f6g7h8i9j0k1l2/92500.jpg",
+  "Half Moon Bay Golf Links - Ocean Course": "https://golf-pass-brightspot.s3.amazonaws.com/u9/v0/w1x2y3z4a5b6c7d8e9f0g1h2i3j4/92400.jpg",
+  "Half Moon Bay Golf Links - Old Course": "https://golf-pass-brightspot.s3.amazonaws.com/w7/x8/y9z0a1b2c3d4e5f6g7h8i9j0k1l2/92500.jpg",
 };
 
 // Seed course photos

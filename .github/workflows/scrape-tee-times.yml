@@ -2,13 +2,17 @@ name: Scrape Tee Times
 
 on:
   schedule:
-    # Run 4x daily at safe intervals (UTC times = PST + 8)
+    # Run 6x daily at ~4 hour intervals (UTC times = PST + 8)
     # 5 AM PST = 13:00 UTC - Catch early morning tee time releases
+    # 8 AM PST = 16:00 UTC - Morning prime time
     # 11 AM PST = 19:00 UTC - Mid-day refresh
+    # 2 PM PST = 22:00 UTC - Afternoon refresh
     # 5 PM PST = 01:00 UTC - Evening refresh
     # 9 PM PST = 05:00 UTC - Final daily update
     - cron: '0 13 * * *'
+    - cron: '0 16 * * *'
     - cron: '0 19 * * *'
+    - cron: '0 22 * * *'
     - cron: '0 1 * * *'
     - cron: '0 5 * * *'
   workflow_dispatch: # Allow manual triggers
