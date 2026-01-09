@@ -7,6 +7,9 @@ const cookieParser = require('cookie-parser');
 const UAParser = require('ua-parser-js');
 const { createClient } = require('@libsql/client');
 const { Resend } = require('resend');
+const bcrypt = require('bcrypt');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,9 +23,20 @@ const db = createClient({
 // Resend email client (optional - emails won't send if not configured)
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Simple password hashing (in production, use bcrypt)
-const hashPassword = (password) => {
-  return crypto.createHash('sha256').update(password + 'baygolf_salt_2024').digest('hex');
+// Secure password hashing with bcrypt
+const BCRYPT_ROUNDS = 12;
+const hashPassword = async (password) => {
+  return bcrypt.hash(password, BCRYPT_ROUNDS);
+};
+const verifyPassword = async (password, hash) => {
+  // Support legacy SHA-256 hashes for existing users (migration)
+  const legacyHash = crypto.createHash('sha256').update(password + 'baygolf_salt_2024').digest('hex');
+  if (hash === legacyHash) {
+    return { valid: true, needsRehash: true };
+  }
+  // Check bcrypt hash
+  const valid = await bcrypt.compare(password, hash);
+  return { valid, needsRehash: false };
 };
 
 // Send verification email with welcome info
@@ -167,7 +181,67 @@ const deleteSession = async (token) => {
   await db.execute({ sql: 'DELETE FROM sessions WHERE token = ?', args: [token] });
 };
 
-app.use(cors());
+// Security: Configure allowed CORS origins
+const allowedOrigins = [
+  'https://bayareagolf.now',
+  'https://www.bayareagolf.now',
+  'http://localhost:3000',
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true
+}));
+
+// Security: Add security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
+      frameSrc: ["https://js.stripe.com"],
+      connectSrc: ["'self'", "https://api.open-meteo.com", "https://api.stripe.com"]
+    }
+  },
+  crossOriginEmbedderPolicy: false
+}));
+
+// Security: Rate limiting for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per window
+  message: { error: 'Too many login attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // 100 requests per minute
+  message: { error: 'Too many requests. Please slow down.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Apply rate limiting to auth endpoints
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/signup', authLimiter);
+app.use('/api/admin/login', authLimiter);
+
+// Apply general rate limiting to all API endpoints
+app.use('/api/', apiLimiter);
+
 // Skip JSON parsing for /api/track (it uses text/plain from sendBeacon)
 app.use((req, res, next) => {
   if (req.path === '/api/track') {
@@ -396,30 +470,57 @@ app.get('/api/courses', async (req, res) => {
   try {
     const { region, all, staff_picks } = req.query;
 
+    // Helper to get today's tee time count and pricing
+    const pacificNow = getPacificNow();
+    const todayEnd = pacificNow.split('T')[0] + 'T23:59:59';
+
     if (staff_picks === 'true') {
-      const result = await db.execute('SELECT * FROM courses WHERE is_staff_pick = 1 ORDER BY staff_pick_order ASC, name ASC');
+      const result = await db.execute({
+        sql: `SELECT c.*,
+          (SELECT MIN(t.price) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ?) as next_price,
+          (SELECT COUNT(*) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ? AND t.datetime <= ?) as tee_time_count
+        FROM courses c
+        WHERE c.is_staff_pick = 1
+        ORDER BY c.staff_pick_order ASC, c.name ASC`,
+        args: [pacificNow, pacificNow, todayEnd]
+      });
       return res.json(result.rows);
     }
 
     if (all === 'true') {
-      const result = await db.execute('SELECT * FROM courses ORDER BY region, city, name');
+      const result = await db.execute({
+        sql: `SELECT c.*,
+          (SELECT MIN(t.price) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ?) as next_price,
+          (SELECT COUNT(*) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ? AND t.datetime <= ?) as tee_time_count
+        FROM courses c
+        ORDER BY c.region, c.city, c.name`,
+        args: [pacificNow, pacificNow, todayEnd]
+      });
       return res.json(result.rows);
     }
 
     if (region) {
-      const result = await db.execute({ sql: 'SELECT * FROM courses WHERE region = ? ORDER BY city, name', args: [region] });
+      const result = await db.execute({
+        sql: `SELECT c.*,
+          (SELECT MIN(t.price) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ?) as next_price,
+          (SELECT COUNT(*) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ? AND t.datetime <= ?) as tee_time_count
+        FROM courses c
+        WHERE c.region = ?
+        ORDER BY c.city, c.name`,
+        args: [pacificNow, pacificNow, todayEnd, region]
+      });
       return res.json(result.rows);
     }
 
-    // Default: courses with prices (using Pacific timezone for comparisons)
-    const pacificNow = getPacificNow();
+    // Default: courses with prices and availability
     const result = await db.execute({
       sql: `SELECT c.*,
         (SELECT MIN(t.price) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ?) as next_price,
-        (SELECT t.datetime FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ? ORDER BY t.datetime LIMIT 1) as next_time
+        (SELECT t.datetime FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ? ORDER BY t.datetime LIMIT 1) as next_time,
+        (SELECT COUNT(*) FROM tee_times t WHERE t.course_id = c.id AND t.datetime >= ? AND t.datetime <= ?) as tee_time_count
       FROM courses c
       ORDER BY c.region, c.city, c.name`,
-      args: [pacificNow, pacificNow]
+      args: [pacificNow, pacificNow, pacificNow, todayEnd]
     });
     res.json(result.rows);
   } catch (error) {
@@ -884,7 +985,7 @@ app.post('/api/auth/signup', async (req, res) => {
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
 
     // Create user with verification token
-    const passwordHash = hashPassword(password);
+    const passwordHash = await hashPassword(password);
     const name = displayName || email.split('@')[0];
     const result = await db.execute({
       sql: `INSERT INTO users (email, password_hash, display_name, email_verified, verification_token, verification_expires)
@@ -1006,8 +1107,20 @@ app.post('/api/auth/login', async (req, res) => {
     const result = await db.execute({ sql: 'SELECT * FROM users WHERE email = ?', args: [email.toLowerCase()] });
     const user = result.rows[0];
 
-    if (!user || user.password_hash !== hashPassword(password)) {
+    if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Security: Use bcrypt verification with legacy hash support
+    const { valid, needsRehash } = await verifyPassword(password, user.password_hash);
+    if (!valid) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Migration: Rehash legacy SHA-256 passwords to bcrypt
+    if (needsRehash) {
+      const newHash = await hashPassword(password);
+      await db.execute({ sql: 'UPDATE users SET password_hash = ? WHERE id = ?', args: [newHash, user.id] });
     }
 
     const token = await createSession(user.id);
@@ -1017,7 +1130,8 @@ app.post('/api/auth/login', async (req, res) => {
       user: { id: user.id, email: user.email, displayName: user.display_name }
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
@@ -1589,6 +1703,17 @@ app.get('/api/admin/courses', adminAuth, async (req, res) => {
   }
 });
 
+// Security: Whitelist of allowed course columns to prevent SQL injection
+const ALLOWED_COURSE_COLUMNS = new Set([
+  'name', 'slug', 'city', 'region', 'address', 'phone', 'website', 'booking_url',
+  'holes', 'par', 'yardage', 'course_rating', 'slope', 'green_fee_range',
+  'has_driving_range', 'has_practice_green', 'has_pro_shop', 'description',
+  'latitude', 'longitude', 'image_url', 'booking_system', 'golfnow_facility_id',
+  'is_staff_pick', 'staff_pick_order', 'is_featured', 'course_record_score',
+  'course_record_holder', 'course_record_date', 'course_record_details',
+  'architect', 'year_built', 'price_range', 'zip'
+]);
+
 app.put('/api/admin/courses/:id', adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
@@ -1598,13 +1723,21 @@ app.put('/api/admin/courses/:id', adminAuth, async (req, res) => {
     const args = [];
 
     for (const [key, value] of Object.entries(updates)) {
+      // Convert camelCase to snake_case
       const dbKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+
+      // Security: Only allow whitelisted column names
+      if (!ALLOWED_COURSE_COLUMNS.has(dbKey)) {
+        console.warn(`Rejected invalid column name in course update: ${dbKey}`);
+        continue; // Skip invalid columns
+      }
+
       setClauses.push(`${dbKey} = ?`);
       args.push(value);
     }
 
     if (setClauses.length === 0) {
-      return res.status(400).json({ error: 'No updates provided' });
+      return res.status(400).json({ error: 'No valid updates provided' });
     }
 
     args.push(parseInt(id));
@@ -1615,7 +1748,8 @@ app.put('/api/admin/courses/:id', adminAuth, async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Course update error:', error);
+    res.status(500).json({ error: 'Failed to update course' });
   }
 });
 
@@ -1844,18 +1978,25 @@ app.get('/api/admin/analytics/searches', adminAuth, async (req, res) => {
 // Conversion funnel
 app.get('/api/admin/analytics/conversions', adminAuth, async (req, res) => {
   try {
-    const period = req.query.period || '7';
-    const dateFilter = `created_at >= date('now', '-${period} days')`;
+    // Security: Validate period is a positive integer to prevent SQL injection
+    const periodInput = req.query.period || '7';
+    const period = parseInt(periodInput, 10);
+    if (isNaN(period) || period < 1 || period > 365) {
+      return res.status(400).json({ error: 'Period must be a number between 1 and 365' });
+    }
+
+    // Security: Use parameterized query with validated integer
+    const dateFilter = `-${period} days`;
 
     const [pageViews, courseViews, teeTimeViews, bookingClicks] = await Promise.all([
-      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'page_view' AND ${dateFilter}`),
-      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'course_view' AND ${dateFilter}`),
-      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'tee_time_view' AND ${dateFilter}`),
-      db.execute(`SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND ${dateFilter}`)
+      db.execute({ sql: `SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'page_view' AND created_at >= date('now', ?)`, args: [dateFilter] }),
+      db.execute({ sql: `SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'course_view' AND created_at >= date('now', ?)`, args: [dateFilter] }),
+      db.execute({ sql: `SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'tee_time_view' AND created_at >= date('now', ?)`, args: [dateFilter] }),
+      db.execute({ sql: `SELECT COUNT(*) as count FROM analytics_events WHERE event_type = 'booking_click' AND created_at >= date('now', ?)`, args: [dateFilter] })
     ]);
 
     res.json({
-      period: parseInt(period),
+      period: period,
       funnel: [
         { stage: 'Page Views', count: pageViews.rows[0]?.count || 0 },
         { stage: 'Course Views', count: courseViews.rows[0]?.count || 0 },
@@ -1864,7 +2005,8 @@ app.get('/api/admin/analytics/conversions', adminAuth, async (req, res) => {
       ]
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Analytics conversion error:', error);
+    res.status(500).json({ error: 'Failed to load analytics' });
   }
 });
 

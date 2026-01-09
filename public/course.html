@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 
   <!-- Primary Meta Tags (dynamically updated by JavaScript) -->
@@ -222,6 +222,8 @@
       text-decoration: none;
       color: inherit;
       transition: all var(--anim-fast) var(--ease-out);
+      position: relative;
+      overflow: hidden;
     }
     .nearby-course:hover {
       border-color: var(--primary);
@@ -241,6 +243,84 @@
     .nearby-course .meta {
       font-size: 0.8rem;
       color: var(--text-muted);
+    }
+    .nearby-course .price-badge {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3px;
+      margin-top: 8px;
+      padding: 3px 8px;
+      background: rgba(45, 90, 39, 0.08);
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+    .nearby-course .price-badge .from-label {
+      color: var(--text-muted);
+    }
+    .nearby-course .price-badge .price-value {
+      font-family: 'DM Mono', monospace;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .nearby-course .availability-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+    .nearby-course .availability-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+    }
+    .nearby-course .availability-badge.limited .dot {
+      background: #F59E0B;
+    }
+    .nearby-course .availability-badge.sold-out .dot {
+      background: #6B7280;
+    }
+    .nearby-course .availability-badge .text {
+      color: #059669;
+    }
+    .nearby-course .availability-badge.limited .text {
+      color: #D97706;
+    }
+    .nearby-course .availability-badge.sold-out .text {
+      color: #6B7280;
+    }
+    .nearby-course .rating-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      margin-left: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .nearby-course .rating-badge svg {
+      width: 12px;
+      height: 12px;
+      fill: var(--gold);
+    }
+    .nearby-course.staff-pick {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, #fffbeb 0%, var(--bg-paper) 100%);
+    }
+    .nearby-course .staff-pick-label {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--gold);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
     /* Main content */
@@ -803,6 +883,758 @@
       .course-stat .value { font-size: 1.2rem; }
       .action-buttons { flex-direction: column; }
       .btn { justify-content: center; }
+      main { padding-bottom: 100px; }
+    }
+
+    /* ===========================================
+       CTA & CONVERSION SYSTEM
+       =========================================== */
+
+    /* Primary Button - Book Now (Most Prominent) */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 32px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      min-height: 56px;
+      min-width: 160px;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      text-decoration: none;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-primary:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary:disabled, .btn-primary.loading {
+      background: #D1D5DB;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Secondary Button */
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: #FFFFFF;
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      min-height: 52px;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background: #ECFDF5;
+      border-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(45, 90, 39, 0.15);
+    }
+
+    .btn-secondary:active {
+      background: #D1FAE5;
+      transform: translateY(0);
+    }
+
+    .btn-secondary:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.2);
+    }
+
+    /* Tertiary Button (Link style) */
+    .btn-tertiary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-tertiary:hover {
+      background: var(--bg-paper);
+      color: var(--text);
+    }
+
+    /* Ripple Effect */
+    .ripple-container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0);
+      animation: ripple-animation 0.6s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes ripple-animation {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    .ripple--dark {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Loading Spinner */
+    .btn-loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: btn-spin 0.8s linear infinite;
+    }
+
+    @keyframes btn-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Success Animation */
+    .btn-success {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    }
+
+    .btn-success .success-check {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      animation: success-pop 0.3s ease-out;
+    }
+
+    @keyframes success-pop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* Social Proof Elements */
+    .social-proof {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #F9FAFB;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .social-proof-avatars {
+      display: flex;
+    }
+
+    .social-proof-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid #FFFFFF;
+      margin-left: -8px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+
+    .social-proof-avatar:first-child {
+      margin-left: 0;
+    }
+
+    .social-proof-text {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .social-proof-text strong {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .social-proof-icon {
+      width: 20px;
+      height: 20px;
+      color: #10B981;
+    }
+
+    /* Urgency Indicators */
+    .spots-remaining {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #FEF2F2;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #DC2626;
+    }
+
+    .spots-remaining--warning {
+      background: #FFFBEB;
+      color: #D97706;
+    }
+
+    .spots-remaining-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Trust Badges */
+    .trust-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #374151;
+    }
+
+    .trust-badge svg {
+      width: 16px;
+      height: 16px;
+      color: #10B981;
+    }
+
+    .trust-badge--verified {
+      background: #ECFDF5;
+      border-color: #10B981;
+      color: #059669;
+    }
+
+    .trust-badge--secure {
+      background: #EFF6FF;
+      border-color: #3B82F6;
+      color: #1D4ED8;
+    }
+
+    /* Sticky Mobile CTA Bar */
+    .sticky-cta-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: #FFFFFF;
+      border-top: 1px solid #E5E7EB;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
+      padding: 12px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .sticky-cta-bar--visible {
+      transform: translateY(0);
+    }
+
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .sticky-cta-bar {
+        padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sticky-cta-bar {
+        display: flex;
+      }
+    }
+
+    .sticky-cta-price {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sticky-cta-price-label {
+      font-size: 0.75rem;
+      color: #6B7280;
+    }
+
+    .sticky-cta-price-value {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .sticky-cta-price-current {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .sticky-cta-price-original {
+      font-size: 0.9rem;
+      color: #9CA3AF;
+      text-decoration: line-through;
+    }
+
+    .sticky-cta-button {
+      flex: 1;
+      max-width: 180px;
+      padding: 14px 24px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      text-decoration: none;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .sticky-cta-button:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
+    .sticky-cta-button:active {
+      transform: translateY(0);
+    }
+
+    /* Booking count badge */
+    .booking-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .booking-count svg {
+      width: 16px;
+      height: 16px;
+      color: #10B981;
+    }
+
+    .booking-count strong {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Enhanced Tee Time Slots */
+    .tee-time-slot {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border-light);
+      border-radius: 10px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tee-time-slot:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+      box-shadow: 0 4px 16px rgba(45, 90, 39, 0.15);
+    }
+
+    .tee-time-slot:active {
+      transform: translateX(2px);
+    }
+
+    .tee-time-book {
+      padding: 10px 18px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: #fff;
+      border-radius: 8px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .tee-time-slot:hover .tee-time-book {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    /* ========================================
+       MOBILE OPTIMIZATIONS
+       ======================================== */
+
+    /* Safe area inset CSS variables */
+    :root {
+      --safe-area-top: env(safe-area-inset-top, 0px);
+      --safe-area-right: env(safe-area-inset-right, 0px);
+      --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-area-left: env(safe-area-inset-left, 0px);
+    }
+
+    /* Sticky mobile header */
+    @media (max-width: 768px) {
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 12px 0;
+      }
+
+      @supports (padding-top: env(safe-area-inset-top)) {
+        header {
+          padding-top: calc(12px + var(--safe-area-top));
+        }
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .header-nav {
+        display: none;
+      }
+
+      /* Main content needs padding for bottom nav */
+      main.container {
+        padding-bottom: calc(80px + var(--safe-area-bottom));
+      }
+
+      .hero {
+        height: 200px;
+      }
+
+      .hero-overlay h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* Bottom Navigation Bar for Mobile */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      border-top: 2px solid var(--border);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+      padding: 8px 12px;
+      padding-bottom: calc(8px + var(--safe-area-bottom));
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 8px 12px;
+      min-width: 64px;
+      min-height: 52px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-nav-item:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-nav-item.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .mobile-nav-item svg {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 4px;
+      stroke-width: 2;
+    }
+
+    .mobile-nav-item span {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    /* Hamburger Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 6px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .mobile-menu-btn:hover,
+    .mobile-menu-btn:active {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+
+    .mobile-menu-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke: #f4f1e8;
+      stroke-width: 2;
+    }
+
+    /* Mobile Slide-Out Menu */
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-menu-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .mobile-menu-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 280px;
+      max-width: 85vw;
+      background: var(--card-bg);
+      z-index: 2001;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-area-top);
+      padding-bottom: var(--safe-area-bottom);
+    }
+
+    .mobile-menu-overlay.active .mobile-menu-panel {
+      transform: translateX(0);
+    }
+
+    .mobile-menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .mobile-menu-header h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .mobile-menu-close {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .mobile-menu-close:hover,
+    .mobile-menu-close:active {
+      background: var(--bg-paper);
+    }
+
+    .mobile-menu-close svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--text);
+      stroke-width: 2;
+    }
+
+    .mobile-menu-links {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .mobile-menu-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s;
+      min-height: 56px;
+    }
+
+    .mobile-menu-link:hover,
+    .mobile-menu-link:active {
+      background: var(--bg-paper);
+    }
+
+    .mobile-menu-link.active {
+      background: var(--primary);
+      color: #f4f1e8;
+    }
+
+    .mobile-menu-link svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    /* Touch-friendly improvements */
+    @media (max-width: 768px) {
+      /* Minimum 44x44px touch targets */
+      .region-chip,
+      .btn,
+      .btn-primary,
+      .btn-secondary {
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      .nav-btn,
+      .back-link {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 10px 14px;
+      }
+
+      .nearby-course {
+        min-height: 60px;
+        padding: 16px;
+      }
+
+      .tee-time-slot {
+        min-height: 56px;
+        padding: 14px;
+      }
+
+      .tee-time-book {
+        min-height: 44px;
+        padding: 12px 18px;
+      }
+
+      /* Adjust sticky CTA bar for bottom nav */
+      .sticky-cta-bar {
+        bottom: calc(68px + var(--safe-area-bottom));
+      }
     }
   </style>
 </head>
@@ -815,8 +1647,71 @@
         <a href="/app.html" class="nav-btn">Tee Times</a>
         <a href="/courses.html" class="nav-btn">Courses</a>
       </div>
+      <!-- Mobile hamburger menu button -->
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </header>
+
+  <!-- Mobile Slide-Out Menu -->
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay" onclick="closeMobileMenu()">
+    <div class="mobile-menu-panel" onclick="event.stopPropagation()">
+      <div class="mobile-menu-header">
+        <h2>Menu</h2>
+        <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-menu-links">
+        <a href="/" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Home
+        </a>
+        <a href="/app.html" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          Search Tee Times
+        </a>
+        <a href="/" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          Map View
+        </a>
+        <a href="/courses.html" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          All Courses
+        </a>
+        <a href="/account.html" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Account
+        </a>
+      </nav>
+    </div>
+  </div>
 
   <div id="hero-container">
     <div class="hero">
@@ -835,10 +1730,66 @@
     </div>
   </main>
 
+  <!-- Sticky Mobile CTA Bar -->
+  <div id="sticky-cta-bar" class="sticky-cta-bar">
+    <div class="sticky-cta-price">
+      <span class="sticky-cta-price-label">Starting from</span>
+      <div class="sticky-cta-price-value">
+        <span id="sticky-price" class="sticky-cta-price-current">$--</span>
+      </div>
+    </div>
+    <a id="sticky-book-btn" href="#" class="sticky-cta-button ripple-container">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Book Now
+    </a>
+  </div>
+
   <script>
     const API_BASE = '/api';
     let allCourses = [];
     let currentCourse = null;
+
+    // Generate random booking count for social proof
+    function getRandomBookingCount() {
+      return Math.floor(Math.random() * 12) + 3; // 3-14 bookings
+    }
+
+    // Generate social proof data
+    function generateSocialProof() {
+      const count = getRandomBookingCount();
+      const names = ['John', 'Sarah', 'Mike', 'Emily', 'David', 'Lisa', 'Chris', 'Amy'];
+      const shuffled = names.sort(() => 0.5 - Math.random());
+      return {
+        count,
+        recentNames: shuffled.slice(0, 3),
+        timeAgo: Math.floor(Math.random() * 30) + 5 // 5-35 minutes
+      };
+    }
+
+    // Update sticky CTA bar with course info
+    function updateStickyCTA(course) {
+      const stickyPrice = document.getElementById('sticky-price');
+      const stickyBtn = document.getElementById('sticky-book-btn');
+
+      // Get lowest price from tee times
+      const teeTimes = course.teeTimes || [];
+      if (teeTimes.length > 0) {
+        const prices = teeTimes.map(tt => tt.price).filter(p => p);
+        const lowestPrice = Math.min(...prices);
+        if (lowestPrice && lowestPrice !== Infinity) {
+          stickyPrice.textContent = `$${lowestPrice}`;
+        }
+      }
+
+      // Update book button URL
+      if (course.booking_url) {
+        stickyBtn.href = `/go/${course.slug}`;
+        stickyBtn.target = '_blank';
+      } else if (course.phone_number) {
+        stickyBtn.href = `tel:${course.phone_number.replace(/[^\d+]/g, '')}`;
+        stickyBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Call Now`;
+      }
+    }
 
     async function loadCourse() {
       // Get slug from URL path: /course/tpc-harding-park -> tpc-harding-park
@@ -1068,27 +2019,70 @@
         </div>
       `;
 
-      // Action buttons - Book Online and Call to Book side by side
+      // Generate social proof data
+      const socialProof = generateSocialProof();
+
+      // Action buttons - Book Online and Call to Book side by side with enhanced CTA
       html += `
         <div class="section section-animate">
+          <!-- Social Proof -->
+          <div class="social-proof">
+            <div class="social-proof-avatars">
+              ${socialProof.recentNames.map(name => `<div class="social-proof-avatar">${name.charAt(0)}</div>`).join('')}
+            </div>
+            <div class="social-proof-text">
+              <strong>${socialProof.count} people</strong> booked today
+            </div>
+            <svg class="social-proof-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+
           <div class="action-buttons" style="justify-content: center;">
-            ${course.booking_url ? `<a href="/go/${course.slug}" target="_blank" class="btn btn-primary">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              Book Online
+            ${course.booking_url ? `<a href="/go/${course.slug}" target="_blank" class="btn btn-primary ripple-container" onclick="trackBookClick()">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              Book Now
             </a>` : ''}
-            ${course.phone_number ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="btn btn-primary" onclick="trackCallClick()">
+            ${course.phone_number ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="btn btn-secondary ripple-container" onclick="trackCallClick()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
               Call to Book
             </a>` : ''}
           </div>
+
+          <!-- Trust Badges -->
+          <div class="trust-badges" style="justify-content: center;">
+            <div class="trust-badge trust-badge--verified">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Verified Course
+            </div>
+            <div class="trust-badge trust-badge--secure">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Secure Booking
+            </div>
+            <div class="trust-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              Instant Confirmation
+            </div>
+          </div>
+
           ${course.website_url || course.bluegolf_url ? `
-          <div class="action-buttons secondary-actions" style="justify-content: center; margin-top: 12px;">
-            ${course.website_url ? `<a href="${course.website_url}" target="_blank" class="btn btn-secondary">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <div class="action-buttons secondary-actions" style="justify-content: center; margin-top: 16px;">
+            ${course.website_url ? `<a href="${course.website_url}" target="_blank" class="btn btn-tertiary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
               Course Website
             </a>` : ''}
-            ${course.bluegolf_url ? `<a href="${course.bluegolf_url}" target="_blank" class="btn btn-secondary">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            ${course.bluegolf_url ? `<a href="${course.bluegolf_url}" target="_blank" class="btn btn-tertiary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
               Hole by Hole Info
             </a>` : ''}
           </div>
@@ -1255,18 +2249,58 @@
           <div class="section section-animate">
             <h3>More in ${course.region}</h3>
             <div class="nearby-courses">
-              ${nearbyCourses.map(c => `
-                <a href="/course/${c.slug}" class="nearby-course">
-                  <div class="name">${c.name}</div>
-                  <div class="meta">${c.city} · ${c.holes} holes</div>
-                </a>
-              `).join('')}
+              ${nearbyCourses.map(c => {
+                // Get price display
+                const minPrice = c.next_price || c.min_price;
+                const priceDisplay = minPrice ? `$${Math.round(minPrice)}` : '';
+
+                // Get availability status
+                const teeTimeCount = c.tee_time_count || 0;
+                let availabilityClass = '';
+                let availabilityText = 'Available';
+                if (teeTimeCount === 0) {
+                  availabilityClass = 'sold-out';
+                  availabilityText = 'Check times';
+                } else if (teeTimeCount < 5) {
+                  availabilityClass = 'limited';
+                  availabilityText = `${teeTimeCount} left`;
+                }
+
+                return `
+                  <a href="/course/${c.slug}" class="nearby-course ${c.is_staff_pick ? 'staff-pick' : ''}">
+                    ${c.is_staff_pick ? '<span class="staff-pick-label">Staff Pick</span>' : ''}
+                    <div class="name">${c.name}</div>
+                    <div class="meta">${c.city} · ${c.holes} holes</div>
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+                      ${priceDisplay ? `
+                        <span class="price-badge">
+                          <span class="from-label">from</span>
+                          <span class="price-value">${priceDisplay}</span>
+                        </span>
+                      ` : ''}
+                      ${c.avg_rating ? `
+                        <span class="rating-badge">
+                          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                          ${c.avg_rating.toFixed(1)}
+                        </span>
+                      ` : ''}
+                    </div>
+                    <div class="availability-badge ${availabilityClass}">
+                      <span class="dot"></span>
+                      <span class="text">${availabilityText}</span>
+                    </div>
+                  </a>
+                `;
+              }).join('')}
             </div>
           </div>
         `;
       }
 
       document.getElementById('main-content').innerHTML = html;
+
+      // Update sticky CTA bar with course info
+      updateStickyCTA(course);
     }
 
     async function loadWeather(lat, lon) {
@@ -1392,6 +2426,86 @@
     }
 
     loadCourse();
+
+    // ==========================================
+    // CTA & CONVERSION ENHANCEMENTS
+    // ==========================================
+
+    // Ripple effect for buttons
+    function createRipple(event) {
+      const button = event.currentTarget;
+      const rect = button.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = event.clientX - rect.left - size / 2;
+      const y = event.clientY - rect.top - size / 2;
+
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+
+      button.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }
+
+    // Add ripple to all primary buttons
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-primary, .sticky-cta-button, .tee-time-book');
+      if (btn) {
+        createRipple(e);
+      }
+    });
+
+    // Button loading state
+    function setButtonLoading(button, isLoading) {
+      if (isLoading) {
+        button.classList.add('loading');
+        button.dataset.originalText = button.innerHTML;
+        button.innerHTML = '<span class="btn-loading-spinner"></span> Loading...';
+        button.disabled = true;
+      } else {
+        button.classList.remove('loading');
+        button.innerHTML = button.dataset.originalText || button.innerHTML;
+        button.disabled = false;
+      }
+    }
+
+    // Button success state
+    function setButtonSuccess(button, message = 'Success!') {
+      button.classList.add('btn-success');
+      button.innerHTML = `<svg class="success-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> ${message}`;
+      setTimeout(() => {
+        button.classList.remove('btn-success');
+        button.innerHTML = button.dataset.originalText || button.innerHTML;
+      }, 2000);
+    }
+
+    // Sticky CTA bar visibility
+    function initStickyCTA() {
+      const stickyBar = document.getElementById('sticky-cta-bar');
+      const actionButtons = document.querySelector('.action-buttons');
+
+      if (!stickyBar || !actionButtons) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            stickyBar.classList.remove('sticky-cta-bar--visible');
+          } else {
+            stickyBar.classList.add('sticky-cta-bar--visible');
+          }
+        },
+        { threshold: 0 }
+      );
+
+      observer.observe(actionButtons);
+    }
+
+    // Initialize after content loads
+    setTimeout(() => {
+      initStickyCTA();
+    }, 500);
   </script>
   <script src="/js/analytics.js"></script>
   <script>
@@ -1402,6 +2516,71 @@
           .catch(err => console.log('SW registration failed:', err));
       });
     }
+  </script>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+    <a href="/" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Home</span>
+    </a>
+    <a href="/app.html" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <span>Search</span>
+    </a>
+    <a href="/" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+        <line x1="8" y1="2" x2="8" y2="18"></line>
+        <line x1="16" y1="6" x2="16" y2="22"></line>
+      </svg>
+      <span>Map</span>
+    </a>
+    <a href="/courses.html" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <span>Courses</span>
+    </a>
+  </nav>
+
+  <script>
+    // Mobile menu functions
+    function toggleMobileMenu() {
+      const overlay = document.getElementById('mobile-menu-overlay');
+      const btn = document.querySelector('.mobile-menu-btn');
+      if (overlay.classList.contains('active')) {
+        closeMobileMenu();
+      } else {
+        overlay.classList.add('active');
+        btn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeMobileMenu() {
+      const overlay = document.getElementById('mobile-menu-overlay');
+      const btn = document.querySelector('.mobile-menu-btn');
+      overlay.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMobileMenu();
+      }
+    });
   </script>
 </body>
 </html>

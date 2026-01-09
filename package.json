@@ -22,12 +22,16 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
     "@libsql/client": "^0.15.15",
+    "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
     "puppeteer": "^24.34.0",
     "resend": "^6.6.0",
+    "stripe": "^20.1.2",
     "ua-parser-js": "^2.0.7"
   },
   "devDependencies": {

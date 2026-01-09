@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <!-- Primary Meta Tags -->
   <title>Bay Area Golf Tee Times | Find & Book Tee Times at 40+ Public Courses</title>
@@ -594,6 +594,245 @@
     .course-card .tee-times-count { font-size: 0.85rem; color: var(--primary); font-weight: 600; }
     .course-card .rating-display { display: flex; align-items: center; gap: 4px; color: var(--gold); font-weight: 700; font-size: 1rem; }
 
+    /* Price Badge */
+    .course-card .price-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .course-card .price-badge .from-label {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      font-family: 'Source Serif 4', Georgia, serif;
+    }
+
+    /* Staff Pick Badge */
+    .course-card .staff-pick-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: linear-gradient(135deg, var(--gold), #92650a);
+      border-radius: 6px;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      box-shadow: 0 2px 8px rgba(184, 134, 11, 0.4);
+    }
+    .course-card .staff-pick-badge svg {
+      width: 12px;
+      height: 12px;
+      fill: #FFFFFF;
+    }
+
+    /* Availability Indicator */
+    .course-card .availability-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .course-card .availability-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .course-card .availability-indicator.available .availability-dot {
+      background: #10B981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+    .course-card .availability-indicator.available .availability-text {
+      color: #059669;
+    }
+    .course-card .availability-indicator.limited .availability-dot {
+      background: #F59E0B;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+      animation: pulse-availability 2s infinite;
+    }
+    .course-card .availability-indicator.limited .availability-text {
+      color: #D97706;
+    }
+    .course-card .availability-indicator.sold-out .availability-dot {
+      background: #6B7280;
+    }
+    .course-card .availability-indicator.sold-out .availability-text {
+      color: #6B7280;
+    }
+    @keyframes pulse-availability {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Urgency Banner */
+    .course-card .urgency-banner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 6px 12px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #FFFFFF;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
+    }
+    .course-card .urgency-banner svg {
+      width: 14px;
+      height: 14px;
+      animation: bounce-urgency 1s infinite;
+    }
+    @keyframes bounce-urgency {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+
+    /* Difficulty/Rating Badge */
+    .course-card .difficulty-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: var(--bg-paper);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .course-card .difficulty-badge.easy { border-color: #10B981; color: #059669; background: #ecfdf5; }
+    .course-card .difficulty-badge.moderate { border-color: #F59E0B; color: #D97706; background: #fffbeb; }
+    .course-card .difficulty-badge.challenging { border-color: #EF4444; color: #DC2626; background: #fef2f2; }
+
+    /* Enhanced Card Footer */
+    .course-card-footer-enhanced {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 2px solid var(--border-light);
+    }
+    .course-card-footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .course-card-footer-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .course-card .price-display {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .course-card .price-current {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .course-card .price-from {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Hover/Tap States with Animation */
+    .course-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .course-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(61, 41, 20, 0.18);
+      border-color: var(--primary);
+    }
+    .course-card:active {
+      transform: translateY(-2px) scale(0.99);
+    }
+    .course-card:hover .course-card-img img {
+      transform: scale(1.05);
+    }
+    .course-card-img img {
+      transition: transform 0.3s ease;
+    }
+
+    /* Mobile Responsive - Stack Layout */
+    @media (max-width: 767px) {
+      .courses-directory {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .course-card {
+        border-radius: 12px;
+      }
+      .course-card-img {
+        height: 160px;
+      }
+      .course-card-body {
+        padding: 14px;
+      }
+      .course-card .price-badge {
+        bottom: 8px;
+        right: 8px;
+        padding: 4px 10px;
+        font-size: 0.85rem;
+      }
+      .course-card .staff-pick-badge {
+        top: 8px;
+        left: 8px;
+        padding: 4px 8px;
+        font-size: 0.65rem;
+      }
+      .course-card-footer-enhanced {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .course-card-footer-right {
+        align-items: flex-start;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
+
+    /* Tablet - 2 column grid */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .courses-directory {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .course-card-img {
+        height: 160px;
+      }
+    }
+
     /* Favorite Button */
     .fav-btn {
       width: 36px;
@@ -741,23 +980,42 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 14px 24px;
-      font-size: 1rem;
+      padding: 16px 28px;
+      font-size: 1.05rem;
       text-decoration: none;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.2s;
+      border-radius: 12px;
+      font-weight: 700;
+      font-family: 'Playfair Display', Georgia, serif;
+      transition: all 0.2s ease;
       flex: 1;
       justify-content: center;
-      min-width: 140px;
-      background: linear-gradient(135deg, #2d5016, #3d6b1e);
+      min-width: 160px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
       color: #fff;
-      border: 2px solid #2d5016;
+      border: none;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      position: relative;
+      overflow: hidden;
     }
     .btn-action:hover {
-      background: linear-gradient(135deg, #3d6b1e, #4a7d24);
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+    .btn-action:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+    }
+    .btn-action.btn-secondary {
+      background: #FFFFFF;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      box-shadow: none;
+    }
+    .btn-action.btn-secondary:hover {
+      background: #ECFDF5;
+      border-color: var(--primary-dark);
+      box-shadow: 0 4px 12px rgba(45, 90, 39, 0.15);
     }
     .btn-secondary {
       background: var(--cream);
@@ -959,20 +1217,67 @@
     }
 
     .chip-book, .chip-call {
-      padding: 8px 14px;
-      background: var(--primary);
+      padding: 10px 18px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
       color: #fff;
       text-decoration: none;
-      border-radius: 4px;
+      border-radius: 8px;
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.9rem;
+      font-weight: 700;
       white-space: nowrap;
       transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+      position: relative;
+      overflow: hidden;
     }
 
     .chip-book:hover, .chip-call:hover {
-      background: var(--primary-dark);
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    }
+
+    .chip-book:active, .chip-call:active {
+      transform: translateY(0);
+    }
+
+    /* Ripple effect for buttons */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0);
+      animation: ripple-anim 0.6s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes ripple-anim {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* Button loading state */
+    .btn-loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn-loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: btn-spin 0.8s linear infinite;
+      margin-right: 6px;
+    }
+
+    @keyframes btn-spin {
+      to { transform: rotate(360deg); }
     }
 
     @media (max-width: 768px) {
@@ -1028,16 +1333,27 @@
     }
 
     .book-btn, .call-btn {
-      padding: 12px 20px;
-      background: var(--primary);
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
       color: white;
       text-decoration: none;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: background 0.2s;
+      border-radius: 10px;
+      font-weight: 700;
+      font-family: 'Playfair Display', Georgia, serif;
+      transition: all 0.2s ease;
       white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+      position: relative;
+      overflow: hidden;
     }
-    .book-btn:hover, .call-btn:hover { background: var(--primary-light); }
+    .book-btn:hover, .call-btn:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 16px rgba(16, 185, 129, 0.45);
+    }
+    .book-btn:active, .call-btn:active {
+      transform: translateY(0);
+    }
 
     .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); }
     .loading-spinner {
@@ -1679,6 +1995,338 @@
       .modal-header { height: 180px; }
       .food-highlight { flex-direction: column; text-align: center; }
     }
+
+    /* ========================================
+       MOBILE OPTIMIZATIONS
+       ======================================== */
+
+    /* Safe area inset CSS variables */
+    :root {
+      --safe-area-top: env(safe-area-inset-top, 0px);
+      --safe-area-right: env(safe-area-inset-right, 0px);
+      --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-area-left: env(safe-area-inset-left, 0px);
+    }
+
+    /* Sticky mobile header */
+    @media (max-width: 768px) {
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 10px 0;
+      }
+
+      @supports (padding-top: env(safe-area-inset-top)) {
+        header {
+          padding-top: calc(10px + var(--safe-area-top));
+        }
+      }
+
+      header h1 {
+        font-size: 1.1rem;
+      }
+
+      .header-nav {
+        gap: 6px;
+      }
+
+      .header-nav .nav-btn {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+        min-height: 44px;
+        min-width: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Hide text labels on mobile nav, show only icons */
+      .header-nav .nav-btn span,
+      .header-nav .nav-btn:not([id]) {
+        /* Keep text for now */
+      }
+
+      /* Main content needs padding for bottom nav */
+      main.container {
+        padding-bottom: calc(80px + var(--safe-area-bottom));
+      }
+
+      footer {
+        padding-bottom: calc(100px + var(--safe-area-bottom));
+      }
+    }
+
+    /* Bottom Navigation Bar for Mobile */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      border-top: 2px solid var(--border);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+      padding: 8px 12px;
+      padding-bottom: calc(8px + var(--safe-area-bottom));
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      /* Hide desktop header nav on mobile */
+      .header-nav {
+        display: none;
+      }
+
+      /* Show hamburger menu button */
+      .mobile-menu-btn {
+        display: flex;
+      }
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 8px 12px;
+      min-width: 64px;
+      min-height: 52px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-nav-item:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-nav-item.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .mobile-nav-item svg {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 4px;
+      stroke-width: 2;
+    }
+
+    .mobile-nav-item span {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    /* Hamburger Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 6px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .mobile-menu-btn:hover,
+    .mobile-menu-btn:active {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+
+    .mobile-menu-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke: #f4f1e8;
+      stroke-width: 2;
+    }
+
+    /* Mobile Slide-Out Menu */
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-menu-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .mobile-menu-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 280px;
+      max-width: 85vw;
+      background: var(--card-bg);
+      z-index: 2001;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-area-top);
+      padding-bottom: var(--safe-area-bottom);
+    }
+
+    .mobile-menu-overlay.active .mobile-menu-panel {
+      transform: translateX(0);
+    }
+
+    .mobile-menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .mobile-menu-header h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .mobile-menu-close {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .mobile-menu-close:hover,
+    .mobile-menu-close:active {
+      background: var(--bg-paper);
+    }
+
+    .mobile-menu-close svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--text);
+      stroke-width: 2;
+    }
+
+    .mobile-menu-links {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .mobile-menu-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s;
+      min-height: 56px;
+    }
+
+    .mobile-menu-link:hover,
+    .mobile-menu-link:active {
+      background: var(--bg-paper);
+    }
+
+    .mobile-menu-link.active {
+      background: var(--primary);
+      color: #f4f1e8;
+    }
+
+    .mobile-menu-link svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2;
+    }
+
+    /* Touch-friendly improvements */
+    @media (max-width: 768px) {
+      /* Minimum 44x44px touch targets */
+      .filter-tab,
+      .region-chip,
+      .quick-filter-btn,
+      .day-btn {
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      .filter-group select,
+      .filter-group input {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+
+      .btn {
+        min-height: 48px;
+        padding: 14px 24px;
+      }
+
+      .book-btn, .call-btn {
+        min-height: 48px;
+        padding: 14px 20px;
+      }
+
+      .chip-book, .chip-call {
+        min-height: 44px;
+        padding: 12px 16px;
+      }
+
+      .fav-btn {
+        width: 44px;
+        height: 44px;
+      }
+
+      .modal-close {
+        width: 44px;
+        height: 44px;
+      }
+
+      .modal-fav-btn {
+        width: 48px;
+        height: 48px;
+      }
+
+      /* Better scrolling on mobile */
+      .week-picker {
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+      }
+
+      .day-btn {
+        scroll-snap-align: start;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1700,8 +2348,71 @@
           <span id="account-nav-text">Sign In</span>
         </a>
       </nav>
+      <!-- Mobile hamburger menu button -->
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </header>
+
+  <!-- Mobile Slide-Out Menu -->
+  <div class="mobile-menu-overlay" id="mobile-menu-overlay" onclick="closeMobileMenu()">
+    <div class="mobile-menu-panel" onclick="event.stopPropagation()">
+      <div class="mobile-menu-header">
+        <h2>Menu</h2>
+        <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-menu-links">
+        <a href="/" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Home
+        </a>
+        <a href="/app.html" class="mobile-menu-link active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          Search Tee Times
+        </a>
+        <a href="/" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          Map View
+        </a>
+        <a href="/courses.html" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          All Courses
+        </a>
+        <a href="/account.html" class="mobile-menu-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Account
+        </a>
+      </nav>
+    </div>
+  </div>
 
   <main class="container" id="main-content" role="main">
     <!-- Tee Times Section -->
@@ -2366,11 +3077,68 @@
         const isFav = isFavorite(course.id);
         const imgUrl = course.photo_url || `https://picsum.photos/seed/${course.id}/400/200`;
         const altText = `${course.name} golf course in ${course.city}, ${course.region} - ${course.holes} hole public golf course`;
+
+        // Get availability status - check tee_times count from course data
+        const teeTimeCount = course.tee_time_count || 0;
+        let availabilityClass = 'available';
+        let availabilityText = 'Available today';
+        if (teeTimeCount === 0) {
+          availabilityClass = 'sold-out';
+          availabilityText = 'Check availability';
+        } else if (teeTimeCount < 5) {
+          availabilityClass = 'limited';
+          availabilityText = `${teeTimeCount} spots left`;
+        }
+
+        // Get difficulty based on slope rating
+        let difficultyClass = '';
+        let difficultyText = '';
+        if (course.slope_rating) {
+          if (course.slope_rating < 115) {
+            difficultyClass = 'easy';
+            difficultyText = 'Beginner Friendly';
+          } else if (course.slope_rating < 130) {
+            difficultyClass = 'moderate';
+            difficultyText = 'Moderate';
+          } else {
+            difficultyClass = 'challenging';
+            difficultyText = 'Challenging';
+          }
+        }
+
+        // Price display - use next_price if available
+        const minPrice = course.next_price || course.min_price;
+        const priceDisplay = minPrice ? `$${Math.round(minPrice)}` : '';
+
+        // Urgency indicator - show if less than 3 spots
+        const showUrgency = teeTimeCount > 0 && teeTimeCount <= 3;
+
         return `
           <article class="course-card" data-id="${course.id}" onclick="openCourseDetail(${course.id})" itemscope itemtype="https://schema.org/GolfCourse">
             <div class="course-card-img">
               <img src="${imgUrl}" alt="${altText}" loading="lazy" itemprop="image">
               ${course.logo_url ? `<img src="${course.logo_url}" alt="${course.name} logo" class="logo-overlay">` : ''}
+              ${course.is_staff_pick ? `
+                <div class="staff-pick-badge">
+                  <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  Staff Pick
+                </div>
+              ` : ''}
+              ${priceDisplay ? `
+                <div class="price-badge">
+                  <span class="from-label">from</span>
+                  ${priceDisplay}
+                </div>
+              ` : ''}
+              ${showUrgency ? `
+                <div class="urgency-banner">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  Only ${teeTimeCount} spot${teeTimeCount > 1 ? 's' : ''} left!
+                </div>
+              ` : ''}
             </div>
             <div class="course-card-body">
               <div class="course-card-header">
@@ -2388,10 +3156,18 @@
                 <span class="meta-item"><strong>${course.holes}</strong> holes</span>
                 ${course.par ? `<span class="meta-item">Par <strong>${course.par}</strong></span>` : ''}
                 ${course.yardage ? `<span class="meta-item"><strong>${course.yardage.toLocaleString()}</strong> yards</span>` : ''}
+                ${difficultyText ? `<span class="difficulty-badge ${difficultyClass}">${difficultyText}</span>` : ''}
               </div>
-              <div class="course-card-footer">
-                <span class="tee-times-count">Book tee times at ${course.name}</span>
-                ${course.avg_rating ? `<span class="rating-display" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"><span itemprop="ratingValue">${course.avg_rating.toFixed(1)}</span> ★</span>` : ''}
+              <div class="course-card-footer-enhanced">
+                <div class="course-card-footer-left">
+                  <div class="availability-indicator ${availabilityClass}">
+                    <span class="availability-dot"></span>
+                    <span class="availability-text">${availabilityText}</span>
+                  </div>
+                </div>
+                <div class="course-card-footer-right">
+                  ${course.avg_rating ? `<span class="rating-display" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating"><span itemprop="ratingValue">${course.avg_rating.toFixed(1)}</span> ★</span>` : ''}
+                </div>
               </div>
             </div>
           </article>
@@ -3292,6 +4068,36 @@
       }).catch(() => {});
     }
 
+    // ==========================================
+    // CTA & CONVERSION ENHANCEMENTS
+    // ==========================================
+
+    // Ripple effect for buttons
+    function createRipple(event) {
+      const button = event.currentTarget;
+      const rect = button.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = event.clientX - rect.left - size / 2;
+      const y = event.clientY - rect.top - size / 2;
+
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+
+      button.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }
+
+    // Add ripple effect on click
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip-book, .chip-call, .book-btn, .call-btn, .btn-action');
+      if (btn) {
+        createRipple(e);
+      }
+    });
+
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -3303,5 +4109,70 @@
   </script>
 
   <script src="/js/analytics.js"></script>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+    <a href="/" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Home</span>
+    </a>
+    <a href="/app.html" class="mobile-nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <span>Search</span>
+    </a>
+    <a href="/" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+        <line x1="8" y1="2" x2="8" y2="18"></line>
+        <line x1="16" y1="6" x2="16" y2="22"></line>
+      </svg>
+      <span>Map</span>
+    </a>
+    <a href="/courses.html" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <span>Courses</span>
+    </a>
+  </nav>
+
+  <script>
+    // Mobile menu functions
+    function toggleMobileMenu() {
+      const overlay = document.getElementById('mobile-menu-overlay');
+      const btn = document.querySelector('.mobile-menu-btn');
+      if (overlay.classList.contains('active')) {
+        closeMobileMenu();
+      } else {
+        overlay.classList.add('active');
+        btn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeMobileMenu() {
+      const overlay = document.getElementById('mobile-menu-overlay');
+      const btn = document.querySelector('.mobile-menu-btn');
+      overlay.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeMobileMenu();
+      }
+    });
+  </script>
 </body>
 </html>
