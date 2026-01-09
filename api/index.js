@@ -719,7 +719,38 @@ const COURSE_BASE_PRICES = {
   // Sacramento - CourseCo
   'Ancil Hoffman Golf Course': 52,
   'Mather Golf Course': 48,
-  'Cherry Island Golf Course': 45
+  'Cherry Island Golf Course': 45,
+  // Par-3/Executive courses
+  'Corica Park - Mif Albright Par 3': 20,
+  'Pruneridge Golf Club': 25,
+  'Sunken Gardens Golf Course': 20,
+  'Fleming Golf Course': 35,
+  // Additional standard courses
+  'Los Lagos Golf Course': 45,
+  'Boulder Ridge Golf Club': 55,
+  'Sunnyvale Golf Course': 45,
+  'Spring Valley Golf Course': 40,
+  'Coyote Creek Golf Club': 65,
+  'Moffett Field Golf Course': 55,
+  'Blackberry Farm Golf Course': 25,
+  'Baylands Golf Links': 35,
+  'Lake Chabot Golf Course': 50,
+  'Montclair Golf Course': 35,
+  'Diablo Hills Golf Course': 35,
+  'Franklin Canyon Golf Course': 45,
+  'Pleasanton Golf Center': 40,
+  'Willow Park Golf Course': 45,
+  'Stanford Golf Course': 75,
+  'Poplar Creek Golf Course': 50,
+  'Gleneagles Golf Course': 40,
+  'Hiddenbrooke Golf Club': 70,
+  'Mare Island Golf Club': 55,
+  'Rooster Run Golf Club': 65,
+  'Adobe Creek Golf Course': 45,
+  'Canyon Lakes Golf Course': 65,
+  'Blue Rock Springs Golf Club': 45,
+  // Premium courses
+  'Wente Vineyards': 150
 };
 
 // Generate demo tee times on-the-fly for a course

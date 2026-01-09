@@ -43,8 +43,8 @@ const courses = [
   { name: "Corica Park - Mif Albright Par 3", city: "Alameda", region: "East Bay", holes: 9, par: 27, yardage: 1100, latitude: 37.7420, longitude: -122.2350, phone_number: "(510) 747-7800", golfnow_id: "8713", booking_url: "https://www.golfnow.com/tee-times/facility/8713-corica-park-mif-albright-par-3/search", booking_system: "golfnow" },
   { name: "Metropolitan Golf Links", city: "Oakland", region: "East Bay", holes: 18, par: 72, yardage: 6801, latitude: 37.7350, longitude: -122.2100, phone_number: "(510) 569-5555", golfnow_id: "570", booking_url: "https://www.golfnow.com/tee-times/facility/570-metropolitan-golf-links/search", booking_system: "golfnow" },
   { name: "Lake Chabot Golf Course", city: "Oakland", region: "East Bay", holes: 27, par: 72, yardage: 6599, latitude: 37.7292, longitude: -122.0920, phone_number: "(510) 351-5812", golfnow_id: "549", booking_url: "https://www.golfnow.com/tee-times/facility/549-lake-chabot-golf-course/search", booking_system: "golfnow" },
-  { name: "Tilden Park Golf Course", city: "Berkeley", region: "East Bay", holes: 18, par: 70, yardage: 6294, latitude: 37.8881, longitude: -122.2441, phone_number: "(510) 848-7373", golfnow_id: "649", booking_url: "https://www.golfnow.com/tee-times/facility/649-tilden-park-golf-course/search", booking_system: "golfnow" },
-  { name: "Redwood Canyon Golf Course", city: "Castro Valley", region: "East Bay", holes: 9, par: 34, yardage: 2580, latitude: 37.7215, longitude: -122.0680, phone_number: "(510) 537-8001", golfnow_id: "602", booking_url: "https://www.golfnow.com/tee-times/facility/602-redwood-canyon-golf-course/search", booking_system: "golfnow" },
+  { name: "Tilden Park Golf Course", city: "Berkeley", region: "East Bay", holes: 18, par: 70, yardage: 6294, latitude: 37.8881, longitude: -122.2441, phone_number: "(510) 848-7373", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/tilden-park-golf-course-california-berkeley", booking_system: "chronogolf" },
+  { name: "Redwood Canyon Golf Course", city: "Castro Valley", region: "East Bay", holes: 9, par: 34, yardage: 2580, latitude: 37.7215, longitude: -122.0680, phone_number: "(510) 537-8001", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/redwood-canyon-public-golf-course", booking_system: "chronogolf" },
   { name: "Monarch Bay Golf Club", city: "San Leandro", region: "East Bay", holes: 18, par: 71, yardage: 5845, latitude: 37.6940, longitude: -122.1920, phone_number: "(510) 895-2162", golfnow_id: "574", booking_url: "https://www.golfnow.com/tee-times/facility/574-monarch-bay-golf-club/search", booking_system: "golfnow" },
   { name: "Montclair Golf Course", city: "Oakland", region: "East Bay", holes: 9, par: 33, yardage: 2370, latitude: 37.8280, longitude: -122.2050, phone_number: "(510) 482-0422", golfnow_id: "575", booking_url: "https://www.golfnow.com/tee-times/facility/575-montclair-golf-course/search", booking_system: "golfnow" },
 
@@ -67,14 +67,15 @@ const courses = [
   { name: "Northwood Golf Club", city: "Monte Rio", region: "North Bay", holes: 9, par: 36, yardage: 2893, latitude: 38.4680, longitude: -123.0140, phone_number: "(707) 865-1116", golfnow_id: null, booking_url: "https://www.northwoodgolf.com/bookteetimes", booking_system: "cpsgolf" },
 
   // Peninsula - Half Moon Bay
-  { name: "Half Moon Bay Golf Links - Old Course", city: "Half Moon Bay", region: "South Bay", holes: 18, par: 72, yardage: 7007, latitude: 37.4328, longitude: -122.4542, phone_number: "(650) 726-1800", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links", booking_system: "chronogolf" },
-  { name: "Half Moon Bay Golf Links - Ocean Course", city: "Half Moon Bay", region: "South Bay", holes: 18, par: 72, yardage: 6732, latitude: 37.4328, longitude: -122.4542, phone_number: "(650) 726-1800", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links", booking_system: "chronogolf" },
+  { name: "Half Moon Bay - Old Course", city: "Half Moon Bay", region: "South Bay", holes: 18, par: 72, yardage: 7007, latitude: 37.4328, longitude: -122.4542, phone_number: "(650) 726-1800", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links", booking_system: "chronogolf" },
+  { name: "Half Moon Bay - Ocean Course", city: "Half Moon Bay", region: "South Bay", holes: 18, par: 72, yardage: 6732, latitude: 37.4328, longitude: -122.4542, phone_number: "(650) 726-1800", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links", booking_system: "chronogolf" },
 
   // Santa Cruz / South Bay Extended
   { name: "Pasatiempo Golf Club", city: "Santa Cruz", region: "South Bay", holes: 18, par: 70, yardage: 6439, latitude: 37.0050, longitude: -122.0560, phone_number: "(831) 459-9155", golfnow_id: "4759", booking_url: "https://www.golfnow.com/tee-times/facility/4759-pasatiempo-golf-club/search", booking_system: "golfnow" },
 
   // East Bay - Additional
-  { name: "Diablo Creek Golf Course", city: "Concord", region: "East Bay", holes: 18, par: 71, yardage: 6830, latitude: 37.9540, longitude: -121.9350, phone_number: "(925) 686-6262", golfnow_id: "1448", booking_url: "https://www.golfnow.com/tee-times/facility/1448-diablo-creek-golf-course/search", booking_system: "golfnow" },
+  { name: "Diablo Creek Golf Course", city: "Concord", region: "East Bay", holes: 18, par: 71, yardage: 6830, latitude: 37.9540, longitude: -121.9350, phone_number: "(925) 686-6262", golfnow_id: null, booking_url: "https://www.diablocreekgc.com/", booking_system: "cpsgolf" },
+  { name: "Canyon Lakes Golf Course", city: "San Ramon", region: "East Bay", holes: 18, par: 71, yardage: 6408, latitude: 37.7520, longitude: -121.9380, phone_number: "(925) 735-6511", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/canyon-lakes-golf-course-and-brewery", booking_system: "chronogolf" },
   { name: "Callippe Preserve Golf Course", city: "Pleasanton", region: "East Bay", holes: 18, par: 72, yardage: 6767, latitude: 37.6247, longitude: -121.8532, phone_number: "(925) 426-6666", golfnow_id: "5023", booking_url: "https://www.golfnow.com/tee-times/facility/5023-callippe-preserve-golf-course/search", booking_system: "golfnow" },
   { name: "Wente Vineyards", city: "Livermore", region: "East Bay", holes: 18, par: 72, yardage: 7012, latitude: 37.6247, longitude: -121.7232, phone_number: "(925) 456-2475", golfnow_id: "432", booking_url: "https://www.golfnow.com/tee-times/facility/432-the-course-at-wente-vineyards/search", booking_system: "golfnow" },
 
@@ -85,6 +86,7 @@ const courses = [
 
   // North Bay - Additional
   { name: "Hiddenbrooke Golf Club", city: "Vallejo", region: "North Bay", holes: 18, par: 72, yardage: 6815, latitude: 38.1447, longitude: -122.1932, phone_number: "(707) 558-1140", golfnow_id: "527", booking_url: "https://www.golfnow.com/tee-times/facility/527-hiddenbrooke-golf-club/search", booking_system: "golfnow" },
+  { name: "Blue Rock Springs Golf Club (East)", city: "Vallejo", region: "North Bay", holes: 18, par: 72, yardage: 6275, latitude: 38.1284, longitude: -122.2256, phone_number: "(707) 643-8476", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/blue-rock-springs-golf-club", booking_system: "chronogolf" },
   { name: "Mare Island Golf Club", city: "Vallejo", region: "North Bay", holes: 18, par: 70, yardage: 6043, latitude: 38.0847, longitude: -122.2632, phone_number: "(707) 562-4653", golfnow_id: "563", booking_url: "https://www.golfnow.com/tee-times/facility/563-mare-island-golf-club/search", booking_system: "golfnow" },
   { name: "Rooster Run Golf Club", city: "Petaluma", region: "North Bay", holes: 18, par: 72, yardage: 7001, latitude: 38.2747, longitude: -122.6432, phone_number: "(707) 778-1211", golfnow_id: "606", booking_url: "https://www.golfnow.com/tee-times/facility/606-rooster-run-golf-club/search", booking_system: "golfnow" },
   { name: "Adobe Creek Golf Course", city: "Petaluma", region: "North Bay", holes: 18, par: 72, yardage: 6302, latitude: 38.2547, longitude: -122.6232, phone_number: "(707) 765-3000", golfnow_id: "434", booking_url: "https://www.golfnow.com/tee-times/facility/434-adobe-creek-golf-club/search", booking_system: "golfnow" },
@@ -164,7 +166,7 @@ const staffPickCourseNames = [
   "TPC Harding Park",
   "Pasatiempo Golf Club",
   "Presidio Golf Course",
-  "Half Moon Bay Golf Links - Ocean Course",
+  "Half Moon Bay - Ocean Course",
   "Corica Park - South Course",
   "Cinnabar Hills Golf Club",
   "Tilden Park Golf Course",
@@ -341,8 +343,8 @@ const coursePhotoUrls = {
   // Extended
   "Pasatiempo Golf Club": "https://www.pasatiempo.com/images/uploads/34/hole-1.jpg",
   "Crystal Springs Golf Course": "https://www.playcrystalsprings.com/images/slideshows/001-startingimage-1.jpg",
-  "Half Moon Bay Golf Links - Ocean Course": "https://golf-pass-brightspot.s3.amazonaws.com/u9/v0/w1x2y3z4a5b6c7d8e9f0g1h2i3j4/92400.jpg",
-  "Half Moon Bay Golf Links - Old Course": "https://golf-pass-brightspot.s3.amazonaws.com/w7/x8/y9z0a1b2c3d4e5f6g7h8i9j0k1l2/92500.jpg",
+  "Half Moon Bay - Ocean Course": "https://golf-pass-brightspot.s3.amazonaws.com/u9/v0/w1x2y3z4a5b6c7d8e9f0g1h2i3j4/92400.jpg",
+  "Half Moon Bay - Old Course": "https://golf-pass-brightspot.s3.amazonaws.com/w7/x8/y9z0a1b2c3d4e5f6g7h8i9j0k1l2/92500.jpg",
 };
 
 // Seed course photos
