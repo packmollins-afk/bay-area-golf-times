@@ -45,6 +45,47 @@ const CHRONOGOLF_COURSES = {
     uuid: '039d1b9b-2723-4b50-b02c-2925ae207f83',
     name: 'Blue Rock Springs Golf Club',
     clubUrl: 'https://www.chronogolf.com/club/blue-rock-springs-golf-club'
+  },
+  // New courses added 2026-01-08
+  'de-laveaga-golf-course': {
+    uuid: '56bdb490-575c-41b4-a096-8f5622cb66eb',
+    name: 'De Laveaga Golf Course',
+    clubUrl: 'https://www.chronogolf.com/club/de-laveaga-golf-course'
+  },
+  'pasatiempo-golf-club': {
+    uuid: '9be5c60c-181e-4f0c-83c0-227f12e8c9b6',
+    name: 'Pasatiempo Golf Club',
+    clubUrl: 'https://www.chronogolf.com/club/pasatiempo-golf-club'
+  },
+  'seascape-golf-club': {
+    uuid: '4fba84ed-8238-45ad-8e8f-3b7763b022e3',
+    name: 'Seascape Golf Club',
+    clubUrl: 'https://www.chronogolf.com/club/seascape-golf-club'
+  },
+  'pajaro-valley-golf-club': {
+    uuid: 'c9f83cb5-f57f-44f6-b303-c61be2dda2f5',
+    name: 'Pajaro Valley Golf Club',
+    clubUrl: 'https://www.chronogolf.com/club/pajaro-valley-golf-club'
+  },
+  'los-lagos-golf-course': {
+    uuid: '99b8dcea-ea2f-4803-8949-8126dd2eadee',
+    name: 'Los Lagos Golf Course',
+    clubUrl: 'https://www.chronogolf.com/club/los-lagos-golf-course'
+  },
+  'gilroy-golf-course': {
+    uuid: 'b5f6d586-f369-400c-8d36-8c3be8a60192',
+    name: 'Gilroy Golf Course',
+    clubUrl: 'https://www.chronogolf.com/club/gilroy-golf-course'
+  },
+  'salinas-fairways-golf-course': {
+    uuid: 'a337ef18-91f0-487a-b226-d56147f0e4b6',
+    name: 'Salinas Fairways Golf Course',
+    clubUrl: 'https://www.chronogolf.com/club/salinas-fairways-golf-course'
+  },
+  'rooster-run-golf-club': {
+    uuid: 'b351720c-470a-45a8-a243-d50e59fcb6ca',
+    name: 'Rooster Run Golf Club',
+    clubUrl: 'https://www.chronogolf.com/club/rooster-run-golf-club'
   }
 };
 

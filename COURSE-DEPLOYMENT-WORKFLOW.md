@@ -14,19 +14,23 @@
 | `public/index.html` | Fairway CSS + HTML on homepage map | Every new course |
 | Turso cloud DB | Production database | Auto-seeded from courses.js |
 
-### Scraper Status (as of codebase review)
+### Scraper Status (as of 2026-01-08)
 
 | Booking System | Scraper Status | Config Location | How It Works |
 |----------------|----------------|-----------------|--------------|
-| **golfnow** | ✓ Active | DB `golfnow_id` field | Auto-discovers via Bay Area location search. Just set `golfnow_id` in courses.js |
-| **chronogolf** | ✓ Active | `src/scrapers/chronogolf.js` → `CHRONOGOLF_COURSES` | Hardcoded object - must add entry manually |
-| **totaleintegrated** | ✓ Active | `src/scrapers/totaleintegrated.js` → `TOTALE_COURSES` | Hardcoded object - must add entry manually |
-| **quick18** | ✓ Active | `src/scrapers/quick18.js` → `QUICK18_COURSES` | Hardcoded object - must add entry manually |
-| **cpsgolf** | ✓ Active | `src/scrapers/cpsgolf.js` → `CPS_COURSES` | Hardcoded object - must add entry manually |
-| **foreup** | ⚠ File exists, NOT integrated | `src/scrapers/foreup.js` | Not called in scrape.js - needs integration |
-| **ezlinks** | ⚠ File exists, NOT integrated | `src/scrapers/ezlinks.js` | Not called in scrape.js - needs integration |
-| **teesnap** | ⚠ File exists, NOT integrated | `src/scrapers/teesnap.js` | Not called in scrape.js - needs integration |
+| **golfnow** | ✓ Active | `scripts/golfnow-optimized.js` | Auto-discovers via 100mi radius search. Set `golfnow_id` in DB |
+| **chronogolf** | ✓ Active (API) | `scripts/chrono-api.js` → `CHRONOGOLF_COURSES` | **Requires UUID** - see Workflow B |
+| **totaleintegrated** | ✓ Active (API) | `scripts/totale-api.js` → `TOTALE_COURSES` | Direct API - add subdomain entry |
+| **cpsgolf** | ✓ Active (API) | `scripts/cps-optimized.js` → `CPS_COURSES` | Direct API - add subdomain entry |
 | **other** | N/A | None | Static/display only - uses demo data |
+
+### Scraper Priority (prefer API over Puppeteer)
+
+When a course is available on multiple booking systems, prefer in this order:
+1. **TotaleIntegrated** - Direct JSON API, most reliable
+2. **Chronogolf** - Hybrid API (browser cookie + fetch), very reliable
+3. **CPS Golf** - Direct JSON API, reliable
+4. **GolfNow** - Puppeteer scrape, slower but widest coverage
 
 ### Course Status Tiers
 
@@ -84,7 +88,23 @@ DO NOT edit scraper files - GolfNow auto-discovers via golfnow_id.
 
 ## Workflow B: Add Chronogolf Course
 
-### Claude Code Prompt
+**IMPORTANT**: Chronogolf API scraper requires a **UUID** for each course. You must find this first.
+
+### Step 1: Find the Course UUID
+
+```bash
+# Visit the course page and extract UUID from page source
+curl -s "https://www.chronogolf.com/club/[club-slug]/teetimes" | grep -o '"uuid":"[^"]*"' | head -1
+
+# Or use browser DevTools:
+# 1. Go to https://www.chronogolf.com/club/[club-slug]/teetimes
+# 2. Open Network tab, filter by "teetimes"
+# 3. Look for API call to /marketplace/v2/teetimes
+# 4. Check request params for course_ids UUID
+```
+
+### Step 2: Add to Database and Scraper
+
 ```
 Add [COURSE NAME] to bayareagolf.now (Chronogolf course)
 
@@ -95,31 +115,35 @@ COURSE DATA:
 - region: [region]
 - holes: [number]
 - par: [number]
-- yardage: [number]
 - latitude: [lat]
 - longitude: [lng]
-- phone_number: [phone]
-- booking_url: "https://www.chronogolf.com/club/[club-slug]"
+- booking_url: "https://www.chronogolf.com/club/[club-slug]/teetimes"
 - booking_system: "chronogolf"
 
-ESTIMATED PRICE: $[XX]
-
-MAP POSITION:
-- CSS class: fw-[shortname]
-- top: [Y]%
-- left: [X]%
-- rotation: [D]deg
+CHRONOGOLF UUID: [xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx]
 
 FILES TO EDIT:
-1. src/db/courses.js - Add to `courses` array
-2. api/index.js - Add to COURSE_BASE_PRICES object
-3. src/scrapers/chronogolf.js - Add to CHRONOGOLF_COURSES object:
+1. Turso DB - Add course via SQL INSERT
+2. scripts/chrono-api.js - Add to CHRONOGOLF_COURSES object:
    '[slug]': {
-     url: 'https://www.chronogolf.com/club/[club-slug]',
-     name: '[Full Name]'
+     uuid: '[UUID]',
+     name: '[Full Name]',
+     clubUrl: 'https://www.chronogolf.com/club/[club-slug]'
    }
-4. public/index.html - Add fairway CSS + HTML
+3. public/index.html - Add fairway CSS + HTML (if map marker needed)
 ```
+
+### Known Chronogolf Courses (for reference)
+
+| Course | UUID | Club Slug |
+|--------|------|-----------|
+| Half Moon Bay - Old | 9f50b574-c281-4df7-a7cb-13d567406c36 | half-moon-bay-golf-links |
+| Half Moon Bay - Ocean | 03274c09-51b5-4ad9-beb4-9177e3990e10 | half-moon-bay-golf-links |
+| Santa Teresa | 27133c6d-1057-4630-a9bc-fb1f4407011d | santa-teresa-golf-club |
+| Tilden Park | 650513a5-bd40-4b9f-af67-4e442ca69d34 | tilden-park-golf-course-california-berkeley |
+| Redwood Canyon | 9a31aebe-9371-47ef-a98f-38de07ad7e91 | redwood-canyon-public-golf-course |
+| Canyon Lakes | e172b6b1-f3cc-4d6d-8ad1-a0ef1737b3cd | canyon-lakes-golf-course-and-brewery |
+| Blue Rock Springs | 039d1b9b-2723-4b50-b02c-2925ae207f83 | blue-rock-springs-golf-club |
 
 ---
 
