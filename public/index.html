@@ -2116,6 +2116,35 @@
       background: rgba(90, 143, 74, 0.15);
     }
 
+    /* Search Trigger (collapsed state for mobile) */
+    .search-trigger {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(244, 235, 224, 0.95);
+      border: 1px solid var(--contour-light);
+      border-radius: 28px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(61, 50, 37, 0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+
+    .search-trigger:hover {
+      border-color: var(--fairway);
+      box-shadow: 0 4px 16px rgba(61, 50, 37, 0.15);
+    }
+
+    .search-trigger svg {
+      color: var(--fairway);
+      flex-shrink: 0;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .search-overlay {
@@ -2123,12 +2152,27 @@
         padding: 0 12px;
       }
 
+      /* Show trigger, hide full bar by default on mobile */
+      .search-trigger {
+        display: flex;
+      }
+
       .search-bar {
+        display: none;
         flex-direction: column;
         border-radius: 20px;
         height: auto;
         padding: 12px;
         gap: 0;
+      }
+
+      /* When expanded, show the full search bar */
+      .search-overlay.expanded .search-trigger {
+        display: none;
+      }
+
+      .search-overlay.expanded .search-bar {
+        display: flex;
       }
 
       .search-field {
@@ -2568,6 +2612,15 @@
 
     <!-- Floating Search Bar -->
     <div class="search-overlay" id="search-overlay">
+      <!-- Collapsed Search Trigger (Mobile Only) -->
+      <button class="search-trigger" id="search-trigger" aria-label="Open search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <span>Search courses...</span>
+      </button>
+
       <div class="search-bar" id="search-bar">
         <!-- Course/Location Field -->
         <div class="search-field course-field" id="course-field">
@@ -3386,6 +3439,28 @@
 
     // Initialize search bar
     document.addEventListener('DOMContentLoaded', function() {
+      // Mobile search toggle
+      const searchOverlay = document.getElementById('search-overlay');
+      const searchTrigger = document.getElementById('search-trigger');
+      const courseInput = document.getElementById('course-input');
+
+      searchTrigger.addEventListener('click', () => {
+        searchOverlay.classList.add('expanded');
+        // Focus the course input after animation
+        setTimeout(() => courseInput.focus(), 100);
+      });
+
+      // Close search on outside click (mobile)
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 &&
+            searchOverlay.classList.contains('expanded') &&
+            !e.target.closest('.search-bar') &&
+            !e.target.closest('.search-trigger') &&
+            !e.target.closest('.search-results-container')) {
+          searchOverlay.classList.remove('expanded');
+        }
+      });
+
       // Load courses for autocomplete
       loadCourses();
 
