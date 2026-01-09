@@ -136,8 +136,10 @@ async function fullScrapeParallel(daysAhead = 7) {
   if (successfulScrapers > 0 && totalScraped > 0) {
     console.log('\nCleaning up stale data...');
 
-    // Delete past tee times (before today)
-    const pastResult = await db.execute("DELETE FROM tee_times WHERE date < date('now')");
+    // Delete past tee times (before today in Pacific Time)
+    // Note: SQLite date('now') is UTC, scrapers store Pacific Time dates
+    // Use -8 hours offset to approximate Pacific Time
+    const pastResult = await db.execute("DELETE FROM tee_times WHERE date < date('now', '-8 hours')");
     pastDeleted = pastResult.rowsAffected || 0;
 
     // Delete tee times that weren't updated in this scrape run
@@ -162,7 +164,7 @@ async function fullScrapeParallel(daysAhead = 7) {
       const staleResult = await db.execute({
         sql: `DELETE FROM tee_times
               WHERE scraped_at < ?
-              AND date >= date('now')
+              AND date >= date('now', '-8 hours')
               AND source IN (${placeholders})`,
         args: [scrapeStartTime, ...successfulSources]
       });

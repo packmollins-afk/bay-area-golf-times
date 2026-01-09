@@ -32,7 +32,7 @@ const CPS_COURSES = {
     name: 'Diablo Creek Golf Course'
   },
   'northwood-golf-club': {
-    url: 'https://www.northwoodgolf.com/bookteetimes',
+    url: 'https://northwood.cps.golf/onlineresweb/search-teetime',
     name: 'Northwood Golf Club'
   }
 };

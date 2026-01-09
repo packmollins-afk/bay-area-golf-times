@@ -8,16 +8,17 @@ When new courses are added to the database, follow these steps to ensure they ap
 Courses are added via the `/api/courses` endpoint or directly to the Turso database with required fields:
 - `name` (must match exactly with homepage `data-course` attribute)
 - `slug` (URL-friendly identifier)
-- `region` (sf, east-bay, south-bay, north-bay, monterey, santa-cruz)
+- `region` (San Francisco, South Bay, East Bay, North Bay, Napa)
 - `latitude`, `longitude`
 - `booking_url`
 
 ### Step 2: Add Scraper Support
 If the course uses a supported booking system, add it to the appropriate scraper:
-- `scripts/golfnow-optimized.js` - GolfNow courses
-- `scripts/chronogolf-optimized.js` - Chronogolf courses
+- `scripts/golfnow-optimized.js` - GolfNow courses (auto-discovers by golfnow_id)
+- `scripts/chrono-api.js` - Chronogolf courses (requires UUID)
 - `scripts/cps-optimized.js` - CPS Golf courses (Diablo Creek, Northwood)
-- `scripts/totale-optimized.js` - Totale/Integrated courses
+- `scripts/totale-api.js` - TotaleIntegrated courses
+- `scripts/quick18.js` - Quick18 courses (Baylands)
 
 ### Step 3: Add Course to Homepage Map (`public/index.html`)
 
@@ -52,8 +53,8 @@ Position values are percentages of the map area:
 - Monterey/Santa Cruz: left ~69-97%, top ~86-98%
 
 ### Step 4: Verify Data Flow
-1. Run the scraper: `node scripts/scrape-all.js`
-2. Check API returns course data: `curl /api/tee-times/next-available`
+1. Run the scraper: `node scripts/full-scrape-parallel.js`
+2. Check API returns course data: `curl https://bayareagolf.now/api/tee-times/next-available`
 3. Verify homepage shows price tags for new courses
 
 ### Debugging Course Data Mismatches

@@ -22,7 +22,8 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
   }
 }
 
-// Course UUIDs for all Chronogolf courses
+// Course UUIDs for all Chronogolf courses with online booking enabled
+// Verified 2026-01-08: UUIDs confirmed via Chronogolf API
 const CHRONOGOLF_COURSES = {
   // Slugs must match database exactly
   'half-moon-bay-old-course': {
@@ -57,50 +58,19 @@ const CHRONOGOLF_COURSES = {
   },
   'blue-rock-springs-golf-club': {
     uuid: '039d1b9b-2723-4b50-b02c-2925ae207f83',
-    name: 'Blue Rock Springs Golf Club',
+    name: 'Blue Rock Springs Golf Club (East)',
     clubUrl: 'https://www.chronogolf.com/club/blue-rock-springs-golf-club'
-  },
-  // New courses added 2026-01-08
-  'de-laveaga-golf-course': {
-    uuid: '56bdb490-575c-41b4-a096-8f5622cb66eb',
-    name: 'De Laveaga Golf Course',
-    clubUrl: 'https://www.chronogolf.com/club/de-laveaga-golf-course'
-  },
-  'pasatiempo-golf-club': {
-    uuid: '9be5c60c-181e-4f0c-83c0-227f12e8c9b6',
-    name: 'Pasatiempo Golf Club',
-    clubUrl: 'https://www.chronogolf.com/club/pasatiempo-golf-club'
-  },
-  'seascape-golf-club': {
-    uuid: '4fba84ed-8238-45ad-8e8f-3b7763b022e3',
-    name: 'Seascape Golf Club',
-    clubUrl: 'https://www.chronogolf.com/club/seascape-golf-club'
-  },
-  'pajaro-valley-golf-club': {
-    uuid: 'c9f83cb5-f57f-44f6-b303-c61be2dda2f5',
-    name: 'Pajaro Valley Golf Club',
-    clubUrl: 'https://www.chronogolf.com/club/pajaro-valley-golf-club'
-  },
-  'los-lagos-golf-course': {
-    uuid: '99b8dcea-ea2f-4803-8949-8126dd2eadee',
-    name: 'Los Lagos Golf Course',
-    clubUrl: 'https://www.chronogolf.com/club/los-lagos-golf-course'
-  },
-  'gilroy-golf-course': {
-    uuid: 'b5f6d586-f369-400c-8d36-8c3be8a60192',
-    name: 'Gilroy Golf Course',
-    clubUrl: 'https://www.chronogolf.com/club/gilroy-golf-course'
-  },
-  'salinas-fairways-golf-course': {
-    uuid: 'a337ef18-91f0-487a-b226-d56147f0e4b6',
-    name: 'Salinas Fairways Golf Course',
-    clubUrl: 'https://www.chronogolf.com/club/salinas-fairways-golf-course'
-  },
-  'rooster-run-golf-club': {
-    uuid: 'b351720c-470a-45a8-a243-d50e59fcb6ca',
-    name: 'Rooster Run Golf Club',
-    clubUrl: 'https://www.chronogolf.com/club/rooster-run-golf-club'
   }
+  // NOTE: The following courses are on Chronogolf but have online booking DISABLED:
+  // - de-laveaga-golf-course (UUID: f1b4da64-623b-4400-a48d-c8fd30f945c6)
+  // - pasatiempo-golf-club (UUID: 735c04da-35c9-408d-851f-f170286ecca8)
+  // - seascape-golf-club (UUID: 28920e2b-f602-44f9-9ca0-5c07bbb51df5)
+  // - pajaro-valley-golf-club
+  // - los-lagos-golf-course (UUID: d0d4abb5-4562-4343-b584-e8cfe19fee45)
+  // - gilroy-golf-course (UUID: b5f6d586-f369-400c-8d36-8c3be8a60192)
+  // - salinas-fairways-golf-course (UUID: 78c7bd7c-d3ac-4d7b-b480-d00d7ffd76dd)
+  // - rooster-run-golf-club (UUID: 0b111430-04db-4fee-861b-17f13c1aa352)
+  // These courses require phone booking - consider a different booking_system in DB
 };
 
 // Create reverse mapping from UUID to slug

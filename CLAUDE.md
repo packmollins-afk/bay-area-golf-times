@@ -35,13 +35,19 @@ grep 'data-course=' public/index.html
 ## Tech Stack
 - Frontend: Vanilla HTML/CSS/JS
 - Database: Turso (libSQL)
-- Scrapers: Puppeteer-based (Node.js)
+- Scrapers: Puppeteer + API-based (Node.js)
 - Hosting: Vercel
-- Booking APIs: GolfNow, Chronogolf, CPS Golf, Totale
+- Booking Systems: GolfNow, Chronogolf, CPS Golf, TotaleIntegrated, Quick18
 
 ## Key Files
 - `public/index.html` - Homepage with interactive map
 - `public/app.html` - Full search interface
 - `api/index.js` - Vercel serverless API
-- `scripts/scrape-all.js` - Main scraper orchestrator
-- `scripts/*-optimized.js` - Individual booking system scrapers
+- `scripts/full-scrape-parallel.js` - Main scraper orchestrator
+- `scripts/golfnow-optimized.js` - GolfNow scraper (Puppeteer)
+- `scripts/chrono-api.js` - Chronogolf scraper (Hybrid API)
+- `scripts/totale-api.js` - TotaleIntegrated scraper (API)
+- `scripts/cps-optimized.js` - CPS Golf scraper (Puppeteer)
+- `scripts/quick18.js` - Quick18 scraper (Puppeteer)
+- `scripts/discover-golfnow-ids.js` - GolfNow ID discovery tool
+- `src/db/courses.js` - Course database seed data

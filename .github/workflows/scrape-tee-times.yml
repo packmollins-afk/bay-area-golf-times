@@ -2,13 +2,15 @@ name: Scrape Tee Times
 
 on:
   schedule:
-    # Run 6x daily at ~4 hour intervals (UTC times = PST + 8)
-    # 5 AM PST = 13:00 UTC - Catch early morning tee time releases
-    # 8 AM PST = 16:00 UTC - Morning prime time
-    # 11 AM PST = 19:00 UTC - Mid-day refresh
-    # 2 PM PST = 22:00 UTC - Afternoon refresh
-    # 5 PM PST = 01:00 UTC - Evening refresh
-    # 9 PM PST = 05:00 UTC - Final daily update
+    # Run 6x daily at ~4 hour intervals (UTC times)
+    # During PST (Nov-Mar): subtract 8 hours from UTC
+    # During PDT (Mar-Nov): subtract 7 hours from UTC
+    # 13:00 UTC = 5 AM PST / 6 AM PDT - Catch early morning tee time releases
+    # 16:00 UTC = 8 AM PST / 9 AM PDT - Morning prime time
+    # 19:00 UTC = 11 AM PST / 12 PM PDT - Mid-day refresh
+    # 22:00 UTC = 2 PM PST / 3 PM PDT - Afternoon refresh
+    # 01:00 UTC = 5 PM PST / 6 PM PDT - Evening refresh
+    # 05:00 UTC = 9 PM PST / 10 PM PDT - Final daily update
     - cron: '0 13 * * *'
     - cron: '0 16 * * *'
     - cron: '0 19 * * *'
@@ -17,10 +19,18 @@ on:
     - cron: '0 5 * * *'
   workflow_dispatch: # Allow manual triggers
 
+# Prevent concurrent runs to avoid database conflicts
+concurrency:
+  group: scrape-tee-times
+  cancel-in-progress: false
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # Optimized scrape takes ~1 minute
+    timeout-minutes: 15  # Buffer for slow scrapes (typical: 5-8 min)
+
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +40,17 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Validate required secrets
+        run: |
+          if [ -z "${{ secrets.TURSO_DATABASE_URL }}" ]; then
+            echo "::error::TURSO_DATABASE_URL secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.TURSO_AUTH_TOKEN }}" ]; then
+            echo "::error::TURSO_AUTH_TOKEN secret is not set"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: npm ci
@@ -45,3 +66,11 @@ jobs:
 
       - name: Log completion
         run: echo "Scrape completed at $(date) - optimized parallel scraper"
+
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "::error::Scrape workflow failed at $(date)"
+          echo "Check the logs above for details"
+          # To add email/Slack notifications, configure a notification action here
+          # Example: actions/github-script to create an issue, or a Slack webhook

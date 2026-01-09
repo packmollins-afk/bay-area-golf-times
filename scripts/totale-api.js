@@ -22,17 +22,8 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
 }
 
 // Course configurations with API parameters
+// Note: Boundary Oak and Metropolitan removed - they now use GolfNow
 const TOTALE_COURSES_API = {
-  'boundary-oak-golf-course': {
-    courseId: 'BOUNDARY OAK',
-    origin: 'https://boundaryoak.totaleintegrated.net',
-    name: 'Boundary Oak Golf Course'
-  },
-  'metropolitan-golf-links': {
-    courseId: 'METROPOLITAN',
-    origin: 'https://metro.totaleintegrated.net',
-    name: 'Metropolitan Golf Links'
-  },
   'san-jose-municipal-golf-course': {
     courseId: 'SANJOSE',
     origin: 'https://sanjose.totaleintegrated.net',

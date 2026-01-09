@@ -18,10 +18,11 @@
 
 | Booking System | Scraper Status | Config Location | How It Works |
 |----------------|----------------|-----------------|--------------|
-| **golfnow** | ✓ Active | `scripts/golfnow-optimized.js` | Auto-discovers via 100mi radius search. Set `golfnow_id` in DB |
+| **golfnow** | ✓ Active | `scripts/golfnow-optimized.js` | Auto-discovers via 75mi radius search. Set `golfnow_id` in DB |
 | **chronogolf** | ✓ Active (API) | `scripts/chrono-api.js` → `CHRONOGOLF_COURSES` | **Requires UUID** - see Workflow B |
-| **totaleintegrated** | ✓ Active (API) | `scripts/totale-api.js` → `TOTALE_COURSES` | Direct API - add subdomain entry |
-| **cpsgolf** | ✓ Active (API) | `scripts/cps-optimized.js` → `CPS_COURSES` | Direct API - add subdomain entry |
+| **totaleintegrated** | ✓ Active (API) | `scripts/totale-api.js` → `TOTALE_COURSES_API` | Direct API - add courseId + origin entry |
+| **cpsgolf** | ✓ Active (Puppeteer) | `scripts/cps-optimized.js` → `CPS_COURSES` | Puppeteer scrape - add URL entry |
+| **quick18** | ✓ Active (Puppeteer) | `scripts/quick18.js` → `QUICK18_COURSES` | Puppeteer scrape - add URL entry |
 | **other** | N/A | None | Static/display only - uses demo data |
 
 ### Scraper Priority (prefer API over Puppeteer)
@@ -144,6 +145,14 @@ FILES TO EDIT:
 | Redwood Canyon | 9a31aebe-9371-47ef-a98f-38de07ad7e91 | redwood-canyon-public-golf-course |
 | Canyon Lakes | e172b6b1-f3cc-4d6d-8ad1-a0ef1737b3cd | canyon-lakes-golf-course-and-brewery |
 | Blue Rock Springs | 039d1b9b-2723-4b50-b02c-2925ae207f83 | blue-rock-springs-golf-club |
+| De Laveaga | 56bdb490-575c-41b4-a096-8f5622cb66eb | de-laveaga-golf-course |
+| Pasatiempo | 9be5c60c-181e-4f0c-83c0-227f12e8c9b6 | pasatiempo-golf-club |
+| Seascape | 4fba84ed-8238-45ad-8e8f-3b7763b022e3 | seascape-golf-club |
+| Pajaro Valley | c9f83cb5-f57f-44f6-b303-c61be2dda2f5 | pajaro-valley-golf-club |
+| Los Lagos | 99b8dcea-ea2f-4803-8949-8126dd2eadee | los-lagos-golf-course |
+| Gilroy | b5f6d586-f369-400c-8d36-8c3be8a60192 | gilroy-golf-course |
+| Salinas Fairways | a337ef18-91f0-487a-b226-d56147f0e4b6 | salinas-fairways-golf-course |
+| Rooster Run | b351720c-470a-45a8-a243-d50e59fcb6ca | rooster-run-golf-club |
 
 ---
 
@@ -170,9 +179,10 @@ MAP POSITION: [coordinates]
 FILES TO EDIT:
 1. src/db/courses.js - Add to `courses` array
 2. api/index.js - Add to COURSE_BASE_PRICES object
-3. src/scrapers/totaleintegrated.js - Add to TOTALE_COURSES object:
+3. scripts/totale-api.js - Add to TOTALE_COURSES_API object:
    '[slug]': {
-     url: '[booking URL]',
+     courseId: '[COURSE_ID]',
+     origin: 'https://[subdomain].totaleintegrated.net',
      name: '[Full Name]'
    }
 4. public/index.html - Add fairway CSS + HTML
@@ -196,7 +206,11 @@ COURSE DATA:
 FILES TO EDIT:
 1. src/db/courses.js
 2. api/index.js - COURSE_BASE_PRICES
-3. src/scrapers/quick18.js - Add to QUICK18_COURSES object
+3. scripts/quick18.js - Add to QUICK18_COURSES object:
+   '[slug]': {
+     url: 'https://[subdomain].quick18.com/teetimes/searchmatrix',
+     name: '[Full Name]'
+   }
 4. public/index.html - fairway
 ```
 
@@ -211,14 +225,18 @@ Add [COURSE NAME] to bayareagolf.now (CPSGolf course)
 COURSE DATA:
 - name: [Full Name]
 - slug: [url-slug]
-- booking_url: "https://[name].cps.golf/"
+- booking_url: "https://[name].cps.golf/onlineresweb/search-teetime"
 - booking_system: "cpsgolf"
 [rest of course data]
 
 FILES TO EDIT:
 1. src/db/courses.js
 2. api/index.js - COURSE_BASE_PRICES
-3. src/scrapers/cpsgolf.js - Add to CPS_COURSES object
+3. scripts/cps-optimized.js - Add to CPS_COURSES object:
+   '[slug]': {
+     url: 'https://[name].cps.golf/onlineresweb/search-teetime',
+     name: '[Full Name]'
+   }
 4. public/index.html - fairway
 ```
 
@@ -306,29 +324,31 @@ const COURSE_BASE_PRICES = {
 
 ### 4. Scraper Config (if applicable)
 
-**Chronogolf** (`src/scrapers/chronogolf.js`):
+**Chronogolf** (`scripts/chrono-api.js`):
 ```javascript
 const CHRONOGOLF_COURSES = {
   // ... existing ...
   '[slug]': {
-    url: 'https://www.chronogolf.com/club/[club-slug]',
-    name: '[Full Name]'
+    uuid: '[UUID]',
+    name: '[Full Name]',
+    clubUrl: 'https://www.chronogolf.com/club/[club-slug]'
   }
 };
 ```
 
-**TotaleIntegrated** (`src/scrapers/totaleintegrated.js`):
+**TotaleIntegrated** (`scripts/totale-api.js`):
 ```javascript
-const TOTALE_COURSES = {
+const TOTALE_COURSES_API = {
   // ... existing ...
   '[slug]': {
-    url: '[booking URL]',
+    courseId: '[COURSE_ID]',
+    origin: 'https://[subdomain].totaleintegrated.net',
     name: '[Full Name]'
   }
 };
 ```
 
-**Quick18** (`src/scrapers/quick18.js`):
+**Quick18** (`scripts/quick18.js`):
 ```javascript
 const QUICK18_COURSES = {
   '[slug]': {
@@ -338,11 +358,11 @@ const QUICK18_COURSES = {
 };
 ```
 
-**CPSGolf** (`src/scrapers/cpsgolf.js`):
+**CPSGolf** (`scripts/cps-optimized.js`):
 ```javascript
 const CPS_COURSES = {
   '[slug]': {
-    url: 'https://[name].cps.golf/',
+    url: 'https://[name].cps.golf/onlineresweb/search-teetime',
     name: '[Full Name]'
   }
 };
@@ -443,6 +463,81 @@ public/index.html - no changes needed
 
 ---
 
+## GolfNow ID Discovery & Verification
+
+When adding GolfNow courses or debugging low tee time coverage, use the discovery script.
+
+### Run Discovery Script
+
+```bash
+node scripts/discover-golfnow-ids.js
+```
+
+### What It Does
+
+1. **Scrapes GolfNow** - Searches 6 Bay Area locations with 75-mile radius
+2. **Compares with DB** - Matches by golfnow_id, name, and slug
+3. **Generates Reports**:
+   - **Matched**: DB courses with correct golfnow_id (working)
+   - **Missing ID**: Courses in DB but golfnow_id not set (need UPDATE)
+   - **Not in DB**: GolfNow courses we don't have (potential additions)
+   - **Ignored**: Simulators/indoor facilities (filtered out)
+
+### Fix Missing golfnow_ids
+
+The script outputs SQL statements to add missing IDs:
+```sql
+UPDATE courses SET golfnow_id = '1450' WHERE id = 451;
+  -- Los Lagos Golf Course (San Jose)
+```
+
+Run these directly or via a Node script.
+
+### Add New Courses
+
+For courses in the "Not in DB" list that are within your coverage area:
+1. Visit the GolfNow URL to verify course details
+2. Follow **Workflow A: Add GolfNow Course** above
+3. Use the provided golfnow_id
+
+### Integration with Course Addition Workflow
+
+Before marking a GolfNow course as "complete":
+
+1. **Verify golfnow_id is set** in database:
+   ```bash
+   node -e "
+   require('dotenv').config({ path: '.env.local' });
+   const { createClient } = require('@libsql/client');
+   const db = createClient({ url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN });
+   db.execute('SELECT id, name, golfnow_id FROM courses WHERE slug = \"[COURSE-SLUG]\"').then(r => console.log(r.rows));
+   "
+   ```
+
+2. **Run a targeted scrape** to verify data flows:
+   ```bash
+   node -e "
+   require('dotenv').config({ path: '.env.local' });
+   const { runScraperOptimized } = require('./scripts/golfnow-optimized');
+   runScraperOptimized(1).then(count => console.log('Scraped:', count, 'tee times'));
+   "
+   ```
+
+3. **Check tee times exist** for the course:
+   ```bash
+   curl -s "https://bayareagolf.now/api/tee-times?course=[COURSE-SLUG]" | jq length
+   ```
+
+### Common golfnow_id Issues
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Course has data on GolfNow but 0 tee times | golfnow_id not set in DB | Run discovery script, apply UPDATE |
+| golfnow_id set but still 0 times | ID is wrong | Find correct ID from URL manually |
+| Scraper finds course but no match | Name/slug mismatch | Check course name in scraper logs |
+
+---
+
 ## Troubleshooting
 
 **Course not showing on map?**
@@ -467,4 +562,4 @@ public/index.html - no changes needed
 ---
 
 ## Version
-v3.0 - 2026-01-08 - Full codebase alignment with actual architecture
+v3.2 - 2026-01-08 - Updated scraper file paths, added missing Chronogolf UUIDs, corrected config object names
