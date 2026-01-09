@@ -6,7 +6,7 @@
  * 2. Each scraper runs days in parallel internally
  * 3. Safe delete pattern: only removes stale data AFTER successful scrape
  *
- * Scrapers: GolfNow, TotaleIntegrated, Chronogolf, CPS Golf, Quick18
+ * Scrapers: GolfNow, TotaleIntegrated, Chronogolf, CPS Golf, Quick18, EZLinks
  * Expected improvement: ~4x faster (20-30min → 5-8min)
  */
 
@@ -24,6 +24,7 @@ const { scrapeAllAPI: runTotaleAPI } = require('./totale-api'); // API-based - 5
 const { scrapeAllAPI: runChronoAPI } = require('./chrono-api'); // Hybrid API - 12x faster!
 const { scrapeAllOptimized: runCPSOptimized } = require('./cps-optimized'); // Optimized Puppeteer
 const { scrapeAllOptimized: runQuick18Optimized } = require('./quick18'); // Quick18 Puppeteer
+const { scrapeAllOptimized: runEZLinksOptimized } = require('./ezlinks'); // EZLinks Puppeteer (Baylands)
 
 async function fullScrapeParallel(daysAhead = 7) {
   console.log('='.repeat(60));
@@ -119,6 +120,19 @@ async function fullScrapeParallel(daysAhead = 7) {
       scraperResults.push(result);
       errors.push(result);
       return result;
+    }),
+
+    runEZLinksOptimized(db, coursesBySlug, daysAhead).then(r => {
+      console.log(`[OK] EZLinks complete: ${r.totalTeeTimes} tee times`);
+      const result = { name: 'EZLinks', count: r.totalTeeTimes, success: true };
+      scraperResults.push(result);
+      return result;
+    }).catch(e => {
+      console.error(`[FAIL] EZLinks error: ${e.message}`);
+      const result = { name: 'EZLinks', count: 0, success: false, error: e.message };
+      scraperResults.push(result);
+      errors.push(result);
+      return result;
     })
   ]);
 
@@ -154,7 +168,8 @@ async function fullScrapeParallel(daysAhead = 7) {
           'TotaleIntegrated': 'totaleintegrated',
           'Chronogolf': 'chronogolf',
           'CPS': 'cpsgolf',
-          'Quick18': 'quick18'
+          'Quick18': 'quick18',
+          'EZLinks': 'ezlinks'
         };
         return sourceMap[r.name] || r.name.toLowerCase();
       });
@@ -196,8 +211,8 @@ async function fullScrapeParallel(daysAhead = 7) {
 
   // Overall stats
   console.log('Summary:');
-  console.log(`  Scrapers succeeded: ${successfulScrapers}/5`);
-  console.log(`  Scrapers failed: ${failedScrapers}/5`);
+  console.log(`  Scrapers succeeded: ${successfulScrapers}/6`);
+  console.log(`  Scrapers failed: ${failedScrapers}/6`);
   console.log(`  Total tee times scraped this run: ${totalScraped}`);
   console.log(`  Stale records cleaned up: ${staleDeleted}`);
   console.log(`  Past records cleaned up: ${pastDeleted}`);
