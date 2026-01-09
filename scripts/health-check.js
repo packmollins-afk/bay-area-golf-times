@@ -47,8 +47,7 @@ const SCRAPER_SOURCES = {
 // Courses configured in each scraper
 const SCRAPER_COURSE_CONFIGS = {
   totaleintegrated: [
-    'Boundary Oak Golf Course',
-    'Metropolitan Golf Links',
+    // Boundary Oak and Metropolitan removed - now use GolfNow
     'San Jose Municipal Golf Course',
     'Pacific Grove Golf Links',
     'Laguna Seca Golf Ranch',
@@ -59,27 +58,26 @@ const SCRAPER_COURSE_CONFIGS = {
     'Cherry Island Golf Course'
   ],
   chronogolf: [
-    'Half Moon Bay Golf Links - Old Course',
-    'Half Moon Bay Golf Links - Ocean Course',
+    // These 7 courses have online booking enabled
+    'Half Moon Bay - Old Course',
+    'Half Moon Bay - Ocean Course',
     'Santa Teresa Golf Club',
     'Tilden Park Golf Course',
     'Redwood Canyon Golf Course',
     'Canyon Lakes Golf Course',
-    'Blue Rock Springs Golf Club',
-    'De Laveaga Golf Course',
-    'Pasatiempo Golf Club',
-    'Seascape Golf Club',
-    'Pajaro Valley Golf Club',
-    'Los Lagos Golf Course',
-    'Gilroy Golf Course',
-    'Salinas Fairways Golf Course',
-    'Rooster Run Golf Club'
+    'Blue Rock Springs Golf Club'
+    // Note: 8 courses removed (online booking disabled, use phone):
+    // De Laveaga, Pasatiempo, Seascape, Pajaro Valley, Los Lagos,
+    // Gilroy, Salinas Fairways, Rooster Run
   ],
   cpsgolf: [
     'Diablo Creek Golf Course',
     'Northwood Golf Club'
   ],
   quick18: [
+    // Baylands moved to ezlinks - Quick18 scraper currently unused
+  ],
+  ezlinks: [
     'Baylands Golf Links'
   ]
   // golfnow uses golfnow_id field in DB, not hardcoded names
@@ -370,7 +368,7 @@ async function runHealthCheck() {
     WHERE booking_system IS NOT NULL
       AND booking_system != 'other'
       AND booking_system != ''
-      AND booking_system NOT IN ('golfnow', 'totaleintegrated', 'chronogolf', 'cpsgolf', 'quick18')
+      AND booking_system NOT IN ('golfnow', 'totaleintegrated', 'chronogolf', 'cpsgolf', 'quick18', 'ezlinks', 'phone', 'other')
   `);
 
   if (orphanedCourses.rows.length > 0) {
