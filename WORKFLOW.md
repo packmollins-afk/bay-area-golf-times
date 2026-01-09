@@ -1,0 +1,83 @@
+# Bay Area Golf - Project Workflows
+
+## Adding New Courses to the Database
+
+When new courses are added to the database, follow these steps to ensure they appear correctly on the homepage map:
+
+### Step 1: Add Course to Database
+Courses are added via the `/api/courses` endpoint or directly to the Turso database with required fields:
+- `name` (must match exactly with homepage `data-course` attribute)
+- `slug` (URL-friendly identifier)
+- `region` (sf, east-bay, south-bay, north-bay, monterey, santa-cruz)
+- `latitude`, `longitude`
+- `booking_url`
+
+### Step 2: Add Scraper Support
+If the course uses a supported booking system, add it to the appropriate scraper:
+- `scripts/golfnow-optimized.js` - GolfNow courses
+- `scripts/chronogolf-optimized.js` - Chronogolf courses
+- `scripts/cps-optimized.js` - CPS Golf courses (Diablo Creek, Northwood)
+- `scripts/totale-optimized.js` - Totale/Integrated courses
+
+### Step 3: Add Course to Homepage Map (`public/index.html`)
+
+#### 3a. Add HTML Element
+Add a fairway link element in the appropriate region section:
+```html
+<a href="/course/{slug}" class="fairway fw-{shortname}" data-course="{Exact Course Name}" data-initial="{2-3 letter abbrev}">
+  <span class="price-tag"></span>
+</a>
+```
+
+**Critical**: The `data-course` attribute MUST match the course `name` in the database exactly (case-sensitive) for price data to flow through.
+
+#### 3b. Add CSS Positioning
+Add a CSS rule for the fairway position on the map:
+```css
+.fw-{shortname} {
+  top: {Y}%;
+  left: {X}%;
+  width: {W}px;
+  height: {H}px;
+  border-radius: 50%;
+  transform: rotate({angle}deg);
+}
+```
+
+Position values are percentages of the map area:
+- SF Peninsula: left ~41-44%, top ~42-52%
+- East Bay: left ~55-90%, top ~32-52%
+- South Bay: left ~64-98%, top ~62-90%
+- North Bay: left ~24-48%, top ~3-35%
+- Monterey/Santa Cruz: left ~69-97%, top ~86-98%
+
+### Step 4: Verify Data Flow
+1. Run the scraper: `node scripts/scrape-all.js`
+2. Check API returns course data: `curl /api/tee-times/next-available`
+3. Verify homepage shows price tags for new courses
+
+### Debugging Course Data Mismatches
+
+To find courses with data not showing on homepage:
+```sql
+-- Courses with tee time data
+SELECT DISTINCT c.name, c.slug
+FROM courses c
+JOIN tee_times t ON c.id = t.course_id;
+```
+
+Compare against `data-course` attributes in `public/index.html`.
+
+Common issues:
+- Name mismatch (e.g., "Wente Vineyards" vs "The Course at Wente Vineyards")
+- Missing CSS positioning class
+- Missing HTML element on homepage
+
+### Map Interaction Rules
+
+**CRITICAL**: Never add features that block pointer events on the map. The homepage map must always support:
+- Dragging/panning
+- Zoom in/out buttons
+- Clicking on course fairways
+
+Any overlays or UI elements must use `pointer-events: none` or be positioned outside the interactive map area.
