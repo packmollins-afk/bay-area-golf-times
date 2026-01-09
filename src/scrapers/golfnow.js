@@ -128,7 +128,7 @@ async function scrapeLocation(location, date) {
 
   // Build search URL with date parameter
   const dateStr = date.toISOString().split('T')[0];
-  const searchUrl = `https://www.golfnow.com/tee-times/search#q=location&latitude=${location.lat}&longitude=${location.lng}&radius=50&date=${dateStr}`;
+  const searchUrl = `https://www.golfnow.com/tee-times/search#q=location&latitude=${location.lat}&longitude=${location.lng}&radius=100&date=${dateStr}`;
 
   console.log(`  Searching ${location.name}...`);
 
