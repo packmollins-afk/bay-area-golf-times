@@ -34,6 +34,10 @@ const CPS_COURSES = {
   'northwood-golf-club': {
     url: 'https://northwood.cps.golf/onlineresweb/search-teetime',
     name: 'Northwood Golf Club'
+  },
+  'presidio-golf-course': {
+    url: 'https://presidio.cps.golf/onlineresweb/search-teetime',
+    name: 'Presidio Golf Course'
   }
 };
 

@@ -45,12 +45,16 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
 
 const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-// Reduced from 6 to 4 locations - these cover the Bay Area well with less overlap
+// Expanded to 7 locations for better coverage including Monterey Peninsula and East Bay
 const SEARCH_LOCATIONS = [
   { lat: 37.7749, lng: -122.4194, name: 'San Francisco' },
   { lat: 37.3382, lng: -121.8863, name: 'San Jose' },
   { lat: 38.2975, lng: -122.2869, name: 'Napa' },
   { lat: 38.4405, lng: -122.7144, name: 'Santa Rosa' },
+  // Added for better coverage:
+  { lat: 36.6002, lng: -121.8947, name: 'Monterey' },      // Del Monte, Pebble area
+  { lat: 37.8044, lng: -122.2712, name: 'Oakland' },       // East Bay courses
+  { lat: 37.6819, lng: -121.7680, name: 'Livermore' },     // Tri-Valley courses
 ];
 
 // ============================================================================
@@ -427,8 +431,24 @@ async function runScraperOptimized(daysAhead = 7) {
   console.log(`[GolfNow] Scraped ${uniqueTeeTimes.length} tee time entries, inserting...`);
   const totalTeeTimes = await insertTeeTimesBatch(uniqueTeeTimes, courseMappings);
 
+  // Diagnostic: Show which courses were found
+  const foundFacilityIds = new Set(uniqueTeeTimes.map(tt => tt.facilityId));
+  const expectedFacilityIds = Object.keys(courseMappings);
+  const missingCourses = expectedFacilityIds.filter(id => !foundFacilityIds.has(id));
+
+  if (missingCourses.length > 0 && missingCourses.length <= 20) {
+    console.log(`[GolfNow] Courses not found in search (${missingCourses.length}):`);
+    missingCourses.forEach(id => {
+      const names = courseMappings[id]?.map(c => c.name).join(', ') || 'Unknown';
+      console.log(`  - ${names} (ID: ${id})`);
+    });
+  } else if (missingCourses.length > 20) {
+    console.log(`[GolfNow] ${missingCourses.length} courses not found (check geographic coverage)`);
+  }
+
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   console.log(`[GolfNow] Complete: ${totalTeeTimes} tee times in ${elapsed}s`);
+  console.log(`[GolfNow] Found ${foundFacilityIds.size}/${expectedFacilityIds.length} mapped courses`);
 
   return totalTeeTimes;
 }
