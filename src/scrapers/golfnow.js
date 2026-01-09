@@ -126,8 +126,9 @@ async function scrapeLocation(location, date) {
   await page.setUserAgent(USER_AGENT);
   await page.setViewport({ width: 1280, height: 800 });
 
-  // Build search URL (without date - GolfNow defaults to today which is what we want for first day)
-  const searchUrl = `https://www.golfnow.com/tee-times/search#q=location&latitude=${location.lat}&longitude=${location.lng}&radius=50`;
+  // Build search URL with date parameter
+  const dateStr = date.toISOString().split('T')[0];
+  const searchUrl = `https://www.golfnow.com/tee-times/search#q=location&latitude=${location.lat}&longitude=${location.lng}&radius=50&date=${dateStr}`;
 
   console.log(`  Searching ${location.name}...`);
 
@@ -270,29 +271,38 @@ async function runScraper(daysAhead = 7) {
   // Clear old data
   await clearOldTeeTimes(dates);
 
-  // Scrape all locations once (search results include multiple days)
-  const allTeeTimes = new Map();  // Use Map to dedupe by facilityId
+  // Scrape all locations for each day
+  const allTeeTimes = new Map();  // Use Map to dedupe by facilityId+date
 
   try {
-    for (const location of SEARCH_LOCATIONS) {
-      const teeTimes = await scrapeLocation(location, today);
+    for (let dayOffset = 0; dayOffset < daysAhead; dayOffset++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + dayOffset);
+      const dateStr = date.toISOString().split('T')[0];
 
-      teeTimes.forEach(tt => {
-        // Keep first occurrence of each course
-        if (!allTeeTimes.has(tt.facilityId)) {
-          allTeeTimes.set(tt.facilityId, tt);
-        }
-      });
+      console.log(`\n--- Day ${dayOffset + 1}/${daysAhead}: ${dateStr} ---`);
 
-      // Small delay between searches
-      await new Promise(r => setTimeout(r, 1000));
+      for (const location of SEARCH_LOCATIONS) {
+        const teeTimes = await scrapeLocation(location, date);
+
+        teeTimes.forEach(tt => {
+          // Key by facilityId + date to allow multiple days per course
+          const key = `${tt.facilityId}-${tt.date}`;
+          if (!allTeeTimes.has(key)) {
+            allTeeTimes.set(key, tt);
+          }
+        });
+
+        // Small delay between searches
+        await new Promise(r => setTimeout(r, 1000));
+      }
     }
   } finally {
     await closeBrowser();
   }
 
   const uniqueTeeTimes = Array.from(allTeeTimes.values());
-  console.log(`\nTotal unique courses found: ${uniqueTeeTimes.length}`);
+  console.log(`\nTotal tee time entries: ${uniqueTeeTimes.length}`);
 
   let totalTeeTimes = 0;
   if (uniqueTeeTimes.length > 0) {
