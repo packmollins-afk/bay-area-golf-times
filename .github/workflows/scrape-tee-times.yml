@@ -1,15 +1,22 @@
-name: Scrape GolfNow Tee Times
+name: Scrape Tee Times
 
 on:
   schedule:
-    # Run every hour
-    - cron: '0 * * * *'
+    # Run 4x daily at safe intervals (UTC times = PST + 8)
+    # 5 AM PST = 13:00 UTC - Catch early morning tee time releases
+    # 11 AM PST = 19:00 UTC - Mid-day refresh
+    # 5 PM PST = 01:00 UTC - Evening refresh
+    # 9 PM PST = 05:00 UTC - Final daily update
+    - cron: '0 13 * * *'
+    - cron: '0 19 * * *'
+    - cron: '0 1 * * *'
+    - cron: '0 5 * * *'
   workflow_dispatch: # Allow manual triggers
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 10  # Optimized scrape takes ~1 minute
 
     steps:
       - uses: actions/checkout@v4
@@ -26,11 +33,11 @@ jobs:
       - name: Install Puppeteer browser
         run: npx puppeteer browsers install chrome
 
-      - name: Run scraper
+      - name: Run optimized scraper
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-        run: node src/scripts/scrape-and-update.js
+        run: npm run scrape
 
       - name: Log completion
-        run: echo "Scrape completed at $(date)"
+        run: echo "Scrape completed at $(date) - optimized parallel scraper"
