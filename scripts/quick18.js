@@ -13,11 +13,13 @@
 
 const puppeteer = require('puppeteer');
 
+// NOTE: Baylands Golf Links moved to EZLinks booking system (https://baylandsbw.ezlinksgolf.com)
+// No Quick18 courses currently configured - scraper kept for future Quick18 integrations
 const QUICK18_COURSES = {
-  'baylands-golf-links': {
-    url: 'https://baylandswalking.quick18.com/teetimes/searchmatrix',
-    name: 'Baylands Golf Links'
-  }
+  // 'baylands-golf-links': {
+  //   url: 'https://baylandswalking.quick18.com/teetimes/searchmatrix',
+  //   name: 'Baylands Golf Links'
+  // }
 };
 
 const CONFIG = {

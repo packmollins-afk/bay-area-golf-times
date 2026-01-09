@@ -37,11 +37,12 @@ const SCRAPER_SOURCES = {
     bookingSystems: ['cpsgolf'],
     description: 'CPS.Golf booking system'
   },
-  quick18: {
-    name: 'Quick18',
-    bookingSystems: ['quick18'],
-    description: 'Quick18 booking platform'
-  }
+  // quick18 commented out - no active Quick18 courses (Baylands moved to ezlinks)
+  // quick18: {
+  //   name: 'Quick18',
+  //   bookingSystems: ['quick18'],
+  //   description: 'Quick18 booking platform'
+  // }
 };
 
 // Courses configured in each scraper
