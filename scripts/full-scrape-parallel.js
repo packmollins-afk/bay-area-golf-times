@@ -33,7 +33,10 @@ async function fullScrapeParallel(daysAhead = 7) {
   const start = Date.now();
 
   // Record the start time for this scrape run (used to identify stale data later)
-  const scrapeStartTime = new Date().toISOString();
+  // IMPORTANT: Use SQLite's datetime format to match what scrapers insert with datetime('now')
+  // JavaScript ISO format (2026-01-09T06:04:09.123Z) != SQLite format (2026-01-09 06:04:09)
+  const timeResult = await db.execute("SELECT datetime('now') as now");
+  const scrapeStartTime = timeResult.rows[0].now;
 
   // Get courses for scrapers
   const res = await db.execute('SELECT id, name, slug FROM courses');
