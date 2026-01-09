@@ -24,14 +24,15 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
 
 // Course UUIDs for all Chronogolf courses
 const CHRONOGOLF_COURSES = {
-  'half-moon-bay-golf-links-old-course': {
+  // Slugs must match database exactly
+  'half-moon-bay-old-course': {
     uuid: '9f50b574-c281-4df7-a7cb-13d567406c36',
-    name: 'Half Moon Bay Golf Links - Old Course',
+    name: 'Half Moon Bay - Old Course',
     clubUrl: 'https://www.chronogolf.com/club/half-moon-bay-golf-links'
   },
-  'half-moon-bay-golf-links-ocean-course': {
+  'half-moon-bay-ocean-course': {
     uuid: '03274c09-51b5-4ad9-beb4-9177e3990e10',
-    name: 'Half Moon Bay Golf Links - Ocean Course',
+    name: 'Half Moon Bay - Ocean Course',
     clubUrl: 'https://www.chronogolf.com/club/half-moon-bay-golf-links'
   },
   'santa-teresa-golf-club': {
