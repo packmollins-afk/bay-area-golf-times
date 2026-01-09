@@ -1336,9 +1336,54 @@
     }
 
     /* ============================================
-       FLOATING SEARCH BAR STYLES
+       SIMPLE SEARCH LINK
        ============================================ */
 
+    .search-link {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      background: rgba(244, 235, 224, 0.95);
+      border: 2px solid var(--contour);
+      border-radius: 9999px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      box-shadow: 0 2px 12px rgba(61, 50, 37, 0.15);
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+
+    .search-link:hover {
+      border-color: var(--fairway);
+      color: var(--text-dark);
+      box-shadow: 0 4px 20px rgba(61, 50, 37, 0.2);
+    }
+
+    .search-link svg {
+      color: var(--fairway);
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .search-link {
+        top: 50px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* ============================================
+       DISABLED: OLD SEARCH OVERLAY STYLES
+       ============================================ */
+    /*
     .search-overlay {
       position: fixed;
       top: 60px;
@@ -1348,12 +1393,13 @@
       width: 100%;
       max-width: 900px;
       padding: 0 16px;
-      pointer-events: none; /* Allow clicks to pass through to map */
+      pointer-events: none;
     }
 
     .search-overlay > * {
-      pointer-events: auto; /* Re-enable on actual search elements */
+      pointer-events: auto;
     }
+    */
 
     .search-bar {
       display: flex;
@@ -2615,17 +2661,17 @@
       <p class="map-subtitle">San Francisco & Vicinity • 80+ Public Courses</p>
     </div>
 
-    <!-- Floating Search Bar -->
-    <div class="search-overlay" id="search-overlay">
-      <!-- Collapsed Search Trigger (Mobile Only) -->
-      <button class="search-trigger" id="search-trigger" aria-label="Open search">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="M21 21l-4.35-4.35"/>
-        </svg>
-        <span>Search courses...</span>
-      </button>
+    <!-- Simple Search Link - Links to App -->
+    <a href="/app.html" class="search-link" id="search-link">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <span>Search tee times...</span>
+    </a>
 
+    <!-- DISABLED: Complex search overlay removed to fix map interaction bugs
+    <div class="search-overlay" id="search-overlay">
       <div class="search-bar" id="search-bar">
         <!-- Course/Location Field -->
         <div class="search-field course-field" id="course-field">
@@ -2736,22 +2782,7 @@
         </button>
       </div>
     </div>
-
-    <!-- Inline Search Results -->
-    <div class="search-results-container" id="search-results-container">
-      <div class="search-results">
-        <div class="search-results-header">
-          <span class="search-results-count" id="search-results-count">Loading...</span>
-          <button class="search-results-close" id="search-results-close" type="button">
-            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-        <div class="search-results-body" id="search-results-body">
-          <!-- Results will be populated here -->
-        </div>
-        <a href="/app.html" class="view-all-link">View All Tee Times</a>
-      </div>
-    </div>
+    END DISABLED SEARCH -->
 
     <!-- Login button (top right, near compass) -->
     <a href="/account.html" class="login-btn" id="login-btn">
