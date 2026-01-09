@@ -1,14 +1,12 @@
 {
   "name": "bay-area-golf-times",
-  "version": "1.0.0",
-  "description": "Bay Area Golf Tee Times Aggregator - Find available tee times across 40+ public courses",
+  "version": "2.0.0",
+  "description": "Bay Area Golf Tee Times Aggregator - Find available tee times across 80+ public courses",
   "main": "src/api/server.js",
   "scripts": {
     "start": "node src/api/server.js",
     "dev": "node --watch src/api/server.js",
     "scrape": "node scripts/full-scrape-parallel.js",
-    "scrape:scheduled": "node scripts/scheduled-scrape.js",
-    "scrape:old": "node src/scripts/scrape.js",
     "demo": "node src/scripts/generate-demo-data.js",
     "setup": "node src/scripts/setup.js"
   },
@@ -24,21 +22,15 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
     "@libsql/client": "^0.15.15",
-    "better-sqlite3": "^12.5.0",
-    "cheerio": "^1.1.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "node-cron": "^4.2.1",
-    "p-limit": "^7.2.0",
     "puppeteer": "^24.34.0",
-    "puppeteer-core": "^24.34.0",
     "resend": "^6.6.0",
     "ua-parser-js": "^2.0.7"
   },
   "devDependencies": {
-    "sharp": "^0.34.5",
     "vercel": "^50.1.3"
   }
 }
