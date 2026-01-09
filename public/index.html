@@ -1348,6 +1348,11 @@
       width: 100%;
       max-width: 900px;
       padding: 0 16px;
+      pointer-events: none; /* Allow clicks to pass through to map */
+    }
+
+    .search-overlay > * {
+      pointer-events: auto; /* Re-enable on actual search elements */
     }
 
     .search-bar {
