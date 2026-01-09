@@ -15,7 +15,7 @@ const puppeteer = require('puppeteer');
 
 const CPS_COURSES = {
   'diablo-creek-golf-course': {
-    url: 'https://diablocreek.cps.golf/',
+    url: 'https://diablocreek.cps.golf/onlineresweb/search-teetime',
     name: 'Diablo Creek Golf Course'
   },
   'northwood-golf-club': {
@@ -55,29 +55,46 @@ function convertTo24Hour(timeStr) {
 
 async function scrapeCPSGolf(page, config, dateStr) {
   try {
-    await page.goto(config.url, { waitUntil: 'networkidle2', timeout: CONFIG.pageTimeout });
+    // Build URL with date parameter for CPS Golf sites
+    const url = config.url.includes('cps.golf')
+      ? `${config.url}?TeeOffTimeMin=0&TeeOffTimeMax=23&Date=${dateStr}`
+      : config.url;
+
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: CONFIG.pageTimeout });
     await new Promise(r => setTimeout(r, CONFIG.postLoadWait));
 
     const teeTimes = await page.evaluate((date) => {
       const results = [];
       const pageText = document.body.innerText || '';
-      const lines = pageText.split('\n');
+      const lines = pageText.split('\n').map(l => l.trim()).filter(l => l);
 
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
+        const line = lines[i];
+        // Match time format like "1:44" or "10:30"
         const timeMatch = line.match(/^(\d{1,2}):(\d{2})$/);
 
         if (timeMatch) {
-          const ampm = lines[i + 1]?.trim();
-          if (ampm === 'P' || ampm === 'A') {
-            const period = ampm === 'P' ? 'PM' : 'AM';
+          // Next line should be P or A (for PM/AM), or next might be "M" after P/A
+          const nextLine = lines[i + 1];
+          if (nextLine === 'P' || nextLine === 'A') {
+            const period = nextLine === 'P' ? 'PM' : 'AM';
             const time = timeMatch[0] + period;
 
+            // Look for price in nearby lines
             let price = null;
-            for (let j = i; j < Math.min(i + 8, lines.length); j++) {
-              const priceMatch = lines[j].match(/\$(\d+(?:\.\d{2})?)/);
+            for (let j = i; j < Math.min(i + 10, lines.length); j++) {
+              const priceMatch = lines[j].match(/\$(\d+)(?:\.\d{2})?/);
               if (priceMatch) {
                 price = parseInt(priceMatch[1]);
+                break;
+              }
+            }
+
+            // Check for holes info - default to 18
+            let holes = 18;
+            for (let j = i; j < Math.min(i + 6, lines.length); j++) {
+              if (lines[j].includes('9 HOLES') || lines[j].includes('9 or 18')) {
+                holes = 9; // Could be either, mark as 9 for flexibility
                 break;
               }
             }
@@ -87,7 +104,7 @@ async function scrapeCPSGolf(page, config, dateStr) {
                 time: time,
                 price: price,
                 players: 4,
-                holes: 18,
+                holes: holes,
                 has_cart: 0,
                 date: date
               });
