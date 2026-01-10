@@ -1,7 +1,7 @@
 # Claude Code Project Instructions
 
 ## Project Overview
-Golf The Bay (golfthebay.com) - A tee time aggregation platform for 80+ golf courses in the San Francisco Bay Area.
+Golf The Bay (golfthebay.com) - A tee time aggregation platform for 100+ golf courses in the San Francisco Bay Area.
 
 ## Critical Rules
 

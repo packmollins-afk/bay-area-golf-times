@@ -64,7 +64,7 @@ const sendVerificationEmail = async (email, token, displayName) => {
           <h2 style="color: #2d5a27; font-size: 24px; margin: 0 0 16px 0;">Welcome, ${displayName}!</h2>
 
           <p style="color: #3d2914; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
-            Thanks for joining Golf The Bay - your home for discovering and booking tee times across 40+ public courses in the San Francisco Bay Area.
+            Thanks for joining Golf The Bay - your home for discovering and booking tee times across 100+ public courses in the San Francisco Bay Area.
           </p>
 
           <div style="text-align: center; margin-bottom: 32px;">
@@ -89,7 +89,7 @@ const sendVerificationEmail = async (email, token, displayName) => {
             <div style="display: flex; margin-bottom: 16px;">
               <div style="background: #e8efe6; border-radius: 50%; width: 36px; height: 36px; text-align: center; line-height: 36px; margin-right: 12px; flex-shrink: 0; color: #2d5a27; font-weight: bold;">2</div>
               <div>
-                <strong style="color: #3d2914;">Explore 40+ Courses</strong>
+                <strong style="color: #3d2914;">Explore 100+ Courses</strong>
                 <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">Browse detailed course info including yardage, slope rating, photos, and upcoming tee times. Check out our Staff Picks!</p>
               </div>
             </div>
@@ -4422,7 +4422,7 @@ app.get('/:regionSlug-golf', async (req, res) => {
   </div>
 
   <footer>
-    <p><a href="/">Golf The Bay</a> - Compare tee times from 80+ courses</p>
+    <p><a href="/">Golf The Bay</a> - Compare tee times from 100+ courses</p>
     <div class="regions">
       <a href="/sf-golf">San Francisco</a>
       <a href="/east-bay-golf">East Bay</a>

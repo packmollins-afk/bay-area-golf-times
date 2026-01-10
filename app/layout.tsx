@@ -11,7 +11,7 @@ const _playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif
 
 export const metadata: Metadata = {
   title: "Golf The Bay",
-  description: "Find and book tee times at 80+ Bay Area golf courses. Compare prices and availability.",
+  description: "Find and book tee times at 100+ Bay Area golf courses. Compare prices and availability.",
   generator: "v0.app",
   icons: {
     icon: [

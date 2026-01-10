@@ -17,12 +17,44 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const course = getCourseBySlug(slug)
 
   if (!course) {
-    return { title: "Course Not Found" }
+    return {
+      title: "Course Not Found | Golf The Bay",
+      description: "The golf course you're looking for could not be found.",
+    }
   }
 
+  const courseUrl = `https://golfthebay.com/course/${course.slug}`
+  const courseImage = `https://golfthebay.com/images/courses/${course.slug}.jpg`
+  const description = `Book tee times at ${course.name} in ${course.city}. ${course.holes} holes, Par ${course.par}${course.yardage ? `, ${course.yardage.toLocaleString()} yards` : ''}. ${course.description || ""}`
+
   return {
-    title: `${course.name} Tee Times | Bay Area Golf`,
-    description: `Book tee times at ${course.name} in ${course.city}. ${course.holes} holes, par ${course.par}. ${course.description || ""}`,
+    title: `${course.name} Tee Times | Golf The Bay`,
+    description,
+    openGraph: {
+      type: "website",
+      url: courseUrl,
+      title: `${course.name} Tee Times | Golf The Bay`,
+      description,
+      images: [
+        {
+          url: courseImage,
+          width: 1200,
+          height: 630,
+          alt: `${course.name} golf course in ${course.city}, California`,
+        },
+      ],
+      siteName: "Golf The Bay",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${course.name} Tee Times | Golf The Bay`,
+      description,
+      images: [courseImage],
+    },
+    alternates: {
+      canonical: courseUrl,
+    },
   }
 }
 
@@ -48,7 +80,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
       <header className="bg-primary text-primary-foreground py-4 sticky top-0 z-50">
         <div className="container mx-auto px-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold font-serif">
-            Bay Area Golf
+            Golf The Bay
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/">
@@ -230,7 +262,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
       {/* Footer */}
       <footer className="bg-muted py-8 mt-12">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Bay Area Golf. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Golf The Bay. All rights reserved.</p>
         </div>
       </footer>
     </div>

@@ -31,7 +31,7 @@ export default async function sitemap() {
     },
   ]
 
-  // Dynamic course pages - all 80+ courses
+  // Dynamic course pages - all 100+ courses
   const coursePages = courses.map((course) => ({
     url: `${BASE_URL}/course/${course.slug}`,
     lastModified: new Date(),
