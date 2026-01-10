@@ -29,11 +29,11 @@ import {
 // Test fixtures
 const createTestEvent = (overrides = {}) => ({
   title: 'Golf Tee Time at Presidio Golf Course',
-  description: 'Booked via Bay Area Golf',
+  description: 'Booked via Golf The Bay',
   location: 'Presidio Golf Course, San Francisco, CA',
   startDate: new Date('2024-06-15T14:30:00Z'),
   endDate: new Date('2024-06-15T18:30:00Z'),
-  url: 'https://bayareagolf.now/book/presidio',
+  url: 'https://golfthebay.com/book/presidio',
   ...overrides
 });
 
@@ -203,7 +203,7 @@ describe('Calendar Service', () => {
 
     it('should include domain suffix', () => {
       const uid = generateUID();
-      expect(uid).toContain('@bayareagolf.now');
+      expect(uid).toContain('@golfthebay.com');
     });
 
     it('should generate different UIDs on successive calls', () => {
@@ -246,7 +246,7 @@ describe('Calendar Service', () => {
 
       it('should include PRODID', () => {
         const ics = generateICS(testEvent);
-        expect(ics).toContain('PRODID:-//Bay Area Golf//Tee Time Booking//EN');
+        expect(ics).toContain('PRODID:-//Golf The Bay//Tee Time Booking//EN');
       });
 
       it('should include CALSCALE:GREGORIAN', () => {
@@ -273,7 +273,7 @@ describe('Calendar Service', () => {
 
       it('should include UID', () => {
         const ics = generateICS(testEvent);
-        expect(ics).toMatch(/UID:[\w-]+@bayareagolf\.now/);
+        expect(ics).toMatch(/UID:[\w-]+@golfthebay\.com/);
       });
 
       it('should include DTSTAMP', () => {
@@ -300,7 +300,7 @@ describe('Calendar Service', () => {
     describe('optional fields', () => {
       it('should include DESCRIPTION when provided', () => {
         const ics = generateICS(testEvent);
-        expect(ics).toContain('DESCRIPTION:Booked via Bay Area Golf');
+        expect(ics).toContain('DESCRIPTION:Booked via Golf The Bay');
       });
 
       it('should not include DESCRIPTION when not provided', () => {
@@ -323,7 +323,7 @@ describe('Calendar Service', () => {
 
       it('should include URL when provided', () => {
         const ics = generateICS(testEvent);
-        expect(ics).toContain('URL:https://bayareagolf.now/book/presidio');
+        expect(ics).toContain('URL:https://golfthebay.com/book/presidio');
       });
 
       it('should not include URL when not provided', () => {

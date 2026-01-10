@@ -7,6 +7,6 @@ export default function robots() {
         disallow: ["/api/", "/auth/update-password"],
       },
     ],
-    sitemap: "https://www.bayareagolf.now/sitemap.xml",
+    sitemap: "https://golfthebay.com/sitemap.xml",
   }
 }

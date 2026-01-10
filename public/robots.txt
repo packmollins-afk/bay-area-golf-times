@@ -1,11 +1,11 @@
-# Bay Area Golf Tee Times - robots.txt
-# https://bayareagolf.now
+# Golf The Bay - robots.txt
+# https://golfthebay.com
 
 User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://bayareagolf.now/sitemap.xml
+Sitemap: https://golfthebay.com/sitemap.xml
 
 # Crawl-delay for politeness
 Crawl-delay: 1

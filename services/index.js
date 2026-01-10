@@ -1,5 +1,5 @@
 /**
- * Bay Area Golf Times - Services Index
+ * Golf The Bay - Services Index
  * =====================================
  * Central export point for all external API services used by the golf app.
  *
@@ -412,14 +412,14 @@ const calendar = {
     return [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Bay Area Golf Times//EN',
+      'PRODID:-//Golf The Bay//EN',
       'BEGIN:VEVENT',
       `DTSTART:${formatDate(event.start)}`,
       `DTEND:${formatDate(event.end)}`,
       `SUMMARY:${event.title}`,
       `LOCATION:${event.location}`,
       `DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`,
-      `UID:${Date.now()}@bayareagolf.now`,
+      `UID:${Date.now()}@golfthebay.com`,
       'END:VEVENT',
       'END:VCALENDAR',
     ].join('\r\n');

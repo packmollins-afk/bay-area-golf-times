@@ -1,6 +1,6 @@
 {
-  "name": "Bay Area Golf Tee Times",
-  "short_name": "BA Golf",
+  "name": "Golf The Bay",
+  "short_name": "Golf The Bay",
   "description": "Find and book golf tee times across 40+ public courses in the San Francisco Bay Area",
   "start_url": "/",
   "display": "standalone",

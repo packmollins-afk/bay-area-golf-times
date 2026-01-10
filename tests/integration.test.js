@@ -1,5 +1,5 @@
 /**
- * Integration Tests for Bay Area Golf Times API Services
+ * Integration Tests for Golf The Bay API Services
  *
  * Tests all external API services against live endpoints with real Bay Area coordinates.
  * These tests make actual network requests and should be skipped in CI environments

@@ -46,23 +46,25 @@ const sendVerificationEmail = async (email, token, displayName) => {
     return;
   }
 
-  const verifyUrl = `https://bayareagolf.now/api/auth/verify?token=${token}`;
+  // Use PRIMARY_DOMAIN env var during migration, fallback to new domain
+  const primaryDomain = process.env.PRIMARY_DOMAIN || 'golfthebay.com';
+  const verifyUrl = `https://${primaryDomain}/api/auth/verify?token=${token}`;
 
   await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || 'Bay Area Golf <noreply@bayareagolf.now>',
+    from: process.env.RESEND_FROM_EMAIL || 'Golf The Bay <noreply@golfthebay.com>',
     to: email,
-    subject: 'Welcome to Bay Area Golf - Verify Your Account',
+    subject: 'Welcome to Golf The Bay - Verify Your Account',
     html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #f9f6ef;">
         <div style="background: #2d5a27; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
-          <h1 style="color: #f4f1e8; font-size: 28px; margin: 0;">Bay Area Golf</h1>
+          <h1 style="color: #f4f1e8; font-size: 28px; margin: 0;">Golf The Bay</h1>
         </div>
 
         <div style="background: white; padding: 32px; border-radius: 0 0 8px 8px; border: 1px solid #ddd0bc; border-top: none;">
           <h2 style="color: #2d5a27; font-size: 24px; margin: 0 0 16px 0;">Welcome, ${displayName}!</h2>
 
           <p style="color: #3d2914; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
-            Thanks for joining Bay Area Golf - your home for discovering and booking tee times across 40+ public courses in the San Francisco Bay Area.
+            Thanks for joining Golf The Bay - your home for discovering and booking tee times across 40+ public courses in the San Francisco Bay Area.
           </p>
 
           <div style="text-align: center; margin-bottom: 32px;">
@@ -104,7 +106,7 @@ const sendVerificationEmail = async (email, token, displayName) => {
               <div style="background: #e8efe6; border-radius: 50%; width: 36px; height: 36px; text-align: center; line-height: 36px; margin-right: 12px; flex-shrink: 0; color: #2d5a27; font-weight: bold;">4</div>
               <div>
                 <strong style="color: #3d2914;">Earn Your Passport</strong>
-                <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">Play different courses to collect stamps on your Bay Area Golf Passport. How many can you visit?</p>
+                <p style="color: #6b5344; font-size: 14px; margin: 4px 0 0 0;">Play different courses to collect stamps on your Golf The Bay Passport. How many can you visit?</p>
               </div>
             </div>
 
@@ -121,10 +123,10 @@ const sendVerificationEmail = async (email, token, displayName) => {
 
           <div style="text-align: center;">
             <p style="color: #3d2914; font-size: 16px; margin-bottom: 16px;"><strong>Ready to play?</strong></p>
-            <a href="https://bayareagolf.now/app.html" style="display: inline-block; background: white; color: #2d5a27; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; border: 2px solid #2d5a27; margin-right: 8px;">
+            <a href="https://${primaryDomain}/app.html" style="display: inline-block; background: white; color: #2d5a27; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; border: 2px solid #2d5a27; margin-right: 8px;">
               Find Tee Times
             </a>
-            <a href="https://bayareagolf.now/courses.html" style="display: inline-block; background: white; color: #2d5a27; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; border: 2px solid #2d5a27;">
+            <a href="https://${primaryDomain}/courses.html" style="display: inline-block; background: white; color: #2d5a27; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; border: 2px solid #2d5a27;">
               Browse Courses
             </a>
           </div>
@@ -182,9 +184,15 @@ const deleteSession = async (token) => {
 };
 
 // Security: Configure allowed CORS origins
+// NOTE: Keep both old and new domains during migration (remove old ones after 30 days)
 const allowedOrigins = [
+  // New domain (primary)
+  'https://golfthebay.com',
+  'https://www.golfthebay.com',
+  // Old domain (keep during migration - remove after 2025-02-10)
   'https://bayareagolf.now',
   'https://www.bayareagolf.now',
+  // Development
   'http://localhost:3000',
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
 ].filter(Boolean);
@@ -367,31 +375,31 @@ app.get('/sitemap.xml', async (req, res) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main Pages -->
   <url>
-    <loc>https://bayareagolf.now/</loc>
+    <loc>https://golfthebay.com/</loc>
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/app.html</loc>
+    <loc>https://golfthebay.com/app.html</loc>
     <lastmod>${today}</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/courses.html</loc>
+    <loc>https://golfthebay.com/courses.html</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/scorebook.html</loc>
+    <loc>https://golfthebay.com/scorebook.html</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/community.html</loc>
+    <loc>https://golfthebay.com/community.html</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -399,49 +407,49 @@ app.get('/sitemap.xml', async (req, res) => {
 
   <!-- Regional Landing Pages -->
   <url>
-    <loc>https://bayareagolf.now/sf-golf</loc>
+    <loc>https://golfthebay.com/sf-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/east-bay-golf</loc>
+    <loc>https://golfthebay.com/east-bay-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/south-bay-golf</loc>
+    <loc>https://golfthebay.com/south-bay-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/north-bay-golf</loc>
+    <loc>https://golfthebay.com/north-bay-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/napa-golf</loc>
+    <loc>https://golfthebay.com/napa-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/monterey-golf</loc>
+    <loc>https://golfthebay.com/monterey-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/sonoma-golf</loc>
+    <loc>https://golfthebay.com/sonoma-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bayareagolf.now/sacramento-golf</loc>
+    <loc>https://golfthebay.com/sacramento-golf</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -449,7 +457,7 @@ app.get('/sitemap.xml', async (req, res) => {
 
   <!-- Individual Course Pages -->
 ${courses.map(c => `  <url>
-    <loc>https://bayareagolf.now/course/${c.slug}</loc>
+    <loc>https://golfthebay.com/course/${c.slug}</loc>
     <lastmod>${c.updated_at ? c.updated_at.split('T')[0] : today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -3232,7 +3240,7 @@ app.post('/api/admin/email-broadcast', adminAuth, async (req, res) => {
     for (const user of users) {
       try {
         await resend.emails.send({
-          from: process.env.RESEND_FROM_EMAIL || 'Bay Area Golf <noreply@bayareagolf.now>',
+          from: process.env.RESEND_FROM_EMAIL || 'Golf The Bay <noreply@golfthebay.com>',
           to: user.email,
           subject: subject,
           html: html_content.replace('{{name}}', user.display_name || 'Golfer')
@@ -3627,7 +3635,7 @@ const parseReferrer = (ref) => {
     let type = 'other';
     if (/google\.|bing\.|yahoo\.|duckduckgo\.|baidu\./i.test(domain)) type = 'search';
     else if (/facebook\.|instagram\.|twitter\.|x\.com|linkedin\.|tiktok\.|pinterest\./i.test(domain)) type = 'social';
-    else if (/bayareagolf\.now|localhost/i.test(domain)) type = 'internal';
+    else if (/golfthebay\.com|localhost/i.test(domain)) type = 'internal';
     else if (/reddit\.|discord\.|slack\./i.test(domain)) type = 'community';
     else if (/mail\.|outlook\.|gmail\./i.test(domain)) type = 'email';
 
@@ -3663,7 +3671,7 @@ app.get('/go/:slug', async (req, res) => {
     // Build final redirect URL
     let redirectUrl = course.booking_url;
     const separator = redirectUrl.includes('?') ? '&' : '?';
-    redirectUrl += `${separator}utm_source=bayareagolf&utm_medium=web&utm_campaign=${slug}&utm_content=${isDeal ? 'deal' : 'regular'}`;
+    redirectUrl += `${separator}utm_source=golfthebay&utm_medium=web&utm_campaign=${slug}&utm_content=${isDeal ? 'deal' : 'regular'}`;
     if (process.env.GOLFNOW_AFFILIATE_ID && course.booking_system === 'golfnow') {
       redirectUrl += `&affiliate=${process.env.GOLFNOW_AFFILIATE_ID}`;
     }
@@ -3724,7 +3732,7 @@ app.get('/go/:slug', async (req, res) => {
       utm_campaign: req.query.utm_campaign || null,
       utm_term: req.query.utm_term || null,
       utm_content: req.query.utm_content || null,
-      landing_page: req.headers.referer?.includes('bayareagolf') ? req.headers.referer : null,
+      landing_page: req.headers.referer?.includes('golfthebay') ? req.headers.referer : null,
       ip_hash: ipHash,
       country: req.headers['x-vercel-ip-country'] || null,
       country_code: req.headers['x-vercel-ip-country'] || null,
@@ -4163,7 +4171,7 @@ app.get('/api/admin/export', adminAuth, async (req, res) => {
     }
 
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=bayareagolf-clicks-full.csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=golfthebay-clicks-full.csv');
     res.send(csv);
 
   } catch (error) {
@@ -4195,9 +4203,9 @@ app.get('/course/:slug', async (req, res) => {
     let html = fs.readFileSync(path.join(publicPath, 'course.html'), 'utf8');
 
     // Build SEO meta tags
-    const title = `${course.name} Tee Times & Prices | Bay Area Golf`;
+    const title = `${course.name} Tee Times & Prices | Golf The Bay`;
     const description = `Book tee times at ${course.name} in ${course.city}. ${course.holes} holes, par ${course.par}. Live availability for Bay Area golf.`;
-    const url = `https://bayareagolf.now/course/${slug}`;
+    const url = `https://golfthebay.com/course/${slug}`;
 
     // Build JSON-LD GolfCourse schema
     const jsonLd = {
@@ -4235,7 +4243,7 @@ app.get('/course/:slug', async (req, res) => {
 
     // Replace placeholder meta tags
     html = html.replace(
-      '<title>Loading... | Bay Area Golf</title>',
+      '<title>Loading... | Golf The Bay</title>',
       `<title>${title}</title>`
     );
     html = html.replace(
@@ -4305,9 +4313,9 @@ app.get('/:regionSlug-golf', async (req, res) => {
     });
     const courses = result.rows;
 
-    const title = `${regionName} Golf Courses - Tee Times & Prices | Bay Area Golf`;
+    const title = `${regionName} Golf Courses - Tee Times & Prices | Golf The Bay`;
     const description = `Compare tee times at ${courses.length} golf courses in ${regionName}. Find the best prices today.`;
-    const url = `https://bayareagolf.now/${regionSlug}-golf`;
+    const url = `https://golfthebay.com/${regionSlug}-golf`;
 
     // Build HTML
     const html = `<!DOCTYPE html>
@@ -4324,7 +4332,7 @@ app.get('/:regionSlug-golf', async (req, res) => {
   <meta property="og:url" content="${url}">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${description}">
-  <meta property="og:site_name" content="Bay Area Golf">
+  <meta property="og:site_name" content="Golf The Bay">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${title}">
@@ -4404,7 +4412,7 @@ app.get('/:regionSlug-golf', async (req, res) => {
   </div>
 
   <footer>
-    <p><a href="/">Bay Area Golf</a> - Compare tee times from 80+ courses</p>
+    <p><a href="/">Golf The Bay</a> - Compare tee times from 80+ courses</p>
     <div class="regions">
       <a href="/sf-golf">San Francisco</a>
       <a href="/east-bay-golf">East Bay</a>

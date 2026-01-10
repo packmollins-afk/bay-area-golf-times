@@ -1,7 +1,7 @@
 # Claude Code Project Instructions
 
 ## Project Overview
-Bay Area Golf (bayareagolf.now) - A tee time aggregation platform for 80+ golf courses in the San Francisco Bay Area.
+Golf The Bay (golfthebay.com) - A tee time aggregation platform for 80+ golf courses in the San Francisco Bay Area.
 
 ## Critical Rules
 
@@ -27,7 +27,7 @@ See `WORKFLOW.md` for detailed steps.
 After adding courses or running scrapers, verify:
 \`\`\`bash
 # Check courses with data
-curl -s https://bayareagolf.now/api/tee-times/next-available | jq 'keys'
+curl -s https://golfthebay.com/api/tee-times/next-available | jq 'keys'
 
 # Compare with homepage data-course attributes
 grep 'data-course=' public/index.html

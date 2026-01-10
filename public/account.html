@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account | Bay Area Golf</title>
-  <meta name="description" content="Sign in or create an account to track your rounds and earn your Bay Area Golf Passport.">
+  <title>Account | Golf The Bay</title>
+  <meta name="description" content="Sign in or create an account to track your rounds and earn your Golf The Bay Passport.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -438,7 +438,7 @@
 <body>
   <header>
     <div class="container">
-      <h1>Bay Area Golf</h1>
+      <h1>Golf The Bay</h1>
       <a href="/" class="back-link">Back to Home</a>
     </div>
   </header>
@@ -446,7 +446,7 @@
   <main class="container">
     <div class="page-title">
       <h2 id="page-heading">Create an Account</h2>
-      <p id="page-subtitle">Track your rounds and earn your Bay Area Golf Passport</p>
+      <p id="page-subtitle">Track your rounds and earn your Golf The Bay Passport</p>
     </div>
 
     <!-- Auth Forms (shown when logged out) -->
@@ -607,14 +607,14 @@
       document.getElementById('auth-container').classList.remove('hidden');
       document.getElementById('profile-container').classList.add('hidden');
       document.getElementById('page-heading').textContent = 'Create an Account';
-      document.getElementById('page-subtitle').textContent = 'Track your rounds and earn your Bay Area Golf Passport';
+      document.getElementById('page-subtitle').textContent = 'Track your rounds and earn your Golf The Bay Passport';
     }
 
     async function showProfile(user) {
       document.getElementById('auth-container').classList.add('hidden');
       document.getElementById('profile-container').classList.remove('hidden');
       document.getElementById('page-heading').textContent = 'My Account';
-      document.getElementById('page-subtitle').textContent = 'Your Bay Area Golf journey';
+      document.getElementById('page-subtitle').textContent = 'Your Golf The Bay journey';
 
       // Set profile picture or initial
       if (user.profilePicture) {

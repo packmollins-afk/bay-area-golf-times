@@ -1,7 +1,7 @@
 {
-  "name": "bay-area-golf-times",
+  "name": "golf-the-bay",
   "version": "2.0.0",
-  "description": "Bay Area Golf Tee Times Aggregator - Find available tee times across 80+ public courses",
+  "description": "Golf The Bay - Find and book tee times across 80+ Bay Area public courses",
   "keywords": [
     "golf",
     "tee-times",

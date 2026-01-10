@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bay-area-golf-v1';
+const CACHE_NAME = 'golf-the-bay-v1';
 const STATIC_ASSETS = [
   '/',
   '/app.html',

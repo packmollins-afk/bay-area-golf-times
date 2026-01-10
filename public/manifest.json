@@ -1,6 +1,6 @@
 {
-  "name": "Bay Area Golf",
-  "short_name": "Bay Area Golf",
+  "name": "Golf The Bay",
+  "short_name": "Golf The Bay",
   "description": "Find tee times and explore public golf courses across the San Francisco Bay Area",
   "start_url": "/",
   "display": "standalone",

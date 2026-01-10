@@ -1,5 +1,5 @@
 /**
- * Calendar Service for Bay Area Golf Times
+ * Calendar Service for Golf The Bay
  *
  * Browser-compatible ICS calendar file generation and calendar URL creation
  * for integrating tee time bookings with popular calendar applications.
@@ -13,7 +13,7 @@
 
 const DEFAULT_TEE_TIME_DURATION_MINUTES = 240; // 4 hours for 18 holes
 const DEFAULT_ALARM_MINUTES = 60; // 1 hour reminder
-const DEFAULT_PROD_ID = '-//Bay Area Golf Times//Calendar//EN';
+const DEFAULT_PROD_ID = '-//Golf The Bay//Calendar//EN';
 const ICS_LINE_LENGTH = 75;
 
 // ============================================================================
@@ -28,7 +28,7 @@ const ICS_LINE_LENGTH = 75;
 function generateEventUID(bookingId) {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(2, 10);
-  return `${timestamp}-${random}-${bookingId}@bayareagolftimes.com`;
+  return `${timestamp}-${random}-${bookingId}@golfthebay.com`;
 }
 
 /**
@@ -279,8 +279,8 @@ function generateEventDescription(booking) {
 
   // Footer
   lines.push('------------------------------');
-  lines.push('Bay Area Golf Times');
-  lines.push('https://bayareagolftimes.com');
+  lines.push('Golf The Bay');
+  lines.push('https://golfthebay.com');
 
   return lines.join('\n');
 }
@@ -349,7 +349,7 @@ function generateICS(booking, options = {}) {
     `PRODID:${prodId}`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:Bay Area Golf Times',
+    'X-WR-CALNAME:Golf The Bay',
     'BEGIN:VEVENT',
     `UID:${uid}`,
     `DTSTAMP:${formatICSDateTime(now)}`,

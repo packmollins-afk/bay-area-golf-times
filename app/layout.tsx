@@ -10,8 +10,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 const _playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
 
 export const metadata: Metadata = {
-  title: "Bay Area Golf Times",
-  description: "Find and book tee times at Bay Area golf courses",
+  title: "Golf The Bay",
+  description: "Find and book tee times at 80+ Bay Area golf courses. Compare prices and availability.",
   generator: "v0.app",
   icons: {
     icon: [

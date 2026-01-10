@@ -1,6 +1,6 @@
 import { courses } from "@/lib/courses-data"
 
-const BASE_URL = "https://www.bayareagolf.now"
+const BASE_URL = "https://golfthebay.com"
 
 export default async function sitemap() {
   // Static pages
