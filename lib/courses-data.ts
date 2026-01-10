@@ -1,4 +1,4 @@
-// Bay Area Golf Courses - Full dataset from src/db/courses.js
+// Bay Area Golf Courses - Full dataset synced from src/db/courses.js
 // This is the source of truth for course data in the Next.js app
 
 export interface Course {
@@ -105,7 +105,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://sfrecpark.org/",
     booking_system: "other",
-    description: "Compact 9-hole course in beautiful Golden Gate Park, perfect for beginners.",
   },
   {
     name: "Fleming Golf Course",
@@ -120,22 +119,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://sfrecpark.org/",
     booking_system: "other",
-    description: "Beginner-friendly 9-hole course in the Sunset District.",
-  },
-  {
-    name: "Gleneagles Golf Course",
-    city: "San Francisco",
-    region: "San Francisco",
-    holes: 9,
-    par: 36,
-    yardage: 2876,
-    latitude: 37.7147,
-    longitude: -122.4232,
-    phone_number: "(415) 587-2425",
-    golfnow_id: null,
-    booking_url: "https://www.gleneaglesgc.com/",
-    booking_system: "other",
-    description: "Scenic 9-hole course in McLaren Park with challenging terrain.",
   },
   {
     name: "Poplar Creek Golf Course",
@@ -150,7 +133,20 @@ const rawCourses = [
     golfnow_id: "594",
     booking_url: "https://www.golfnow.com/tee-times/facility/594-poplar-creek-golf-course/search",
     booking_system: "golfnow",
-    description: "Executive course in San Mateo, great for a quick round.",
+  },
+  {
+    name: "Gleneagles Golf Course",
+    city: "San Francisco",
+    region: "San Francisco",
+    holes: 9,
+    par: 36,
+    yardage: 2876,
+    latitude: 37.7147,
+    longitude: -122.4232,
+    phone_number: "(415) 587-2425",
+    golfnow_id: null,
+    booking_url: "https://www.gleneaglesgc.com/",
+    booking_system: "other",
   },
 
   // South Bay - Santa Clara County
@@ -167,7 +163,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://sanjose.totaleintegrated.net/web/tee-times",
     booking_system: "totaleintegrated",
-    description: "Well-maintained municipal course in San Jose.",
   },
   {
     name: "Cinnabar Hills Golf Club",
@@ -182,7 +177,7 @@ const rawCourses = [
     golfnow_id: "465",
     booking_url: "https://www.golfnow.com/tee-times/facility/465-cinnabar-hills-golf-club/search",
     booking_system: "golfnow",
-    description: "Award-winning 27-hole facility in the foothills with three distinct nines.",
+    description: "Award-winning public course with 27 holes winding through the oak-studded hillside.",
   },
   {
     name: "Los Lagos Golf Course",
@@ -197,7 +192,6 @@ const rawCourses = [
     golfnow_id: "561",
     booking_url: "https://www.golfnow.com/tee-times/facility/561-los-lagos-golf-course/search",
     booking_system: "golfnow",
-    description: "Executive course perfect for working on your short game.",
   },
   {
     name: "Santa Teresa Golf Club",
@@ -212,7 +206,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.chronogolf.com/club/santa-teresa-golf-club",
     booking_system: "chronogolf",
-    description: "Challenging hillside course with panoramic valley views.",
   },
   {
     name: "Boulder Ridge Golf Club",
@@ -227,7 +220,6 @@ const rawCourses = [
     golfnow_id: "8267",
     booking_url: "https://www.golfnow.com/tee-times/facility/8267-boulder-ridge-golf-club/search",
     booking_system: "golfnow",
-    description: "Robert Muir Graves design winding through the hills.",
   },
   {
     name: "Pruneridge Golf Club",
@@ -242,7 +234,6 @@ const rawCourses = [
     golfnow_id: "596",
     booking_url: "https://www.golfnow.com/tee-times/facility/596-pruneridge-golf-club/search",
     booking_system: "golfnow",
-    description: "Convenient 9-hole course in the heart of Silicon Valley.",
   },
   {
     name: "Deep Cliff Golf Course",
@@ -257,7 +248,6 @@ const rawCourses = [
     golfnow_id: "474",
     booking_url: "https://www.golfnow.com/tee-times/facility/474-deep-cliff-golf-course/search",
     booking_system: "golfnow",
-    description: "Executive course in Cupertino with well-maintained greens.",
   },
   {
     name: "Sunnyvale Golf Course",
@@ -272,7 +262,6 @@ const rawCourses = [
     golfnow_id: "639",
     booking_url: "https://www.golfnow.com/tee-times/facility/639-sunnyvale-golf-course/search",
     booking_system: "golfnow",
-    description: "Flat, walkable course ideal for all skill levels.",
   },
   {
     name: "Sunken Gardens Golf Course",
@@ -287,7 +276,6 @@ const rawCourses = [
     golfnow_id: "638",
     booking_url: "https://www.golfnow.com/tee-times/facility/638-sunken-gardens-golf-course/search",
     booking_system: "golfnow",
-    description: "Compact par-3 course perfect for practice rounds.",
   },
   {
     name: "Spring Valley Golf Course",
@@ -302,7 +290,6 @@ const rawCourses = [
     golfnow_id: "630",
     booking_url: "https://www.golfnow.com/tee-times/facility/630-spring-valley-golf-course/search",
     booking_system: "golfnow",
-    description: "Friendly course with affordable rates in Milpitas.",
   },
   {
     name: "Coyote Creek Golf Club",
@@ -317,7 +304,6 @@ const rawCourses = [
     golfnow_id: "469",
     booking_url: "https://www.golfnow.com/tee-times/facility/469-coyote-creek-golf-club/search",
     booking_system: "golfnow",
-    description: "36-hole facility with Valley and Tournament courses.",
   },
   {
     name: "Moffett Field Golf Course",
@@ -332,7 +318,6 @@ const rawCourses = [
     golfnow_id: "573",
     booking_url: "https://www.golfnow.com/tee-times/facility/573-moffett-field-golf-course/search",
     booking_system: "golfnow",
-    description: "Military-style course near NASA Ames Research Center.",
   },
   {
     name: "Blackberry Farm Golf Course",
@@ -347,7 +332,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.cupertino.org/",
     booking_system: "other",
-    description: "City-owned 9-hole course in a beautiful park setting.",
   },
   {
     name: "Palo Alto Golf Course",
@@ -362,7 +346,6 @@ const rawCourses = [
     golfnow_id: "586",
     booking_url: "https://www.golfnow.com/tee-times/facility/586-palo-alto-golf-course/search",
     booking_system: "golfnow",
-    description: "Municipal course near the Baylands with flat, walkable layout.",
   },
   {
     name: "Baylands Golf Links",
@@ -377,7 +360,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://baylandsbw.ezlinksgolf.com",
     booking_system: "ezlinks",
-    description: "Links-style course with bay views and challenging winds.",
   },
   {
     name: "Stanford Golf Course",
@@ -392,7 +374,6 @@ const rawCourses = [
     golfnow_id: "631",
     booking_url: "https://www.golfnow.com/tee-times/facility/631-stanford-golf-course/search",
     booking_system: "golfnow",
-    description: "Beautiful tree-lined course on the Stanford campus.",
   },
 
   // Peninsula - Half Moon Bay
@@ -409,7 +390,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links",
     booking_system: "chronogolf",
-    description: "Classic Arnold Palmer design with ocean views.",
   },
   {
     name: "Half Moon Bay - Ocean Course",
@@ -424,8 +404,10 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.chronogolf.com/club/half-moon-bay-golf-links",
     booking_system: "chronogolf",
-    description: "Stunning oceanfront course along the Pacific cliffs.",
+    description: "Spectacular ocean-view course perched on dramatic coastal bluffs.",
   },
+
+  // Santa Cruz
   {
     name: "Pasatiempo Golf Club",
     city: "Santa Cruz",
@@ -439,7 +421,7 @@ const rawCourses = [
     golfnow_id: "4759",
     booking_url: "https://www.golfnow.com/tee-times/facility/4759-pasatiempo-golf-club/search",
     booking_system: "golfnow",
-    description: "Legendary Alister MacKenzie design, ranked among the best in the country.",
+    description: "Alister MacKenzie masterpiece consistently ranked among America's top public courses.",
   },
 
   // East Bay - Alameda County
@@ -456,7 +438,7 @@ const rawCourses = [
     golfnow_id: "8136",
     booking_url: "https://www.golfnow.com/tee-times/facility/8136-corica-park-south-course/search",
     booking_system: "golfnow",
-    description: "Recently renovated Rees Jones design with modern facilities.",
+    description: "Redesigned by Rees Jones, this modern links-style course offers outstanding conditions.",
   },
   {
     name: "Corica Park - North Course",
@@ -471,7 +453,6 @@ const rawCourses = [
     golfnow_id: "514",
     booking_url: "https://www.golfnow.com/tee-times/facility/514-corica-park-north-course/search",
     booking_system: "golfnow",
-    description: "Well-maintained course with water features.",
   },
   {
     name: "Corica Park - Mif Albright Par 3",
@@ -486,7 +467,6 @@ const rawCourses = [
     golfnow_id: "8713",
     booking_url: "https://www.golfnow.com/tee-times/facility/8713-corica-park-mif-albright-par-3/search",
     booking_system: "golfnow",
-    description: "Perfect par-3 course for beginners and short game practice.",
   },
   {
     name: "Metropolitan Golf Links",
@@ -501,7 +481,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.metropolitangolflinks.com",
     booking_system: "phone",
-    description: "Links-style course near Oakland Airport with great conditions.",
   },
   {
     name: "Lake Chabot Golf Course",
@@ -516,7 +495,6 @@ const rawCourses = [
     golfnow_id: "549",
     booking_url: "https://www.golfnow.com/tee-times/facility/549-lake-chabot-golf-course/search",
     booking_system: "golfnow",
-    description: "27-hole facility in the Oakland hills with scenic views.",
   },
   {
     name: "Tilden Park Golf Course",
@@ -531,7 +509,7 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.chronogolf.com/club/tilden-park-golf-course-california-berkeley",
     booking_system: "chronogolf",
-    description: "Beautiful hillside course in Tilden Regional Park.",
+    description: "Beautiful course in the Berkeley Hills with stunning bay views.",
   },
   {
     name: "Redwood Canyon Golf Course",
@@ -546,7 +524,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.chronogolf.com/club/redwood-canyon-public-golf-course",
     booking_system: "chronogolf",
-    description: "Challenging 9-hole course among the redwoods.",
   },
   {
     name: "Monarch Bay Golf Club",
@@ -561,7 +538,6 @@ const rawCourses = [
     golfnow_id: "574",
     booking_url: "https://www.golfnow.com/tee-times/facility/574-monarch-bay-golf-club/search",
     booking_system: "golfnow",
-    description: "Waterfront course with views of San Francisco Bay.",
   },
   {
     name: "Montclair Golf Course",
@@ -576,7 +552,6 @@ const rawCourses = [
     golfnow_id: "575",
     booking_url: "https://www.golfnow.com/tee-times/facility/575-montclair-golf-course/search",
     booking_system: "golfnow",
-    description: "Neighborhood 9-hole course in the Oakland hills.",
   },
 
   // East Bay - Contra Costa County
@@ -593,7 +568,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.playboundaryoak.com",
     booking_system: "phone",
-    description: "Championship course with challenging layout and great conditions.",
   },
   {
     name: "Diablo Hills Golf Course",
@@ -608,7 +582,6 @@ const rawCourses = [
     golfnow_id: "478",
     booking_url: "https://www.golfnow.com/tee-times/facility/478-diablo-hills-golf-course/search",
     booking_system: "golfnow",
-    description: "Executive 9-hole course with Mount Diablo views.",
   },
   {
     name: "Franklin Canyon Golf Course",
@@ -623,7 +596,6 @@ const rawCourses = [
     golfnow_id: "498",
     booking_url: "https://www.golfnow.com/tee-times/facility/498-franklin-canyon-golf-course/search",
     booking_system: "golfnow",
-    description: "Scenic course winding through Franklin Canyon.",
   },
   {
     name: "Poppy Ridge Golf Course",
@@ -638,7 +610,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://poppyridgegolf.com",
     booking_system: "phone",
-    description: "27-hole Rees Jones design in Livermore wine country.",
   },
   {
     name: "Las Positas Golf Course",
@@ -653,7 +624,6 @@ const rawCourses = [
     golfnow_id: "553",
     booking_url: "https://www.golfnow.com/tee-times/facility/553-las-positas-golf-course/search",
     booking_system: "golfnow",
-    description: "Well-designed course in the Livermore Valley.",
   },
   {
     name: "Pleasanton Golf Center",
@@ -668,7 +638,6 @@ const rawCourses = [
     golfnow_id: "591",
     booking_url: "https://www.golfnow.com/tee-times/facility/591-pleasanton-golf-center/search",
     booking_system: "golfnow",
-    description: "Par-3 course with practice facilities.",
   },
   {
     name: "Willow Park Golf Course",
@@ -683,7 +652,6 @@ const rawCourses = [
     golfnow_id: "659",
     booking_url: "https://www.golfnow.com/tee-times/facility/659-willow-park-golf-course/search",
     booking_system: "golfnow",
-    description: "Friendly neighborhood course in Castro Valley.",
   },
   {
     name: "Diablo Creek Golf Course",
@@ -698,7 +666,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.diablocreekgc.com/",
     booking_system: "cpsgolf",
-    description: "Championship course in Concord with water hazards.",
   },
   {
     name: "Canyon Lakes Golf Course",
@@ -713,7 +680,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.chronogolf.com/club/canyon-lakes-golf-course-and-brewery",
     booking_system: "chronogolf",
-    description: "Golf course with on-site brewery - best of both worlds!",
   },
   {
     name: "Callippe Preserve Golf Course",
@@ -728,7 +694,6 @@ const rawCourses = [
     golfnow_id: "5023",
     booking_url: "https://www.golfnow.com/tee-times/facility/5023-callippe-preserve-golf-course/search",
     booking_system: "golfnow",
-    description: "Beautiful preserve setting with wildlife habitat areas.",
   },
   {
     name: "Wente Vineyards",
@@ -743,7 +708,6 @@ const rawCourses = [
     golfnow_id: "432",
     booking_url: "https://www.golfnow.com/tee-times/facility/432-the-course-at-wente-vineyards/search",
     booking_system: "golfnow",
-    description: "Greg Norman design in the heart of wine country.",
   },
   {
     name: "San Ramon Golf Club",
@@ -758,7 +722,6 @@ const rawCourses = [
     golfnow_id: "241",
     booking_url: "https://www.golfnow.com/tee-times/facility/241-san-ramon-golf-club/search",
     booking_system: "golfnow",
-    description: "Well-maintained public course in San Ramon.",
   },
   {
     name: "The Bridges Golf Club",
@@ -773,10 +736,9 @@ const rawCourses = [
     golfnow_id: "5141",
     booking_url: "https://www.golfnow.com/tee-times/facility/5141-the-bridges-golf-club/search",
     booking_system: "golfnow",
-    description: "Upscale Johnny Miller design with excellent conditions.",
   },
 
-  // North Bay - Marin County
+  // North Bay (Marin, Sonoma, Napa)
   {
     name: "Peacock Gap Golf Club",
     city: "San Rafael",
@@ -790,7 +752,6 @@ const rawCourses = [
     golfnow_id: "588",
     booking_url: "https://www.golfnow.com/tee-times/facility/588-peacock-gap-golf-club/search",
     booking_system: "golfnow",
-    description: "Well-maintained course with bay views in Marin County.",
   },
   {
     name: "Indian Valley Golf Club",
@@ -805,7 +766,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.indianvalleygc.com",
     booking_system: "phone",
-    description: "Scenic course in the hills of Novato.",
   },
   {
     name: "StoneTree Golf Club",
@@ -820,7 +780,6 @@ const rawCourses = [
     golfnow_id: "633",
     booking_url: "https://www.golfnow.com/tee-times/facility/633-stonetree-golf-club/search",
     booking_system: "golfnow",
-    description: "Championship course with challenging elevation changes.",
   },
   {
     name: "McInnis Park Golf Center",
@@ -835,7 +794,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.mcinnisparkgolf.com",
     booking_system: "phone",
-    description: "9-hole course with driving range and practice facilities.",
   },
   {
     name: "Mill Valley Golf Course",
@@ -850,7 +808,6 @@ const rawCourses = [
     golfnow_id: "572",
     booking_url: "https://www.golfnow.com/tee-times/facility/572-mill-valley-golf-course/search",
     booking_system: "golfnow",
-    description: "Charming 9-hole course in Mill Valley.",
   },
   {
     name: "The Links at Bodega Harbour",
@@ -865,7 +822,7 @@ const rawCourses = [
     golfnow_id: "149",
     booking_url: "https://www.golfnow.com/tee-times/facility/149-the-links-at-bodega-harbour/search",
     booking_system: "golfnow",
-    description: "Scottish links-style course along the Sonoma Coast.",
+    description: "Stunning coastal course designed by Robert Trent Jones Jr. with Pacific Ocean views.",
   },
   {
     name: "Northwood Golf Club",
@@ -880,7 +837,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.northwoodgolf.com/bookteetimes",
     booking_system: "cpsgolf",
-    description: "Historic Alister MacKenzie design among the redwoods.",
   },
   {
     name: "Hiddenbrooke Golf Club",
@@ -895,7 +851,6 @@ const rawCourses = [
     golfnow_id: "527",
     booking_url: "https://www.golfnow.com/tee-times/facility/527-hiddenbrooke-golf-club/search",
     booking_system: "golfnow",
-    description: "Arnold Palmer design with challenging wind conditions.",
   },
   {
     name: "Blue Rock Springs Golf Club (East)",
@@ -910,7 +865,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.chronogolf.com/club/blue-rock-springs-golf-club",
     booking_system: "chronogolf",
-    description: "Municipal course with two 18-hole layouts.",
   },
   {
     name: "Mare Island Golf Club",
@@ -925,7 +879,6 @@ const rawCourses = [
     golfnow_id: "563",
     booking_url: "https://www.golfnow.com/tee-times/facility/563-mare-island-golf-club/search",
     booking_system: "golfnow",
-    description: "Historic course on former Mare Island Naval Shipyard.",
   },
   {
     name: "Rooster Run Golf Club",
@@ -940,7 +893,6 @@ const rawCourses = [
     golfnow_id: "606",
     booking_url: "https://www.golfnow.com/tee-times/facility/606-rooster-run-golf-club/search",
     booking_system: "golfnow",
-    description: "Award-winning course with excellent playing conditions.",
   },
   {
     name: "Adobe Creek Golf Course",
@@ -955,7 +907,90 @@ const rawCourses = [
     golfnow_id: "434",
     booking_url: "https://www.golfnow.com/tee-times/facility/434-adobe-creek-golf-club/search",
     booking_system: "golfnow",
-    description: "Robert Trent Jones Jr. design in Petaluma.",
+  },
+  {
+    name: "Silverado Resort - North Course",
+    city: "Napa",
+    region: "North Bay",
+    holes: 18,
+    par: 72,
+    yardage: 6896,
+    latitude: 38.3047,
+    longitude: -122.2632,
+    phone_number: "(707) 257-5460",
+    golfnow_id: null,
+    booking_url: "https://www.silveradoresort.com/napa-valley-golf",
+    booking_system: "other",
+  },
+  {
+    name: "Silverado Resort - South Course",
+    city: "Napa",
+    region: "North Bay",
+    holes: 18,
+    par: 72,
+    yardage: 6632,
+    latitude: 38.3037,
+    longitude: -122.2622,
+    phone_number: "(707) 257-5460",
+    golfnow_id: null,
+    booking_url: "https://www.silveradoresort.com/napa-valley-golf",
+    booking_system: "other",
+  },
+  {
+    name: "Napa Golf Course at Kennedy Park",
+    city: "Napa",
+    region: "North Bay",
+    holes: 18,
+    par: 72,
+    yardage: 6738,
+    latitude: 38.2847,
+    longitude: -122.2732,
+    phone_number: "(707) 255-4333",
+    golfnow_id: "129",
+    booking_url: "https://www.golfnow.com/tee-times/facility/129-napa-golf-course/search",
+    booking_system: "golfnow",
+  },
+  {
+    name: "Vintner's Golf Club",
+    city: "Yountville",
+    region: "North Bay",
+    holes: 9,
+    par: 34,
+    yardage: 2645,
+    latitude: 38.4147,
+    longitude: -122.3532,
+    phone_number: "(707) 944-1992",
+    golfnow_id: "1676",
+    booking_url: "https://www.golfnow.com/tee-times/facility/1676-vintners-golf-club/search",
+    booking_system: "golfnow",
+  },
+  {
+    name: "Eagle Vines Golf Club",
+    city: "American Canyon",
+    region: "North Bay",
+    holes: 18,
+    par: 72,
+    yardage: 7283,
+    latitude: 38.1747,
+    longitude: -122.2332,
+    phone_number: "(707) 257-4470",
+    golfnow_id: "10706",
+    booking_url: "https://www.golfnow.com/tee-times/facility/10706-eagle-vines-golf-club/search",
+    booking_system: "golfnow",
+  },
+  {
+    name: "Chardonnay Golf Club",
+    city: "American Canyon",
+    region: "North Bay",
+    holes: 18,
+    par: 72,
+    yardage: 6816,
+    latitude: 38.1747,
+    longitude: -122.2332,
+    phone_number: "(707) 257-8950",
+    golfnow_id: "463",
+    booking_url: "https://www.golfnow.com/tee-times/facility/463-chardonnay-golf-club/search",
+    booking_system: "golfnow",
   },
   {
     name: "Valley of the Moon Club",
@@ -970,99 +1005,6 @@ const rawCourses = [
     golfnow_id: "243",
     booking_url: "https://www.golfnow.com/tee-times/facility/243/search",
     booking_system: "golfnow",
-    description: "Classic course in the Valley of the Moon.",
-  },
-
-  // Napa Valley
-  {
-    name: "Silverado Resort - North Course",
-    city: "Napa",
-    region: "Napa",
-    holes: 18,
-    par: 72,
-    yardage: 6896,
-    latitude: 38.3047,
-    longitude: -122.2632,
-    phone_number: "(707) 257-5460",
-    golfnow_id: null,
-    booking_url: "https://www.silveradoresort.com/napa-valley-golf",
-    booking_system: "other",
-    description: "PGA Tour venue with stunning Napa Valley views.",
-  },
-  {
-    name: "Silverado Resort - South Course",
-    city: "Napa",
-    region: "Napa",
-    holes: 18,
-    par: 72,
-    yardage: 6632,
-    latitude: 38.3037,
-    longitude: -122.2622,
-    phone_number: "(707) 257-5460",
-    golfnow_id: null,
-    booking_url: "https://www.silveradoresort.com/napa-valley-golf",
-    booking_system: "other",
-    description: "Beautiful resort course through oak-studded hills.",
-  },
-  {
-    name: "Napa Golf Course at Kennedy Park",
-    city: "Napa",
-    region: "Napa",
-    holes: 18,
-    par: 72,
-    yardage: 6738,
-    latitude: 38.2847,
-    longitude: -122.2732,
-    phone_number: "(707) 255-4333",
-    golfnow_id: "129",
-    booking_url: "https://www.golfnow.com/tee-times/facility/129-napa-golf-course/search",
-    booking_system: "golfnow",
-    description: "Affordable municipal option in wine country.",
-  },
-  {
-    name: "Vintner's Golf Club",
-    city: "Yountville",
-    region: "Napa",
-    holes: 9,
-    par: 34,
-    yardage: 2645,
-    latitude: 38.4147,
-    longitude: -122.3532,
-    phone_number: "(707) 944-1992",
-    golfnow_id: "1676",
-    booking_url: "https://www.golfnow.com/tee-times/facility/1676-vintners-golf-club/search",
-    booking_system: "golfnow",
-    description: "Charming 9-hole course surrounded by vineyards.",
-  },
-  {
-    name: "Eagle Vines Golf Club",
-    city: "American Canyon",
-    region: "Napa",
-    holes: 18,
-    par: 72,
-    yardage: 7283,
-    latitude: 38.1747,
-    longitude: -122.2332,
-    phone_number: "(707) 257-4470",
-    golfnow_id: "10706",
-    booking_url: "https://www.golfnow.com/tee-times/facility/10706-eagle-vines-golf-club/search",
-    booking_system: "golfnow",
-    description: "Championship course at the gateway to Napa Valley.",
-  },
-  {
-    name: "Chardonnay Golf Club",
-    city: "American Canyon",
-    region: "Napa",
-    holes: 18,
-    par: 72,
-    yardage: 6816,
-    latitude: 38.1747,
-    longitude: -122.2332,
-    phone_number: "(707) 257-8950",
-    golfnow_id: "463",
-    booking_url: "https://www.golfnow.com/tee-times/facility/463-chardonnay-golf-club/search",
-    booking_system: "golfnow",
-    description: "Wine country course with vineyard views.",
   },
 
   // Sonoma County
@@ -1079,7 +1021,6 @@ const rawCourses = [
     golfnow_id: "8367",
     booking_url: "https://www.golfnow.com/tee-times/facility/8367-bennett-valley-golf-course/search",
     booking_system: "golfnow",
-    description: "Municipal course with well-maintained greens.",
   },
   {
     name: "Windsor Golf Club",
@@ -1094,7 +1035,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.windsorgolf.com",
     booking_system: "phone",
-    description: "Popular course in Sonoma wine country.",
   },
   {
     name: "Sonoma Golf Club",
@@ -1109,7 +1049,6 @@ const rawCourses = [
     golfnow_id: "18188",
     booking_url: "https://www.golfnow.com/tee-times/facility/18188-sonoma-golf-club/search",
     booking_system: "golfnow",
-    description: "Historic course in the heart of Sonoma.",
   },
   {
     name: "Fairgrounds Golf Course",
@@ -1124,7 +1063,6 @@ const rawCourses = [
     golfnow_id: null,
     booking_url: "https://www.fairgroundsgolf.com",
     booking_system: "phone",
-    description: "Affordable 9-hole option in Santa Rosa.",
   },
   {
     name: "Oakmont Golf Club",
@@ -1139,7 +1077,22 @@ const rawCourses = [
     golfnow_id: "8429",
     booking_url: "https://www.golfnow.com/tee-times/facility/8429-the-club-at-sugarloaf/search",
     booking_system: "golfnow",
-    description: "Executive course in the Oakmont community.",
+  },
+
+  // Napa Region
+  {
+    name: "Napa Golf Course",
+    city: "Napa",
+    region: "Napa",
+    holes: 18,
+    par: 72,
+    yardage: 6730,
+    latitude: 38.2822,
+    longitude: -122.2855,
+    phone_number: "(707) 255-4333",
+    golfnow_id: "129",
+    booking_url: "https://www.golfnow.com/tee-times/facility/129/search",
+    booking_system: "golfnow",
   },
 
   // Monterey Peninsula
@@ -1156,7 +1109,6 @@ const rawCourses = [
     golfnow_id: "4739",
     booking_url: "https://www.golfnow.com/tee-times/facility/4739/search",
     booking_system: "golfnow",
-    description: "Affordable seaside golf with ocean views on every hole.",
   },
   {
     name: "Bayonet Golf Course",
@@ -1171,7 +1123,6 @@ const rawCourses = [
     golfnow_id: "25",
     booking_url: "https://www.golfnow.com/tee-times/facility/25-bayonet-golf-course/search",
     booking_system: "golfnow",
-    description: "Former military course with challenging layout.",
   },
   {
     name: "Black Horse Golf Club",
@@ -1186,7 +1137,6 @@ const rawCourses = [
     golfnow_id: "11986",
     booking_url: "https://www.golfnow.com/tee-times/facility/11986-black-horse-golf-course/search",
     booking_system: "golfnow",
-    description: "Sister course to Bayonet with bay views.",
   },
   {
     name: "Del Monte Golf Course",
@@ -1201,7 +1151,6 @@ const rawCourses = [
     golfnow_id: "13082",
     booking_url: "https://www.golfnow.com/tee-times/facility/13082-del-monte-golf-course/search",
     booking_system: "golfnow",
-    description: "Oldest continuously operating course west of the Mississippi.",
   },
   {
     name: "Laguna Seca Golf Ranch",
@@ -1216,7 +1165,6 @@ const rawCourses = [
     golfnow_id: "127",
     booking_url: "https://www.golfnow.com/tee-times/facility/127/search",
     booking_system: "golfnow",
-    description: "Robert Trent Jones Sr. design near Laguna Seca Raceway.",
   },
   {
     name: "The Quail Golf Club",
@@ -1231,7 +1179,6 @@ const rawCourses = [
     golfnow_id: "224",
     booking_url: "https://www.golfnow.com/tee-times/facility/224-quail-lodge-golf-club/search",
     booking_system: "golfnow",
-    description: "Private club atmosphere with public access at Quail Lodge.",
   },
   {
     name: "Carmel Valley Ranch",
@@ -1246,7 +1193,6 @@ const rawCourses = [
     golfnow_id: "107",
     booking_url: "https://www.golfnow.com/tee-times/facility/107-carmel-valley-ranch-golf-course/search",
     booking_system: "golfnow",
-    description: "Pete Dye design in beautiful Carmel Valley.",
   },
   {
     name: "Corral de Tierra Country Club",
@@ -1261,7 +1207,6 @@ const rawCourses = [
     golfnow_id: "17569",
     booking_url: "https://www.golfnow.com/tee-times/facility/17569-corral-de-tierra-country-club/search",
     booking_system: "golfnow",
-    description: "Semi-private club with public tee times available.",
   },
   {
     name: "Twin Creeks Golf Course",
@@ -1276,7 +1221,6 @@ const rawCourses = [
     golfnow_id: "17211",
     booking_url: "https://www.golfnow.com/tee-times/facility/17211-twin-creeks-golf-course/search",
     booking_system: "golfnow",
-    description: "Par-3 course perfect for beginners.",
   },
   {
     name: "The Club at Crazy Horse Ranch",
@@ -1291,7 +1235,6 @@ const rawCourses = [
     golfnow_id: "8615",
     booking_url: "https://www.golfnow.com/tee-times/facility/8615-crazy-horse-golf-club/search",
     booking_system: "golfnow",
-    description: "Challenging course in the Salinas Valley.",
   },
   {
     name: "Salinas Fairways Golf Course",
@@ -1306,7 +1249,6 @@ const rawCourses = [
     golfnow_id: "4290",
     booking_url: "https://www.golfnow.com/tee-times/facility/4290-salinas-fairways-golf-course/search",
     booking_system: "golfnow",
-    description: "Affordable par-3 course in Salinas.",
   },
   {
     name: "Monterey Pines Golf Club",
@@ -1321,17 +1263,208 @@ const rawCourses = [
     golfnow_id: "5094",
     booking_url: "https://www.golfnow.com/tee-times/facility/5094-monterey-pines-golf-club/search",
     booking_system: "golfnow",
-    description: "Military course open to public with affordable rates.",
+  },
+
+  // Sacramento Region
+  {
+    name: "Ancil Hoffman Golf Course",
+    city: "Carmichael",
+    region: "Sacramento",
+    holes: 18,
+    par: 72,
+    yardage: 6794,
+    latitude: 38.6247,
+    longitude: -121.3287,
+    phone_number: "(916) 482-3813",
+    golfnow_id: null,
+    booking_url: "https://ancilhoffman.totaleintegrated.com/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+  {
+    name: "Mather Golf Course",
+    city: "Mather",
+    region: "Sacramento",
+    holes: 18,
+    par: 72,
+    yardage: 6725,
+    latitude: 38.5527,
+    longitude: -121.2958,
+    phone_number: "(916) 364-4354",
+    golfnow_id: null,
+    booking_url: "https://mather.totaleintegrated.net/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+  {
+    name: "Cherry Island Golf Course",
+    city: "Elverta",
+    region: "Sacramento",
+    holes: 18,
+    par: 72,
+    yardage: 6605,
+    latitude: 38.7142,
+    longitude: -121.4569,
+    phone_number: "(916) 991-7293",
+    golfnow_id: null,
+    booking_url: "https://cherryisland.totaleintegrated.net/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+  {
+    name: "Bidwell Park Golf Course",
+    city: "Chico",
+    region: "Sacramento",
+    holes: 18,
+    par: 72,
+    yardage: 6300,
+    latitude: 39.7351,
+    longitude: -121.8254,
+    phone_number: "(530) 891-8417",
+    golfnow_id: null,
+    booking_url: "https://bidwellpark.totaleintegrated.net/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+  {
+    name: "Haggin Oaks Golf Complex",
+    city: "Sacramento",
+    region: "Sacramento",
+    holes: 36,
+    par: 72,
+    yardage: 6900,
+    latitude: 38.5816,
+    longitude: -121.4944,
+    phone_number: "(916) 808-2531",
+    golfnow_id: null,
+    booking_url: "https://mortongolf.totaleintegrated.com/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+  {
+    name: "Wild Wings Golf Club",
+    city: "Woodland",
+    region: "Sacramento",
+    holes: 9,
+    par: 36,
+    yardage: 3500,
+    latitude: 38.6596,
+    longitude: -121.7817,
+    phone_number: "(530) 661-4720",
+    golfnow_id: null,
+    booking_url: "https://www.chronogolf.com/club/wild-wings-golf-club",
+    booking_system: "chronogolf",
+  },
+
+  // Central Valley
+  {
+    name: "Riverside Golf Course",
+    city: "Fresno",
+    region: "Central Valley",
+    holes: 18,
+    par: 72,
+    yardage: 6500,
+    latitude: 36.7318,
+    longitude: -119.7871,
+    phone_number: "(559) 256-1800",
+    golfnow_id: null,
+    booking_url: "https://playriverside.totaleintegrated.com/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+  {
+    name: "Valley Oaks Golf Course",
+    city: "Visalia",
+    region: "Central Valley",
+    holes: 18,
+    par: 72,
+    yardage: 6300,
+    latitude: 36.3303,
+    longitude: -119.3248,
+    phone_number: "(559) 651-1441",
+    golfnow_id: null,
+    booking_url: "https://playvalleyoaks.totaleintegrated.com/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+
+  // Inland Empire
+  {
+    name: "Green River Golf Club",
+    city: "Corona",
+    region: "Inland Empire",
+    holes: 18,
+    par: 71,
+    yardage: 6400,
+    latitude: 33.8953,
+    longitude: -117.5117,
+    phone_number: "(951) 737-7393",
+    golfnow_id: null,
+    booking_url: "https://playgreenriver.totaleintegrated.com/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+
+  // San Diego Region
+  {
+    name: "Reidy Creek Golf Course",
+    city: "Escondido",
+    region: "San Diego",
+    holes: 18,
+    par: 58,
+    yardage: 3100,
+    latitude: 33.0853,
+    longitude: -117.0644,
+    phone_number: "(760) 740-2450",
+    golfnow_id: null,
+    booking_url: "https://reidycreek.totaleintegrated.net/web/tee-times",
+    booking_system: "totaleintegrated",
+  },
+  {
+    name: "Encinitas Ranch Golf Course",
+    city: "Encinitas",
+    region: "San Diego",
+    holes: 18,
+    par: 72,
+    yardage: 6587,
+    latitude: 33.0317,
+    longitude: -117.2485,
+    phone_number: "(760) 944-1936",
+    golfnow_id: null,
+    booking_url: "https://jcgpub35.cps.golf/onlineresweb/search-teetime",
+    booking_system: "cpsgolf",
+  },
+  {
+    name: "San Vicente Golf Resort",
+    city: "Ramona",
+    region: "San Diego",
+    holes: 18,
+    par: 72,
+    yardage: 6611,
+    latitude: 33.0317,
+    longitude: -116.8678,
+    phone_number: "(760) 789-3477",
+    golfnow_id: null,
+    booking_url: "https://sanvicentev3.cps.golf/onlineresweb/search-teetime",
+    booking_system: "cpsgolf",
+  },
+
+  // Palm Springs Region
+  {
+    name: "Indian Canyons Golf Resort",
+    city: "Palm Springs",
+    region: "Palm Springs",
+    holes: 36,
+    par: 72,
+    yardage: 6900,
+    latitude: 33.7866,
+    longitude: -116.5445,
+    phone_number: "(760) 833-8700",
+    golfnow_id: null,
+    booking_url: "https://indiancanyonca.cps.golf/onlineresweb/search-teetime",
+    booking_system: "cpsgolf",
   },
 ]
 
-// Add slugs to all courses
+// Add slugs to courses
 export const courses: Course[] = rawCourses.map((course) => ({
   ...course,
   slug: generateSlug(course.name),
 }))
 
-// Staff picks - featured courses
+// Staff picks - top courses
 export const staffPickSlugs = [
   "tpc-harding-park",
   "pasatiempo-golf-club",
@@ -1343,18 +1476,19 @@ export const staffPickSlugs = [
   "the-links-at-bodega-harbour",
 ]
 
+// Helper functions
 export function getCourseBySlug(slug: string): Course | undefined {
-  return courses.find((c) => c.slug === slug)
+  return courses.find((course) => course.slug === slug)
 }
 
 export function getCoursesByRegion(region: string): Course[] {
-  return courses.filter((c) => c.region === region)
+  return courses.filter((course) => course.region === region)
 }
 
 export function getStaffPicks(): Course[] {
-  return courses.filter((c) => staffPickSlugs.includes(c.slug))
+  return courses.filter((course) => staffPickSlugs.includes(course.slug))
 }
 
 export function getAllRegions(): string[] {
-  return [...new Set(courses.map((c) => c.region))]
+  return [...new Set(courses.map((course) => course.region))]
 }
