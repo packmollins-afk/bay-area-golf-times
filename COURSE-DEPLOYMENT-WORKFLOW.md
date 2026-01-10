@@ -52,7 +52,7 @@ GolfNow scraper auto-discovers courses by location. You just need the `golfnow_i
 3. The `XXXXX` is the golfnow_id
 
 ### Claude Code Prompt
-```
+\`\`\`
 Add [COURSE NAME] to bayareagolf.now (GolfNow course)
 
 COURSE DATA:
@@ -83,7 +83,7 @@ FILES TO EDIT:
 3. public/index.html - Add fairway CSS + HTML
 
 DO NOT edit scraper files - GolfNow auto-discovers via golfnow_id.
-```
+\`\`\`
 
 ---
 
@@ -93,7 +93,7 @@ DO NOT edit scraper files - GolfNow auto-discovers via golfnow_id.
 
 ### Step 1: Find the Course UUID
 
-```bash
+\`\`\`bash
 # Visit the course page and extract UUID from page source
 curl -s "https://www.chronogolf.com/club/[club-slug]/teetimes" | grep -o '"uuid":"[^"]*"' | head -1
 
@@ -102,11 +102,11 @@ curl -s "https://www.chronogolf.com/club/[club-slug]/teetimes" | grep -o '"uuid"
 # 2. Open Network tab, filter by "teetimes"
 # 3. Look for API call to /marketplace/v2/teetimes
 # 4. Check request params for course_ids UUID
-```
+\`\`\`
 
 ### Step 2: Add to Database and Scraper
 
-```
+\`\`\`
 Add [COURSE NAME] to bayareagolf.now (Chronogolf course)
 
 COURSE DATA:
@@ -132,7 +132,7 @@ FILES TO EDIT:
      clubUrl: 'https://www.chronogolf.com/club/[club-slug]'
    }
 3. public/index.html - Add fairway CSS + HTML (if map marker needed)
-```
+\`\`\`
 
 ### Known Chronogolf Courses (for reference)
 
@@ -159,7 +159,7 @@ FILES TO EDIT:
 ## Workflow C: Add TotaleIntegrated Course
 
 ### Claude Code Prompt
-```
+\`\`\`
 Add [COURSE NAME] to bayareagolf.now (TotaleIntegrated course)
 
 COURSE DATA:
@@ -186,14 +186,14 @@ FILES TO EDIT:
      name: '[Full Name]'
    }
 4. public/index.html - Add fairway CSS + HTML
-```
+\`\`\`
 
 ---
 
 ## Workflow D: Add Quick18 Course
 
 ### Claude Code Prompt
-```
+\`\`\`
 Add [COURSE NAME] to bayareagolf.now (Quick18 course)
 
 COURSE DATA:
@@ -212,14 +212,14 @@ FILES TO EDIT:
      name: '[Full Name]'
    }
 4. public/index.html - fairway
-```
+\`\`\`
 
 ---
 
 ## Workflow E: Add CPSGolf Course
 
 ### Claude Code Prompt
-```
+\`\`\`
 Add [COURSE NAME] to bayareagolf.now (CPSGolf course)
 
 COURSE DATA:
@@ -238,7 +238,7 @@ FILES TO EDIT:
      name: '[Full Name]'
    }
 4. public/index.html - fairway
-```
+\`\`\`
 
 ---
 
@@ -250,7 +250,7 @@ For courses where:
 - You just want map/page presence
 
 ### Claude Code Prompt
-```
+\`\`\`
 Add [COURSE NAME] to bayareagolf.now (STATIC - no live scraper)
 
 COURSE DATA:
@@ -269,7 +269,7 @@ FILES TO EDIT:
 
 DO NOT edit any scraper files.
 Course will display with demo/fallback pricing.
-```
+\`\`\`
 
 ---
 
@@ -277,7 +277,7 @@ Course will display with demo/fallback pricing.
 
 ### 1. src/db/courses.js - Add to `courses` array
 
-```javascript
+\`\`\`javascript
 // Add in appropriate region section
 { 
   name: "Course Name", 
@@ -293,39 +293,39 @@ Course will display with demo/fallback pricing.
   booking_url: "https://...", 
   booking_system: "golfnow"  // or chronogolf, totaleintegrated, quick18, cpsgolf, other
 },
-```
+\`\`\`
 
 ### 2. api/index.js - Add to COURSE_BASE_PRICES (~line 450)
 
-```javascript
+\`\`\`javascript
 const COURSE_BASE_PRICES = {
   // ... existing courses ...
   'Course Name': XX,  // Base price in dollars
 };
-```
+\`\`\`
 
 ### 3. public/index.html - Add Fairway
 
 **CSS (around line 426-530):**
-```css
+\`\`\`css
 /* [Region] */
 .fw-[shortname] { top: [Y]%; left: [X]%; width: [W]px; height: [H]px; border-radius: 50%; transform: rotate([D]deg); }
-```
+\`\`\`
 
 **CSS counter-rotate (around line 562-590):**
-```css
+\`\`\`css
 .fw-[shortname] .price-tag { --counter-rotate: [D]deg; }
-```
+\`\`\`
 
 **HTML (around line 1499-1550, in correct region section):**
-```html
+\`\`\`html
 <a href="/course/[slug]" class="fairway fw-[shortname]" data-course="[Full Name]" data-initial="[XX]"><span class="price-tag loading">...</span></a>
-```
+\`\`\`
 
 ### 4. Scraper Config (if applicable)
 
 **Chronogolf** (`scripts/chrono-api.js`):
-```javascript
+\`\`\`javascript
 const CHRONOGOLF_COURSES = {
   // ... existing ...
   '[slug]': {
@@ -334,10 +334,10 @@ const CHRONOGOLF_COURSES = {
     clubUrl: 'https://www.chronogolf.com/club/[club-slug]'
   }
 };
-```
+\`\`\`
 
 **TotaleIntegrated** (`scripts/totale-api.js`):
-```javascript
+\`\`\`javascript
 const TOTALE_COURSES_API = {
   // ... existing ...
   '[slug]': {
@@ -346,27 +346,27 @@ const TOTALE_COURSES_API = {
     name: '[Full Name]'
   }
 };
-```
+\`\`\`
 
 **Quick18** (`scripts/quick18.js`):
-```javascript
+\`\`\`javascript
 const QUICK18_COURSES = {
   '[slug]': {
     url: 'https://[subdomain].quick18.com/teetimes/searchmatrix',
     name: '[Full Name]'
   }
 };
-```
+\`\`\`
 
 **CPSGolf** (`scripts/cps-optimized.js`):
-```javascript
+\`\`\`javascript
 const CPS_COURSES = {
   '[slug]': {
     url: 'https://[name].cps.golf/onlineresweb/search-teetime',
     name: '[Full Name]'
   }
 };
-```
+\`\`\`
 
 ---
 
@@ -384,7 +384,7 @@ Slugs are auto-generated from course name:
 
 After code changes:
 
-```bash
+\`\`\`bash
 # 1. Test locally (optional)
 npm run dev
 
@@ -399,7 +399,7 @@ git push
 # - Check homepage map shows fairway
 # - Check /course/[slug] page loads
 # - Check /courses.html lists course
-```
+\`\`\`
 
 ---
 
@@ -418,7 +418,7 @@ git push
 
 When a scraper becomes available for a static course:
 
-```
+\`\`\`
 Upgrade [COURSE NAME] from STATIC to LIVE
 
 Current status: booking_system='other' with demo data
@@ -431,7 +431,7 @@ FILES TO EDIT:
 
 api/index.js COURSE_BASE_PRICES - keep as fallback
 public/index.html - no changes needed
-```
+\`\`\`
 
 ---
 
@@ -469,9 +469,9 @@ When adding GolfNow courses or debugging low tee time coverage, use the discover
 
 ### Run Discovery Script
 
-```bash
+\`\`\`bash
 node scripts/discover-golfnow-ids.js
-```
+\`\`\`
 
 ### What It Does
 
@@ -486,10 +486,10 @@ node scripts/discover-golfnow-ids.js
 ### Fix Missing golfnow_ids
 
 The script outputs SQL statements to add missing IDs:
-```sql
+\`\`\`sql
 UPDATE courses SET golfnow_id = '1450' WHERE id = 451;
   -- Los Lagos Golf Course (San Jose)
-```
+\`\`\`
 
 Run these directly or via a Node script.
 
@@ -505,28 +505,28 @@ For courses in the "Not in DB" list that are within your coverage area:
 Before marking a GolfNow course as "complete":
 
 1. **Verify golfnow_id is set** in database:
-   ```bash
+   \`\`\`bash
    node -e "
    require('dotenv').config({ path: '.env.local' });
    const { createClient } = require('@libsql/client');
    const db = createClient({ url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN });
    db.execute('SELECT id, name, golfnow_id FROM courses WHERE slug = \"[COURSE-SLUG]\"').then(r => console.log(r.rows));
    "
-   ```
+   \`\`\`
 
 2. **Run a targeted scrape** to verify data flows:
-   ```bash
+   \`\`\`bash
    node -e "
    require('dotenv').config({ path: '.env.local' });
    const { runScraperOptimized } = require('./scripts/golfnow-optimized');
    runScraperOptimized(1).then(count => console.log('Scraped:', count, 'tee times'));
    "
-   ```
+   \`\`\`
 
 3. **Check tee times exist** for the course:
-   ```bash
+   \`\`\`bash
    curl -s "https://bayareagolf.now/api/tee-times?course=[COURSE-SLUG]" | jq length
-   ```
+   \`\`\`
 
 ### Common golfnow_id Issues
 

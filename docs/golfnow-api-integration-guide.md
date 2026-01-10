@@ -68,7 +68,7 @@ GolfNow offers two authentication methods:
 
 Pass your credentials directly in HTTP headers:
 
-```http
+\`\`\`http
 POST /rest/system/status/secure-echo HTTP/1.1
 Host: sandbox.api.gnsvc.com
 Content-Type: application/json; charset=utf-8
@@ -76,7 +76,7 @@ UserName: your_username
 Password: your_password
 
 {}
-```
+\`\`\`
 
 ### Method 2: Authorization Signature (Production - Recommended)
 
@@ -92,7 +92,7 @@ Generate a secure HMAC-SHA256 signature for production use:
 
 #### Node.js Signature Generation
 
-```javascript
+\`\`\`javascript
 const crypto = require('crypto');
 
 function generateAuthSignature(username, password, clientSecret) {
@@ -126,11 +126,11 @@ const auth = generateAuthSignature(
     'your_password',
     'your_client_secret'
 );
-```
+\`\`\`
 
 #### HTTP Request with Authorization Signature
 
-```http
+\`\`\`http
 POST /rest/system/status/secure-echo HTTP/1.1
 Host: api.gnsvc.com
 Content-Type: application/json; charset=utf-8
@@ -138,7 +138,7 @@ Authorization: {generated_signature}
 Timestamp: {unix_timestamp}
 
 {}
-```
+\`\`\`
 
 > **Important**: The timestamp is valid for only **one minute** and will be rejected if older.
 
@@ -146,7 +146,7 @@ Timestamp: {unix_timestamp}
 
 For user-specific operations, the API returns a `CustomerToken` in response headers:
 
-```javascript
+\`\`\`javascript
 // Extract customer token from response headers
 const customerToken = response.headers['customertoken'];
 
@@ -155,7 +155,7 @@ const headers = {
     'CustomerToken': customerToken,
     'CustomerTokenTimeout': '30' // Token validity in minutes
 };
-```
+\`\`\`
 
 ---
 
@@ -163,14 +163,14 @@ const headers = {
 
 ### System Status (Test Connection)
 
-```http
+\`\`\`http
 GET /rest/system/status/echo
-```
+\`\`\`
 
 **Secure Echo (Authenticated)**
-```http
+\`\`\`http
 POST /rest/system/status/secure-echo
-```
+\`\`\`
 
 ### Facilities & Courses
 
@@ -208,13 +208,13 @@ POST /rest/system/status/secure-echo
 
 ### Search by Geo-Location
 
-```http
+\`\`\`http
 GET /rest/channel/{channelId}/facilities?q=geo-location&latitude=37.7749&longitude=-122.4194&proximity=25&expand=FacilityDetail.Ratesets HTTP/1.1
 Host: sandbox.api.gnsvc.com
 Content-Type: application/json
 UserName: your_username
 Password: your_password
-```
+\`\`\`
 
 #### Query Parameters
 
@@ -228,7 +228,7 @@ Password: your_password
 
 ### JavaScript Implementation
 
-```javascript
+\`\`\`javascript
 const axios = require('axios');
 
 class GolfNowAPI {
@@ -294,11 +294,11 @@ api.searchFacilitiesByLocation(37.7749, -122.4194, 30)
     .then(facilities => {
         console.log('Found facilities:', facilities);
     });
-```
+\`\`\`
 
 ### Response Structure
 
-```json
+\`\`\`json
 {
     "Facilities": [
         {
@@ -336,7 +336,7 @@ api.searchFacilitiesByLocation(37.7749, -122.4194, 30)
         }
     ]
 }
-```
+\`\`\`
 
 ---
 
@@ -351,7 +351,7 @@ api.searchFacilitiesByLocation(37.7749, -122.4194, 30)
 
 ### Step 1: Generate Invoice
 
-```javascript
+\`\`\`javascript
 async generateInvoice(teeTimeRateId, numberOfPlayers) {
     const url = `${this.baseUrl}/invoices`;
 
@@ -371,11 +371,11 @@ async generateInvoice(teeTimeRateId, numberOfPlayers) {
         throw error;
     }
 }
-```
+\`\`\`
 
 ### Step 2: Create Reservation Claim Object
 
-```javascript
+\`\`\`javascript
 function createReservationClaim(invoice, customerInfo, paymentInfo) {
     return {
         InventoryChannelId: invoice.InventoryChannelId,
@@ -394,11 +394,11 @@ function createReservationClaim(invoice, customerInfo, paymentInfo) {
         ]
     };
 }
-```
+\`\`\`
 
 ### Step 3: Submit Booking
 
-```javascript
+\`\`\`javascript
 async createReservation(customerEmail, reservationClaim) {
     const url = `${this.baseUrl}/customers/${encodeURIComponent(customerEmail)}/reservations`;
 
@@ -417,11 +417,11 @@ async createReservation(customerEmail, reservationClaim) {
         throw error;
     }
 }
-```
+\`\`\`
 
 ### Complete Booking Example
 
-```javascript
+\`\`\`javascript
 async function bookTeeTime(api, teeTimeRateId, customerInfo) {
     // Step 1: Generate Invoice
     const invoice = await api.generateInvoice(teeTimeRateId, customerInfo.players);
@@ -483,7 +483,7 @@ bookTeeTime(api, 'tee-time-rate-id', customerInfo)
     .then(reservation => {
         console.log('Booking successful!', reservation);
     });
-```
+\`\`\`
 
 ---
 
@@ -501,7 +501,7 @@ bookTeeTime(api, 'tee-time-rate-id', customerInfo)
 
 Replace standard `CreditCardPayment` with `AffiliatePayment`:
 
-```javascript
+\`\`\`javascript
 const reservationClaim = {
     InventoryChannelId: channelId,
     TeeTimeRateId: teeTimeRateId,
@@ -520,7 +520,7 @@ const reservationClaim = {
         }
     ]
 };
-```
+\`\`\`
 
 ### Commission Structure
 
@@ -538,7 +538,7 @@ Access commission reports through:
 - **Affiliate Portal**: Login at [affiliate.gnsvc.com](https://affiliate.gnsvc.com) to view earnings
 - **API Endpoints**: Query invoice and reservation data for tracking
 
-```javascript
+\`\`\`javascript
 async getAffiliateReservations(startDate, endDate) {
     const url = `${this.baseUrl}/affiliate/reservations`;
 
@@ -556,7 +556,7 @@ async getAffiliateReservations(startDate, endDate) {
         throw error;
     }
 }
-```
+\`\`\`
 
 ---
 
@@ -579,7 +579,7 @@ GolfNow does not publicly document specific rate limits, but general best practi
    - Cache for 24 hours, refresh daily
 
 2. **Handle Rate Limits Gracefully**
-   ```javascript
+   \`\`\`javascript
    async function makeRequestWithRetry(requestFn, maxRetries = 3) {
        for (let i = 0; i < maxRetries; i++) {
            try {
@@ -596,10 +596,10 @@ GolfNow does not publicly document specific rate limits, but general best practi
        }
        throw new Error('Max retries exceeded');
    }
-   ```
+   \`\`\`
 
 3. **Implement Request Queuing**
-   ```javascript
+   \`\`\`javascript
    const Bottleneck = require('bottleneck');
 
    const limiter = new Bottleneck({
@@ -608,7 +608,7 @@ GolfNow does not publicly document specific rate limits, but general best practi
    });
 
    const rateLimitedRequest = limiter.wrap(axios.get);
-   ```
+   \`\`\`
 
 4. **Use Expand Parameters Wisely**
    - Only request data you need
@@ -633,11 +633,11 @@ GolfNow does not publicly document specific rate limits, but general best practi
 
 #### Node.js SDK (npm: golfnow)
 
-```bash
+\`\`\`bash
 npm install golfnow
-```
+\`\`\`
 
-```javascript
+\`\`\`javascript
 const golfnow = require('golfnow');
 
 const app = golfnow('CLIENT_ID', 'CLIENT_SECRET');
@@ -651,7 +651,7 @@ request.on('error', function(error) {
     console.log(error);
 });
 request.end();
-```
+\`\`\`
 
 **Repository**: [github.com/aleplusplus/golfnow-node-js](https://github.com/aleplusplus/golfnow-node-js)
 
@@ -659,11 +659,11 @@ request.end();
 
 #### Alternative: node-golfnow
 
-```bash
+\`\`\`bash
 npm install node-golfnow
-```
+\`\`\`
 
-```javascript
+\`\`\`javascript
 const GolfNow = require('node-golfnow');
 
 const client = new GolfNow({
@@ -673,7 +673,7 @@ const client = new GolfNow({
 
 // Uses axios under the hood
 // Exposes: root, channels, course, courses, rateTags, invoices
-```
+\`\`\`
 
 **npm**: [npmjs.com/package/node-golfnow](https://www.npmjs.com/package/node-golfnow)
 
@@ -683,7 +683,7 @@ const client = new GolfNow({
 
 ### Complete Integration Class
 
-```javascript
+\`\`\`javascript
 const axios = require('axios');
 const crypto = require('crypto');
 
@@ -885,11 +885,11 @@ class GolfNowIntegration {
 }
 
 module.exports = GolfNowIntegration;
-```
+\`\`\`
 
 ### Express.js API Routes Example
 
-```javascript
+\`\`\`javascript
 const express = require('express');
 const GolfNowIntegration = require('./golfnow-integration');
 
@@ -1003,7 +1003,7 @@ router.delete('/bookings/:reservationId', async (req, res) => {
 });
 
 module.exports = router;
-```
+\`\`\`
 
 ---
 
@@ -1057,7 +1057,7 @@ module.exports = router;
 
 ### Error Response Format
 
-```json
+\`\`\`json
 {
     "Code": "ERROR_CODE",
     "Message": "Human readable error message",
@@ -1065,7 +1065,7 @@ module.exports = router;
         "Field": "Additional context"
     }
 }
-```
+\`\`\`
 
 ### Support Resources
 

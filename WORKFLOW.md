@@ -24,17 +24,17 @@ If the course uses a supported booking system, add it to the appropriate scraper
 
 #### 3a. Add HTML Element
 Add a fairway link element in the appropriate region section:
-```html
+\`\`\`html
 <a href="/course/{slug}" class="fairway fw-{shortname}" data-course="{Exact Course Name}" data-initial="{2-3 letter abbrev}">
   <span class="price-tag"></span>
 </a>
-```
+\`\`\`
 
 **Critical**: The `data-course` attribute MUST match the course `name` in the database exactly (case-sensitive) for price data to flow through.
 
 #### 3b. Add CSS Positioning
 Add a CSS rule for the fairway position on the map:
-```css
+\`\`\`css
 .fw-{shortname} {
   top: {Y}%;
   left: {X}%;
@@ -43,7 +43,7 @@ Add a CSS rule for the fairway position on the map:
   border-radius: 50%;
   transform: rotate({angle}deg);
 }
-```
+\`\`\`
 
 Position values are percentages of the map area:
 - SF Peninsula: left ~41-44%, top ~42-52%
@@ -56,22 +56,22 @@ Position values are percentages of the map area:
 Every course MUST have a beautiful hole photo (not just a logo). Options:
 
 #### Option A: Auto-fetch from Pexels (recommended for batch updates)
-```bash
+\`\`\`bash
 node scripts/fetch-course-photos.js
-```
+\`\`\`
 
 #### Option B: Manual URL (for specific courses)
 Add the photo URL to `src/scripts/update-course-photos.js`:
-```javascript
+\`\`\`javascript
 "Course Name": "https://example.com/beautiful-hole.jpg",
-```
+\`\`\`
 Then run: `node src/scripts/update-course-photos.js`
 
 #### Option C: Local file
 Save image to `public/images/courses/{slug}.jpg` and update database:
-```sql
+\`\`\`sql
 UPDATE courses SET photo_url = '/images/courses/{slug}.jpg' WHERE slug = '{slug}';
-```
+\`\`\`
 
 **Image requirements:**
 - Must show an actual golf hole (fairway, green, scenic view)
@@ -88,12 +88,12 @@ UPDATE courses SET photo_url = '/images/courses/{slug}.jpg' WHERE slug = '{slug}
 ### Debugging Course Data Mismatches
 
 To find courses with data not showing on homepage:
-```sql
+\`\`\`sql
 -- Courses with tee time data
 SELECT DISTINCT c.name, c.slug
 FROM courses c
 JOIN tee_times t ON c.id = t.course_id;
-```
+\`\`\`
 
 Compare against `data-course` attributes in `public/index.html`.
 

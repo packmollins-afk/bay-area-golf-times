@@ -25,13 +25,13 @@ See `WORKFLOW.md` for detailed steps.
 
 ### Data Flow Verification
 After adding courses or running scrapers, verify:
-```bash
+\`\`\`bash
 # Check courses with data
 curl -s https://bayareagolf.now/api/tee-times/next-available | jq 'keys'
 
 # Compare with homepage data-course attributes
 grep 'data-course=' public/index.html
-```
+\`\`\`
 
 ## Tech Stack
 - Frontend: Vanilla HTML/CSS/JS

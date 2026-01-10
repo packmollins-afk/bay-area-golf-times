@@ -46,7 +46,7 @@ Last updated: 2026-01-08
 
 ## Database Schema (Turso)
 
-```sql
+\`\`\`sql
 -- courses table
 id, name, slug, region, lat, lng, par, holes, phone, website,
 booking_system, booking_url, golfnow_id, created_at
@@ -58,7 +58,7 @@ has_cart, booking_url, source, scraped_at
 -- clicks table
 id, course_slug, course_name, visitor_id, user_agent,
 referrer, clicked_at
-```
+\`\`\`
 
 ## API Endpoints (Vercel)
 
@@ -95,14 +95,14 @@ Mostly courses without active GolfNow inventory or requiring direct booking:
 
 ## Environment Variables
 
-```
+\`\`\`
 TURSO_DATABASE_URL=libsql://bay-area-golf-bayareagolfnow.aws-us-west-2.turso.io
 TURSO_AUTH_TOKEN=<token>
-```
+\`\`\`
 
 ## Full Scrape Command
 
-```bash
+\`\`\`bash
 cd ~/bay-area-golf-times
 TURSO_DATABASE_URL="..." TURSO_AUTH_TOKEN="..." TZ=America/Los_Angeles node -e "
 const { createClient } = require('@libsql/client');
@@ -113,7 +113,7 @@ const { scrapeAllChronogolf } = require('./src/scrapers/chronogolf');
 const { scrapeAllCPSGolf } = require('./src/scrapers/cpsgolf');
 // ... run all scrapers
 "
-```
+\`\`\`
 
 ## Expected Tee Time Counts (7-day scrape)
 
