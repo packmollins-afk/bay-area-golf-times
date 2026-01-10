@@ -197,6 +197,16 @@ const allowedOrigins = [
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
 ].filter(Boolean);
 
+// Domain redirect: old domain → new domain (for SEO preservation)
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  if (host.includes('bayareagolf.now') || host.includes('bayareagolf.vercel.app')) {
+    const newUrl = `https://golfthebay.com${req.originalUrl}`;
+    return res.redirect(308, newUrl);
+  }
+  next();
+});
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, etc.)

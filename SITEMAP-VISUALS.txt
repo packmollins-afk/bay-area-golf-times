@@ -1,0 +1,449 @@
+# Bay Area Golf - Sitemap Visual Diagrams
+
+## 1. SITEMAP HIERARCHY TREE
+
+bayareagolf.now/
+│
+├─ MAIN PAGES (5) ──────────────────────────────────────────────────────
+│  │
+│  ├─ / (Homepage)
+│  │  ├─ Priority: 1.0 (Highest)
+│  │  ├─ Change Freq: daily
+│  │  └─ Purpose: Main entry point
+│  │
+│  ├─ /app.html (Search Interface)
+│  │  ├─ Priority: 0.9
+│  │  ├─ Change Freq: hourly
+│  │  └─ Purpose: Find & filter tee times
+│  │
+│  ├─ /courses.html (Course Directory)
+│  │  ├─ Priority: 0.8
+│  │  ├─ Change Freq: weekly
+│  │  └─ Purpose: Browse all courses
+│  │
+│  ├─ /scorebook.html (User Scorecard)
+│  │  ├─ Priority: 0.5
+│  │  ├─ Change Freq: weekly
+│  │  └─ Purpose: Track scores
+│  │
+│  └─ /community.html (Social)
+│     ├─ Priority: 0.5
+│     ├─ Change Freq: weekly
+│     └─ Purpose: Community features
+│
+├─ REGIONAL PAGES (7) ──────────────────────────────────────────────────
+│  │
+│  ├─ /sf-golf (San Francisco)
+│  │  ├─ Priority: 0.8
+│  │  ├─ # Courses: 6
+│  │  └─ Keywords: "San Francisco golf", "SF tee times"
+│  │
+│  ├─ /east-bay-golf (East Bay)
+│  │  ├─ Priority: 0.8
+│  │  ├─ # Courses: 10
+│  │  └─ Keywords: "East Bay golf", "Oakland tee times"
+│  │
+│  ├─ /south-bay-golf (South Bay)
+│  │  ├─ Priority: 0.8
+│  │  ├─ # Courses: 14
+│  │  └─ Keywords: "South Bay golf", "San Jose tee times"
+│  │
+│  ├─ /north-bay-golf (North Bay)
+│  │  ├─ Priority: 0.8
+│  │  ├─ # Courses: 12
+│  │  └─ Keywords: "North Bay golf", "Marin golf"
+│  │
+│  ├─ /peninsula-golf (Peninsula)
+│  │  ├─ Priority: 0.8
+│  │  ├─ # Courses: 8
+│  │  └─ Keywords: "Peninsula golf", "Palo Alto tee times"
+│  │
+│  ├─ /monterey-golf (Monterey Coast)
+│  │  ├─ Priority: 0.8
+│  │  ├─ # Courses: 15
+│  │  └─ Keywords: "Monterey golf", "Pebble Beach"
+│  │
+│  └─ /sacramento-golf (Central Valley)
+│     ├─ Priority: 0.8
+│     ├─ # Courses: 18
+│     └─ Keywords: "Sacramento golf", "Valley tee times"
+│
+└─ COURSE PAGES (89) ───────────────────────────────────────────────────
+   │
+   ├─ SAN FRANCISCO REGION (6)
+   │  ├─ /course/tpc-harding-park
+   │  ├─ /course/lincoln-park-golf-course
+   │  ├─ /course/sharp-park-golf-course
+   │  ├─ /course/presidio-golf-course
+   │  ├─ /course/golden-gate-park-golf-course
+   │  └─ /course/fleming-golf-course
+   │
+   ├─ SOUTH BAY (14)
+   │  ├─ /course/san-jose-municipal-golf-course
+   │  ├─ /course/cinnabar-hills-golf-club
+   │  ├─ /course/los-lagos-golf-course
+   │  ├─ /course/santa-teresa-golf-club
+   │  ├─ /course/boulder-ridge-golf-club
+   │  ├─ /course/pruneridge-golf-club
+   │  ├─ /course/deep-cliff-golf-course
+   │  ├─ /course/sunnyvale-golf-course
+   │  ├─ /course/sunken-gardens-golf-course
+   │  ├─ /course/spring-valley-golf-course
+   │  ├─ /course/coyote-creek-golf-club
+   │  ├─ /course/moffett-field-golf-course
+   │  ├─ /course/blackberry-farm-golf-course
+   │  ├─ /course/palo-alto-golf-course
+   │  └─ /course/baylands-golf-links
+   │
+   ├─ EAST BAY (10)
+   │  ├─ /course/corica-park-south-course
+   │  ├─ /course/corica-park-north-course
+   │  ├─ /course/corica-park-mif-albright-par-3
+   │  ├─ /course/metropolitan-golf-links
+   │  ├─ /course/lake-chabot-golf-course
+   │  ├─ /course/tilden-park-golf-course
+   │  ├─ /course/redwood-canyon-golf-course
+   │  ├─ /course/monarch-bay-golf-club
+   │  ├─ /course/montclair-golf-course
+   │  └─ /course/sunol-golf-club
+   │
+   ├─ PENINSULA (8)
+   │  ├─ /course/crystal-springs-golf-club
+   │  ├─ /course/san-geronimo-golf-club
+   │  ├─ /course/half-moon-bay-golf-links
+   │  ├─ /course/cow-palace-par-3
+   │  ├─ /course/ocean-view-golf-club
+   │  ├─ /course/burlingame-country-club
+   │  ├─ /course/poppy-ridge-golf-course
+   │  └─ /course/cinnabar-creek-golf-club
+   │
+   ├─ NORTH BAY (12)
+   │  ├─ /course/northgate-golf-course
+   │  ├─ /course/santa-rosa-golf-club
+   │  ├─ /course/fountaingrove-resort-golf-club
+   │  ├─ /course/windsor-golf-club
+   │  ├─ /course/sebastopol-golf-course
+   │  ├─ /course/bodega-harbour-golf-course
+   │  ├─ /course/napa-golf-course
+   │  ├─ /course/silverado-resort-and-spa
+   │  ├─ /course/oak-valley-golf-club
+   │  ├─ /course/penngrove-golf-club
+   │  ├─ /course/fairfield-ranch-golf-club
+   │  └─ /course/black-oak-golf-course
+   │
+   ├─ CENTRAL VALLEY (18)
+   │  ├─ /course/castle-oaks-golf-club
+   │  ├─ /course/dry-creek-golf-course
+   │  ├─ /course/lincoln-hills-golf-course
+   │  ├─ /course/rancho-murieta-country-club
+   │  ├─ /course/sunridge-golf-club
+   │  ├─ /course/waterford-golf-course
+   │  ├─ /course/turkey-creek-golf-club
+   │  ├─ /course/foothill-oaks-golf-course
+   │  ├─ /course/twelve-bridges-golf-club
+   │  ├─ /course/sierra-vista-golf-course
+   │  ├─ /course/oak-point-golf-course
+   │  ├─ /course/poppy-hills-golf-course
+   │  ├─ /course/stockton-golf-club
+   │  ├─ /course/meadowlawn-golf-course
+   │  ├─ /course/empire-west-golf-course
+   │  ├─ /course/spring-creek-golf-club
+   │  ├─ /course/country-club-at-woodcreek
+   │  └─ /course/loch-lomond-golf-club
+   │
+   ├─ MONTEREY & COAST (15)
+   │  ├─ /course/monterey-peninsula-country-club
+   │  ├─ /course/pebble-beach-golf-links
+   │  ├─ /course/spyglass-hill-golf-course
+   │  ├─ /course/spanish-bay-golf-course
+   │  ├─ /course/old-del-monte-golf-course
+   │  ├─ /course/poppy-hills-golf-course
+   │  ├─ /course/carmel-valley-ranch-golf-club
+   │  ├─ /course/black-horse-golf-course
+   │  ├─ /course/salinas-valley-country-club
+   │  ├─ /course/rancho-canada-golf-club
+   │  ├─ /course/corral-de-tierra-country-club
+   │  ├─ /course/bayonet-black-horse-golf-club
+   │  ├─ /course/pacific-grove-golf-links
+   │  ├─ /course/quail-lodge-golf-course
+   │  └─ /course/castle-rock-country-club
+   │
+   └─ SIERRA & MOUNTAIN (6)
+      ├─ /course/chardonnay-golf-club
+      ├─ /course/iron-horse-golf-club
+      ├─ /course/silver-oaks-golf-course
+      ├─ /course/alta-sierra-country-club
+      ├─ /course/northstar-california-golf-course
+      └─ /course/sierra-star-golf-course
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 2. PRIORITY DISTRIBUTION
+
+Priority Levels (X-axis = Priority Value, Y-axis = Number of URLs)
+
+1.0  ┃           ▓▓
+     ┃           ▓▓
+0.9  ┃           ▓▓
+     ┃           ▓▓
+0.8  ┃           ▓▓    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     ┃           ▓▓    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+0.7  ┃           ▓▓    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     ┃           ▓▓    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+0.5  ┃           ▓▓    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ▓▓
+     ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       Home  App   Regional              Courses                      Community
+       (1)   (1)   (7)                   (89)                         (2)
+
+Distribution:
+  ▓ Priority 1.0: 1 URL (Homepage)
+  ▓ Priority 0.9: 1 URL (App page)
+  ▓ Priority 0.8: 7 URLs (Regional pages)
+  ▓ Priority 0.7: 89 URLs (Course pages)
+  ▓ Priority 0.5: 2 URLs (Community/Scorebook)
+
+Total: 101 URLs
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 3. DATA FLOW DIAGRAM
+
+User/Search Engine
+         │
+         │ Request /sitemap.xml
+         ↓
+    ┌─────────────┐
+    │ Express.js  │
+    │ API Handler │
+    └──────┬──────┘
+           │
+           │ Query
+           ↓
+    ┌─────────────────────────┐
+    │  Turso Database         │
+    │ (SELECT slug, updated   │
+    │  FROM courses ORDER...) │
+    └──────┬──────────────────┘
+           │
+           │ Result: 89 courses
+           ↓
+    ┌─────────────────┐
+    │ Generate XML    │
+    │ - Main pages    │
+    │ - Regional     │
+    │ - Courses      │
+    └──────┬──────────┘
+           │
+           │ Output: XML 1.0
+           ↓
+    ┌──────────────────────┐
+    │ Set Content-Type     │
+    │ application/xml      │
+    │ Return HTTP 200 OK   │
+    └──────┬───────────────┘
+           │
+           ↓
+Search Engine/User receives sitemap.xml
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 4. REGION DISTRIBUTION
+
+                    Course Count by Region
+
+North Bay ██████████████ 12 (13.5%)
+Central Valley ██████████████████ 18 (20.2%)
+South Bay ██████████████ 14 (15.7%)
+Monterey/Coast ███████████████ 15 (16.9%)
+East Bay ██████████ 10 (11.2%)
+Peninsula ████████ 8 (9%)
+San Francisco ██████ 6 (6.7%)
+Sierra ██████ 6 (6.7%)
+
+Total: 89 courses across 8 regions
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 5. SITEMAP SIZE COMPARISON
+
+File Size: ~20 KB
+
+Text representation:
+
+  ┌─────────────────────────────────┐
+  │ XML Declaration & Root Tag      │ ~200 bytes
+  ├─────────────────────────────────┤
+  │ Main Pages Section (5 URLs)     │ ~2 KB
+  ├─────────────────────────────────┤
+  │ Regional Pages Section (7 URLs) │ ~2 KB
+  ├─────────────────────────────────┤
+  │ Course Pages Section (89 URLs)  │ ~15-16 KB
+  │                                 │ (each ~170-180 bytes)
+  ├─────────────────────────────────┤
+  │ Closing Tags                    │ ~50 bytes
+  └─────────────────────────────────┘
+
+Total: ~20 KB
+
+XML Limits:
+  ├─ Google/Bing Limit: 50 MB per file
+  ├─ Max URLs: 50,000 per file
+  └─ Current Usage: 0.04% of size limit, 0.2% of URL limit
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 6. SEO PRIORITY FLOW
+
+Homepage (Priority 1.0)
+         │
+         ├─ High-traffic entry point
+         ├─ Updated daily
+         └─ Crawled frequently
+              │
+              ├─► App Page (0.9)
+              │   ├─ High conversion
+              │   ├─ Updated hourly
+              │   └─ Crawled very frequently
+              │
+              ├─► Courses List (0.8)
+              │   ├─ Directory page
+              │   ├─ Links to all courses
+              │   └─ Crawled weekly
+              │
+              └─► Regional Pages (0.8)
+                  ├─ Local SEO signals
+                  ├─ Geographic targeting
+                  └─ Crawled weekly
+                       │
+                       └─► Individual Courses (0.7)
+                           ├─ 89 separate landing pages
+                           ├─ Long-tail keywords
+                           ├─ Updated weekly
+                           └─ Crawled regularly
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 7. CONTENT HIERARCHY
+
+                        Homepage
+                            │
+            ┌───────────────┬┴┬───────────────┐
+            │               │ │               │
+          App            Courses          Regional         Community
+        Search          Directory         Pages             Social
+          │               │ │               │               │
+          │               │ └──────┬────────┘               │
+          │               │        │                       │
+          └───────────────┼────────┴───────────────────────┘
+                          │
+                    ┌─────┴──────┐
+                    │            │
+              Course Pages    Scorebook
+              (89 individual)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 8. CRAWL STRATEGY FOR SEARCH ENGINES
+
+Timeline (Example for Google):
+
+Week 1: Initial Crawl
+  Day 1: Crawl homepage (1.0 priority)
+         └─ Discovers /sitemap.xml link in robots.txt
+  Day 2: Crawl /app.html (0.9 priority)
+  Day 3: Crawl regional pages (0.8 priority)
+  Days 4-7: Crawl course pages (0.7 priority)
+         └─ 89 courses ÷ 7 days = ~13 per day
+
+Week 2+: Regular Recrawl
+  Daily: Check homepage (changes frequently)
+  2-3x/week: Check app page (hourly changes)
+  Weekly: Check regional pages
+  Every 2 weeks: Check individual courses
+  Monthly: Deep crawl for new content
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 9. URL SLUG GENERATION
+
+Course Name → Slug Transformation
+
+"TPC Harding Park"
+  → lowercase: "tpc harding park"
+  → remove special chars: "tpc harding park"
+  → replace spaces: "tpc-harding-park"
+  → remove duplicates: "tpc-harding-park"
+  FINAL URL: /course/tpc-harding-park
+
+"Corica Park - South Course"
+  → lowercase: "corica park - south course"
+  → remove special chars: "corica park  south course"
+  → replace spaces: "corica-park--south-course"
+  → remove duplicates: "corica-park-south-course"
+  FINAL URL: /course/corica-park-south-course
+
+"Mif Albright Par 3"
+  → lowercase: "mif albright par 3"
+  → remove special chars: "mif albright par 3"
+  → replace spaces: "mif-albright-par-3"
+  → remove duplicates: "mif-albright-par-3"
+  FINAL URL: /course/mif-albright-par-3
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+
+## 10. KEYWORD OPTIMIZATION BY SECTION
+
+Homepage (1.0)
+  "bay area golf tee times"
+  "find tee times near me"
+  "book golf courses"
+  "california golf"
+
+App/Search (0.9)
+  "search golf courses"
+  "book tee times online"
+  "[course name] availability"
+  "[course name] prices"
+
+Regional Pages (0.8)
+  "san francisco golf courses"
+  "east bay tee times"
+  "south bay golf clubs"
+  "[city] golf courses"
+
+Individual Courses (0.7)
+  "[course name] tee times"
+  "[course name] prices"
+  "[course name] booking"
+  "[city] [course type] golf"
+
+Community/Stats (0.5)
+  "golf scorecard"
+  "track golf scores"
+  "golf community"
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Generated: January 8, 2026
+Sitemap Version: 1.0
+Total URLs: 101
+Total Courses: 89

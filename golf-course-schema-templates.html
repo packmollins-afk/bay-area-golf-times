@@ -1,0 +1,666 @@
+<!-- GOLF COURSE SCHEMA TEMPLATES FOR IMPLEMENTATION -->
+<!-- Use these templates as starting points for your golf course pages -->
+
+<!-- ============================================================ -->
+<!-- TEMPLATE 1: COMPLETE GOLF COURSE DETAIL PAGE -->
+<!-- ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pine Valley Golf Club - Championship Golf Course in NJ</title>
+  <meta name="description" content="Experience Pine Valley Golf Club, ranked #1 in the world. Premier 18-hole championship course in New Jersey. Par 72, private membership.">
+
+  <!-- PRIMARY SCHEMA: LocalBusiness + GolfCourse -->
+  <!-- This is the most important schema for golf courses -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["LocalBusiness", "GolfCourse"],
+    "id": "https://example.com/courses/pine-valley#golf-course",
+    "name": "Pine Valley Golf Club",
+    "url": "https://example.com/courses/pine-valley",
+    "description": "Championship 18-hole golf course ranked #1 in the world. Pristine conditioning, challenging layout, and world-class service.",
+    "telephone": "+1-609-465-3886",
+    "email": "reservations@pinevalley.com",
+    "image": [
+      "https://example.com/images/pine-valley-hero-1200x628.jpg",
+      "https://example.com/images/clubhouse-800x600.jpg",
+      "https://example.com/images/hole-18-ocean-view.jpg",
+      "https://example.com/images/pro-shop.jpg"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Fairway Drive",
+      "addressLocality": "Pine Valley",
+      "addressRegion": "NJ",
+      "postalCode": "08021",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 39.8093,
+      "longitude": -74.8902,
+      "elevation": "150"
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "07:00",
+        "closes": "17:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Saturday", "Sunday"],
+        "opens": "06:00",
+        "closes": "17:00"
+      }
+    ],
+    "acceptsReservations": true,
+    "priceRange": "$$$",
+    "sameAs": [
+      "https://www.facebook.com/pinevalley",
+      "https://www.instagram.com/pinevalley",
+      "https://twitter.com/pinevalley",
+      "https://www.youtube.com/channel/pinevalley"
+    ],
+    "hasMap": "https://goo.gl/maps/pinevalley",
+    "founder": "George Arthur Crump",
+    "foundingDate": "1913",
+    "amenityFeature": [
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Pro Shop"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Golf Instruction"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Restaurant & Dining"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Bar & Lounge"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Golf Cart Rental"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Club Rental"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Handicap Accessible"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Driving Range"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Practice Chipping Green"
+      },
+      {
+        "@type": "LocationFeatureSpecification",
+        "name": "Event & Wedding Venue"
+      }
+    ],
+    "additionalProperty": [
+      {
+        "@type": "PropertyValue",
+        "name": "Par",
+        "value": "72"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Holes",
+        "value": "18"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Length",
+        "value": "6701"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Length Unit",
+        "value": "yards"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Course Rating (White Tees)",
+        "value": "73.6"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Slope Rating (White Tees)",
+        "value": "144"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Course Rating (Blue Tees)",
+        "value": "75.2"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Slope Rating (Blue Tees)",
+        "value": "147"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Course Architect",
+        "value": "George Arthur Crump, Hugh Wilson"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Est. Play Time",
+        "value": "4.5 hours"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Course Type",
+        "value": "Private Championship"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Membership Status",
+        "value": "Private / Invitation Only"
+      }
+    ]
+  }
+  </script>
+
+  <!-- SECONDARY SCHEMA: AggregateRating with Reviews -->
+  <!-- Shows star rating and reviews in search results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Pine Valley Golf Club",
+    "url": "https://example.com/courses/pine-valley",
+    "image": "https://example.com/images/pine-valley-hero-1200x628.jpg",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "bestRating": "5",
+      "worstRating": "1",
+      "ratingCount": 427,
+      "reviewCount": 312
+    },
+    "review": [
+      {
+        "@type": "Review",
+        "headline": "World-class course with exceptional service",
+        "reviewBody": "Pine Valley exceeded all my expectations. The course conditioning is impeccable, every detail is perfect, and the staff treats you like royalty. The views are stunning and the design is challenging but fair. This is a true championship layout that tests every aspect of your game.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "datePublished": "2026-01-05",
+        "author": {
+          "@type": "Person",
+          "name": "Michael Thompson"
+        }
+      },
+      {
+        "@type": "Review",
+        "headline": "Pristine conditions and challenging holes",
+        "reviewBody": "The greens at Pine Valley are lightning quick and the rough is genuinely penal. The design forces you to think about every shot. Worth every penny of the green fee for this bucket list experience.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "datePublished": "2025-12-28",
+        "author": {
+          "@type": "Person",
+          "name": "David Williams"
+        }
+      },
+      {
+        "@type": "Review",
+        "headline": "Great experience despite high green fees",
+        "reviewBody": "Pine Valley is an exceptional golf course. The price is steep, but you get what you pay for in terms of quality and prestige. Course management is excellent and pace of play flows well.",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "4",
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "datePublished": "2025-12-15",
+        "author": {
+          "@type": "Person",
+          "name": "Robert Johnson"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- TERTIARY SCHEMA: BreadcrumbList -->
+  <!-- Shows navigation path in search results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://example.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Golf Courses",
+        "item": "https://example.com/courses"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "New Jersey",
+        "item": "https://example.com/courses/new-jersey"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Pine Valley Golf Club",
+        "item": "https://example.com/courses/pine-valley"
+      }
+    ]
+  }
+  </script>
+
+</head>
+<body>
+  <h1>Pine Valley Golf Club</h1>
+  <p>Championship golf course in New Jersey</p>
+</body>
+</html>
+
+
+<!-- ============================================================ -->
+<!-- TEMPLATE 2: GOLF COURSE LISTING PAGE -->
+<!-- ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Best Golf Courses in New Jersey</title>
+  <meta name="description" content="Discover top-rated golf courses in New Jersey. Championship courses with reviews, ratings, and booking information.">
+
+  <!-- BREADCRUMB for listing page -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://example.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Golf Courses",
+        "item": "https://example.com/courses"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "New Jersey"
+      }
+    ]
+  }
+  </script>
+
+  <!-- ITEMLIST with multiple golf courses -->
+  <!-- Shows all courses in structured format -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Golf Courses in New Jersey",
+    "itemListElement": [
+      {
+        "@type": "LocalBusiness",
+        "position": 1,
+        "name": "Pine Valley Golf Club",
+        "url": "https://example.com/courses/pine-valley",
+        "image": "https://example.com/images/pine-valley.jpg",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Pine Valley",
+          "addressRegion": "NJ"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "ratingCount": 427
+        },
+        "priceRange": "$$$"
+      },
+      {
+        "@type": "LocalBusiness",
+        "position": 2,
+        "name": "Baltusrol Golf Club",
+        "url": "https://example.com/courses/baltusrol",
+        "image": "https://example.com/images/baltusrol.jpg",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Springfield",
+          "addressRegion": "NJ"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "ratingCount": 385
+        },
+        "priceRange": "$$$"
+      },
+      {
+        "@type": "LocalBusiness",
+        "position": 3,
+        "name": "Ridgewood Country Club",
+        "url": "https://example.com/courses/ridgewood",
+        "image": "https://example.com/images/ridgewood.jpg",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Ridgewood",
+          "addressRegion": "NJ"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.7",
+          "ratingCount": 298
+        },
+        "priceRange": "$$$"
+      }
+    ]
+  }
+  </script>
+
+</head>
+<body>
+  <h1>Best Golf Courses in New Jersey</h1>
+</body>
+</html>
+
+
+<!-- ============================================================ -->
+<!-- TEMPLATE 3: TEE TIME BOOKING PAGE -->
+<!-- ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Tee Times at Pine Valley Golf Club</title>
+
+  <!-- COURSE INFO schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": ["LocalBusiness", "GolfCourse"],
+    "name": "Pine Valley Golf Club",
+    "url": "https://example.com/book-tee-time",
+    "telephone": "+1-609-465-3886",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Fairway Drive",
+      "addressLocality": "Pine Valley",
+      "addressRegion": "NJ",
+      "postalCode": "08021",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 39.8093,
+      "longitude": -74.8902
+    }
+  }
+  </script>
+
+  <!-- AVAILABLE TEE TIMES - Include multiple time slots -->
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsEvent",
+      "name": "Golf Tee Time - 8:00 AM",
+      "description": "18-hole round at Pine Valley Golf Club",
+      "startDate": "2026-02-15T08:00:00-05:00",
+      "endDate": "2026-02-15T12:00:00-05:00",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "location": {
+        "@type": "GolfCourse",
+        "name": "Pine Valley Golf Club",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "123 Fairway Drive",
+          "addressLocality": "Pine Valley",
+          "addressRegion": "NJ",
+          "postalCode": "08021"
+        }
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://example.com/book-tee-time?date=2026-02-15&time=0800",
+        "price": "185.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "availabilityEnds": "2026-02-15T08:00:00-05:00",
+        "validFrom": "2026-01-08T00:00:00Z"
+      },
+      "organizer": {
+        "@type": "Organization",
+        "name": "Pine Valley Golf Club",
+        "url": "https://example.com",
+        "telephone": "+1-609-465-3886"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsEvent",
+      "name": "Golf Tee Time - 9:00 AM",
+      "description": "18-hole round at Pine Valley Golf Club",
+      "startDate": "2026-02-15T09:00:00-05:00",
+      "endDate": "2026-02-15T13:00:00-05:00",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "location": {
+        "@type": "GolfCourse",
+        "name": "Pine Valley Golf Club"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://example.com/book-tee-time?date=2026-02-15&time=0900",
+        "price": "185.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "availabilityEnds": "2026-02-15T09:00:00-05:00",
+        "validFrom": "2026-01-08T00:00:00Z"
+      },
+      "organizer": {
+        "@type": "Organization",
+        "name": "Pine Valley Golf Club"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsEvent",
+      "name": "Golf Tee Time - 10:00 AM",
+      "description": "18-hole round at Pine Valley Golf Club",
+      "startDate": "2026-02-15T10:00:00-05:00",
+      "endDate": "2026-02-15T14:00:00-05:00",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+      "location": {
+        "@type": "GolfCourse",
+        "name": "Pine Valley Golf Club"
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": "https://example.com/book-tee-time?date=2026-02-15&time=1000",
+        "price": "185.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/OutOfStock",
+        "availabilityEnds": "2026-02-15T10:00:00-05:00",
+        "validFrom": "2026-01-08T00:00:00Z"
+      },
+      "organizer": {
+        "@type": "Organization",
+        "name": "Pine Valley Golf Club"
+      }
+    }
+  ]
+  </script>
+
+</head>
+<body>
+  <h1>Book Your Tee Time</h1>
+</body>
+</html>
+
+
+<!-- ============================================================ -->
+<!-- TEMPLATE 4: GOLF TOURNAMENT PAGE -->
+<!-- ============================================================ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>2026 Invitational Championship - Pine Valley Golf Club</title>
+
+  <!-- TOURNAMENT EVENT schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    "name": "2026 Invitational Championship",
+    "description": "Premier 54-hole invitational golf tournament featuring the world's top amateur and professional golfers. Hosted at Pine Valley Golf Club.",
+    "image": "https://example.com/images/tournament-hero.jpg",
+    "startDate": "2026-06-01T07:00:00-04:00",
+    "endDate": "2026-06-03T18:00:00-04:00",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
+    "location": {
+      "@type": "GolfCourse",
+      "name": "Pine Valley Golf Club",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "123 Fairway Drive",
+        "addressLocality": "Pine Valley",
+        "addressRegion": "NJ",
+        "postalCode": "08021",
+        "addressCountry": "US"
+      }
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": "https://example.com/tournaments/invitational-2026",
+      "price": "5000.00",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/OutOfStock",
+      "validFrom": "2025-12-01T00:00:00Z"
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": "Pine Valley Golf Club",
+      "url": "https://example.com",
+      "telephone": "+1-609-465-3886"
+    },
+    "competitor": [
+      {
+        "@type": "Person",
+        "name": "Rory McIlroy"
+      },
+      {
+        "@type": "Person",
+        "name": "Jon Rahm"
+      },
+      {
+        "@type": "Person",
+        "name": "Scottie Scheffler"
+      }
+    ],
+    "sponsor": {
+      "@type": "Organization",
+      "name": "Golf Channel"
+    }
+  }
+  </script>
+
+</head>
+<body>
+  <h1>2026 Invitational Championship</h1>
+</body>
+</html>
+
+
+<!-- ============================================================ -->
+<!-- COPY/PASTE CHECKLIST FOR IMPLEMENTATION -->
+<!-- ============================================================ -->
+
+IMPLEMENTATION CHECKLIST:
+
+1. LocalBusiness + GolfCourse Schema
+   [ ] Course name matches Google Business Profile
+   [ ] Full address with postal code
+   [ ] Valid phone number with country code
+   [ ] Absolute URL to course page
+   [ ] Precise latitude/longitude (Google Maps)
+   [ ] Opening hours cover all day/time combos
+   [ ] High-quality hero image (1200x628px)
+   [ ] Course specs (Par, Holes, Rating, Slope)
+   [ ] All amenities listed
+   [ ] Social media links included
+   [ ] Validated with https://jsonlint.com/
+
+2. AggregateRating Schema
+   [ ] Only includes reviews from your website
+   [ ] Rating between 1-5
+   [ ] Rating count reflects actual reviews
+   [ ] 3-5 sample reviews included
+   [ ] Review dates are accurate (ISO 8601)
+   [ ] Mix of 4-5 star reviews (realistic)
+   [ ] Tested with Google Rich Results Test
+
+3. BreadcrumbList Schema
+   [ ] Position numbering starts at 1
+   [ ] All URLs are absolute paths
+   [ ] Last item is current page
+   [ ] 3-5 levels deep (optimal)
+   [ ] Matches visible breadcrumbs on page
+
+4. Event Schema (for tee times/tournaments)
+   [ ] startDate and endDate in ISO 8601
+   [ ] eventStatus is valid value
+   [ ] Offer price and currency specified
+   [ ] Availability is accurate (InStock/OutOfStock)
+   [ ] organizer information complete
+   [ ] location is GolfCourse type
+
+5. Final Testing
+   [ ] Validate JSON syntax
+   [ ] Test with Google Rich Results Test tool
+   [ ] Check Search Console for errors
+   [ ] Verify all data matches GBP
+   [ ] Test with mobile device
+   [ ] Monitor search results for rich snippets

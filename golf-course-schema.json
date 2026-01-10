@@ -1,0 +1,485 @@
+{
+  "title": "Comprehensive Golf Course Schema.org Structured Data",
+  "description": "Complete JSON-LD markup templates for golf course SEO pages",
+  "schemas": {
+    "1_LocalBusiness_GolfCourse": {
+      "description": "Primary schema combining LocalBusiness and GolfCourse types",
+      "priority": "CRITICAL",
+      "jsonld": {
+        "@context": "https://schema.org",
+        "@type": ["LocalBusiness", "GolfCourse"],
+        "id": "https://example.com/#golf-course",
+        "name": "Pebble Beach Golf Links",
+        "url": "https://example.com",
+        "description": "Championship 18-hole golf course featuring stunning ocean views on the Monterey Peninsula",
+        "telephone": "+1-831-622-8723",
+        "email": "reservations@pebblebeach.com",
+        "image": [
+          "https://example.com/images/pebble-beach-hero.jpg",
+          "https://example.com/images/clubhouse.jpg",
+          "https://example.com/images/hole-18.jpg"
+        ],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "1518 8th Avenue",
+          "addressLocality": "Pebble Beach",
+          "addressRegion": "CA",
+          "postalCode": "93953",
+          "addressCountry": "US"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 36.5625,
+          "longitude": -121.9496
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "07:00",
+            "closes": "18:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Saturday", "Sunday"],
+            "opens": "06:00",
+            "closes": "18:00"
+          }
+        ],
+        "acceptsReservations": true,
+        "priceRange": "$$$",
+        "sameAs": [
+          "https://www.facebook.com/pebblebeach",
+          "https://www.instagram.com/pebblebeach",
+          "https://twitter.com/pebblebeach"
+        ],
+        "founder": "Jack Neville, Douglas Grant",
+        "foundingDate": "1919",
+        "hasMap": "https://goo.gl/maps/pebblebeach",
+        "amenityFeature": [
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Full Service Pro Shop"
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Golf Instruction Available"
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Restaurant & Bar"
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Golf Cart Rental"
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Handicap Accessible"
+          }
+        ],
+        "additionalProperty": [
+          {
+            "@type": "PropertyValue",
+            "name": "Par",
+            "value": "72"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Holes",
+            "value": "18"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Course Rating",
+            "value": "73.5"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Slope Rating",
+            "value": "145"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Course Architect",
+            "value": "Jack Neville, Douglas Grant"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Established",
+            "value": "1919"
+          }
+        ]
+      }
+    },
+    "2_SportsActivityLocation": {
+      "description": "Enhanced SportsActivityLocation schema with more golf-specific properties",
+      "priority": "HIGH",
+      "jsonld": {
+        "@context": "https://schema.org",
+        "@type": "SportsActivityLocation",
+        "name": "Pebble Beach Golf Links",
+        "url": "https://example.com",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "1518 8th Avenue",
+          "addressLocality": "Pebble Beach",
+          "addressRegion": "CA",
+          "postalCode": "93953",
+          "addressCountry": "US"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 36.5625,
+          "longitude": -121.9496
+        },
+        "sportsActivityLocation": {
+          "@type": "SportsActivityLocation",
+          "name": "Championship Course"
+        },
+        "numberOfHoles": 18,
+        "courseSpecifications": {
+          "@type": "Thing",
+          "par": 72,
+          "courseRating": 73.5,
+          "slopeRating": 145
+        },
+        "guestCanBringOwnEquipment": true,
+        "equipmentRental": {
+          "@type": "Thing",
+          "name": "Golf Clubs",
+          "availability": "https://schema.org/InStock"
+        }
+      }
+    },
+    "3_AggregateRating": {
+      "description": "Review and rating aggregation schema",
+      "priority": "HIGH",
+      "notes": "Only include ratings from reviews hosted on your own website",
+      "jsonld": {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Pebble Beach Golf Links",
+        "url": "https://example.com",
+        "image": "https://example.com/images/pebble-beach.jpg",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.7",
+          "bestRating": "5",
+          "worstRating": "1",
+          "ratingCount": 328,
+          "reviewCount": 248,
+          "name": "Pebble Beach Golf Links Reviews"
+        },
+        "review": [
+          {
+            "@type": "Review",
+            "headline": "Spectacular course with world-class service",
+            "reviewBody": "Had an amazing experience playing Pebble Beach. The course condition was immaculate, the views were stunning, and the staff was exceptional. Highly recommend for any serious golfer.",
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": "5",
+              "bestRating": "5",
+              "worstRating": "1"
+            },
+            "datePublished": "2026-01-05",
+            "author": {
+              "@type": "Person",
+              "name": "John Smith"
+            }
+          },
+          {
+            "@type": "Review",
+            "headline": "Pricey but worth it for a bucket list course",
+            "reviewBody": "Beautiful course with incredible oceanfront holes. The green fees are premium but you're getting a legendary experience. Booking is competitive, but once you get on, it's unforgettable.",
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": "4",
+              "bestRating": "5",
+              "worstRating": "1"
+            },
+            "datePublished": "2026-01-02",
+            "author": {
+              "@type": "Person",
+              "name": "Sarah Johnson"
+            }
+          }
+        ]
+      }
+    },
+    "4_EventSchema_TeeTimes": {
+      "description": "Event schema for tee time bookings and tournaments",
+      "priority": "MEDIUM",
+      "notes": "Use this for specific tee time slots and golf tournaments",
+      "examples": [
+        {
+          "type": "Standard Tee Time",
+          "jsonld": {
+            "@context": "https://schema.org",
+            "@type": "SportsEvent",
+            "name": "Golf Tee Time - Pebble Beach Golf Links",
+            "description": "18-hole championship round at Pebble Beach Golf Links",
+            "startDate": "2026-01-15T08:00:00-08:00",
+            "endDate": "2026-01-15T12:00:00-08:00",
+            "eventStatus": "https://schema.org/EventScheduled",
+            "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+            "location": {
+              "@type": "GolfCourse",
+              "name": "Pebble Beach Golf Links",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "1518 8th Avenue",
+                "addressLocality": "Pebble Beach",
+                "addressRegion": "CA",
+                "postalCode": "93953",
+                "addressCountry": "US"
+              }
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": "https://example.com/book-tee-time?date=2026-01-15&time=0800",
+              "price": "550.00",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock",
+              "availabilityEnds": "2026-01-15T08:00:00-08:00",
+              "validFrom": "2026-01-01T00:00:00Z"
+            },
+            "organizer": {
+              "@type": "Organization",
+              "name": "Pebble Beach Golf Links",
+              "url": "https://example.com",
+              "telephone": "+1-831-622-8723"
+            },
+            "performer": {
+              "@type": "Person",
+              "name": "Pro Starter"
+            }
+          }
+        },
+        {
+          "type": "Tournament",
+          "jsonld": {
+            "@context": "https://schema.org",
+            "@type": "SportsEvent",
+            "name": "Pebble Beach Pro-Am 2026",
+            "description": "Annual professional and amateur golf tournament at Pebble Beach",
+            "startDate": "2026-02-03T07:00:00-08:00",
+            "endDate": "2026-02-06T18:00:00-08:00",
+            "eventStatus": "https://schema.org/EventScheduled",
+            "eventAttendanceMode": "https://schema.org/MixedEventAttendanceMode",
+            "location": {
+              "@type": "GolfCourse",
+              "name": "Pebble Beach Golf Links"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": "https://example.com/pro-am",
+              "price": "10000.00",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/OutOfStock",
+              "validFrom": "2025-06-01T00:00:00Z"
+            },
+            "organizer": {
+              "@type": "Organization",
+              "name": "Pebble Beach Golf Links",
+              "url": "https://example.com"
+            },
+            "competitor": [
+              {
+                "@type": "Person",
+                "name": "Professional Golfer Name"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "5_BreadcrumbList": {
+      "description": "BreadcrumbList for navigation and SEO",
+      "priority": "MEDIUM",
+      "notes": "Include on all course detail pages",
+      "example_1_GolfCourses_Listing": {
+        "jsonld": {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://example.com"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Golf Courses",
+              "item": "https://example.com/courses"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "California",
+              "item": "https://example.com/courses/california"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Pebble Beach Golf Links",
+              "item": "https://example.com/courses/pebble-beach"
+            }
+          ]
+        }
+      },
+      "example_2_Deep_Navigation": {
+        "jsonld": {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Golf Times",
+              "item": "https://example.com"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Bay Area",
+              "item": "https://example.com/bay-area"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Monterey Peninsula",
+              "item": "https://example.com/bay-area/monterey-peninsula"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Pebble Beach Golf Links",
+              "item": "https://example.com/bay-area/monterey-peninsula/pebble-beach-golf-links"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "combined_implementation": {
+    "description": "Complete example of all schemas combined on a single page",
+    "notes": "This is the recommended approach - include all schemas on the course detail page",
+    "html_structure": "<head>\n  <!-- Schema 1: Combined LocalBusiness + GolfCourse -->\n  <script type=\"application/ld+json\">\n  { LocalBusiness_GolfCourse schema }\n  </script>\n\n  <!-- Schema 2: AggregateRating -->\n  <script type=\"application/ld+json\">\n  { AggregateRating schema }\n  </script>\n\n  <!-- Schema 3: BreadcrumbList -->\n  <script type=\"application/ld+json\">\n  { BreadcrumbList schema }\n  </script>\n\n  <!-- Schema 4: Event (Tee Times) - Optional, include on booking pages -->\n  <script type=\"application/ld+json\">\n  { SportsEvent schema }\n  </script>\n</head>"
+  },
+  "implementation_guidelines": {
+    "1_LocalBusiness_GolfCourse": {
+      "required_properties": [
+        "name",
+        "address (full PostalAddress)",
+        "telephone",
+        "url",
+        "geo (latitude, longitude)"
+      ],
+      "recommended_properties": [
+        "image (hero image, 1200x628px minimum)",
+        "openingHoursSpecification",
+        "aggregateRating",
+        "review",
+        "email",
+        "sameAs (social profiles)",
+        "amenityFeature",
+        "additionalProperty (par, slope, rating)"
+      ],
+      "best_practices": [
+        "Use exact name matching Google Business Profile",
+        "Ensure coordinates pin the clubhouse entrance",
+        "Include high-quality hero image",
+        "List all holes and course specifications",
+        "Link directly to online booking system",
+        "Keep in sync with Google Business Profile data"
+      ]
+    },
+    "2_AggregateRating": {
+      "required_properties": [
+        "ratingValue",
+        "bestRating",
+        "worstRating",
+        "ratingCount"
+      ],
+      "recommended_properties": [
+        "reviewCount",
+        "review (individual review items)",
+        "name"
+      ],
+      "critical_warning": "ONLY include reviews hosted on your own website. Do not mark up third-party reviews from Google, Yelp, or other platforms.",
+      "validation": "Test in Google Rich Results Test tool to ensure eligibility"
+    },
+    "3_SportsActivityLocation": {
+      "when_to_use": "When you want to emphasize golf-specific activities and equipment",
+      "can_combine_with": "LocalBusiness type in same schema",
+      "golf_specific_properties": [
+        "numberOfHoles",
+        "courseRating",
+        "par",
+        "slopeRating",
+        "guestCanBringOwnEquipment",
+        "equipmentRental"
+      ]
+    },
+    "4_BreadcrumbList": {
+      "recommended_depth": "3-5 levels deep",
+      "position_numbering": "Must start at 1 and increment sequentially",
+      "last_item": "Should be current page (optional to include URL)",
+      "helps_with": "Navigation in search results, click-through rates, site structure clarity"
+    },
+    "5_EventSchema": {
+      "when_to_use": "Include on pages showing specific tee times or tournaments",
+      "required_for_teetimes": [
+        "startDate (specific time slot)",
+        "location (GolfCourse)",
+        "offers (price and availability)",
+        "organizer"
+      ],
+      "availability_values": {
+        "InStock": "Slots still available",
+        "OutOfStock": "Fully booked",
+        "PreOrder": "Available for future booking"
+      },
+      "eventStatus_values": {
+        "EventScheduled": "Event confirmed and scheduled",
+        "EventCancelled": "Event has been cancelled",
+        "EventRescheduled": "Event rescheduled to different time"
+      }
+    }
+  },
+  "seo_impact_summary": {
+    "rich_results": "Proper schema markup enables golf course business cards in Google Search",
+    "local_seo": "Improves visibility in Google Maps and local pack results",
+    "voice_search": "Critical for Alexa, Siri, and Google Assistant golf course queries",
+    "ai_search": "Ensures proper representation in ChatGPT, Gemini, and other AI engines",
+    "ctr_improvement": "Studies show 20-30% improvement in click-through rates with proper schema",
+    "validation_tools": [
+      "Google Rich Results Test: https://search.google.com/test/rich-results",
+      "Schema.org Validator: https://validator.schema.org/",
+      "Structured Data Testing Tool: https://developers.google.com/search/docs/appearance/structured-data"
+    ]
+  },
+  "testing_checklist": {
+    "before_deployment": [
+      "Validate JSON-LD syntax with https://jsonlint.com/",
+      "Test with Google Rich Results Test tool",
+      "Verify all phone numbers, addresses, hours match Google Business Profile",
+      "Check geo coordinates with Google Maps",
+      "Ensure images are properly hosted and accessible",
+      "Validate all URLs are absolute (not relative)",
+      "Test review markup only includes your own reviews",
+      "Verify opening hours cover all day/time combinations"
+    ],
+    "after_deployment": [
+      "Check Search Console for structured data errors",
+      "Monitor Google Search results for rich results appearance",
+      "Test voice search with Alexa/Google Assistant",
+      "Verify course appears correctly in Google Maps",
+      "Check AI search engines (ChatGPT, Gemini) for accurate representation",
+      "Set up monitoring for schema validation errors"
+    ]
+  }
+}
