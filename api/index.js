@@ -991,6 +991,798 @@ app.get('/api/tee-times/deals', async (req, res) => {
   }
 });
 
+// ========== ENVIRONMENTAL DATA ENDPOINTS ==========
+
+// In-memory cache for environmental data
+const envDataCache = new Map();
+const ENV_CACHE_TTL = 15 * 60 * 1000; // 15 minutes for weather/AQI
+const DAYLIGHT_CACHE_TTL = 60 * 60 * 1000; // 1 hour for daylight (doesn't change often)
+const TIDES_CACHE_TTL = 30 * 60 * 1000; // 30 minutes for tides
+
+/**
+ * Get cached data or null if expired/missing
+ */
+const getEnvCache = (key, ttl) => {
+  const entry = envDataCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > ttl) {
+    envDataCache.delete(key);
+    return null;
+  }
+  return entry.data;
+};
+
+/**
+ * Set cache entry
+ */
+const setEnvCache = (key, data) => {
+  envDataCache.set(key, { data, timestamp: Date.now() });
+};
+
+/**
+ * Helper to get course coordinates from database
+ */
+const getCourseCoordinates = async (courseId) => {
+  let result;
+  if (/^\d+$/.test(courseId)) {
+    result = await db.execute({
+      sql: 'SELECT id, name, latitude, longitude, city, region FROM courses WHERE id = ?',
+      args: [parseInt(courseId)]
+    });
+  } else {
+    result = await db.execute({
+      sql: 'SELECT id, name, latitude, longitude, city, region FROM courses WHERE slug = ?',
+      args: [courseId]
+    });
+  }
+
+  if (!result.rows.length) {
+    return null;
+  }
+
+  const course = result.rows[0];
+  if (!course.latitude || !course.longitude) {
+    return { ...course, hasCoordinates: false };
+  }
+
+  return { ...course, hasCoordinates: true };
+};
+
+/**
+ * List of coastal course IDs/slugs for tide relevance
+ * Courses within ~5 miles of the coast where tides may affect play or views
+ */
+const COASTAL_COURSES = [
+  'half-moon-bay-ocean-course',
+  'half-moon-bay-old-course',
+  'pacific-grove-golf-links',
+  'pebble-beach-golf-links',
+  'spyglass-hill-golf-course',
+  'links-at-spanish-bay',
+  'bayonet-black-horse',
+  'sharp-park-golf-course',
+  'presidio-golf-course',
+  'lincoln-park-golf-course',
+  'tpc-harding-park',
+  'tpc-harding-park-fleming-9',
+  'gleneagles-golf-course',
+  'crystal-springs-golf-course',
+  'corica-park-north-course',
+  'corica-park-south-course'
+];
+
+/**
+ * Check if course is coastal
+ */
+const isCoastalCourse = (courseSlug, courseId) => {
+  return COASTAL_COURSES.includes(courseSlug) || COASTAL_COURSES.includes(String(courseId));
+};
+
+// GET /api/weather/:courseId - Get weather for a course
+app.get('/api/weather/:courseId', async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await getCourseCoordinates(courseId);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    if (!course.hasCoordinates) {
+      return res.status(400).json({
+        error: 'Course coordinates not available',
+        course: { id: course.id, name: course.name }
+      });
+    }
+
+    const cacheKey = `weather:${course.latitude}:${course.longitude}`;
+    const cached = getEnvCache(cacheKey, ENV_CACHE_TTL);
+    if (cached) {
+      res.set('Cache-Control', 'public, max-age=900'); // 15 min
+      res.set('X-Cache', 'HIT');
+      return res.json({ ...cached, course: { id: course.id, name: course.name } });
+    }
+
+    // Use Open-Meteo API (free, no API key required)
+    const weatherUrl = new URL('https://api.open-meteo.com/v1/forecast');
+    weatherUrl.searchParams.set('latitude', course.latitude);
+    weatherUrl.searchParams.set('longitude', course.longitude);
+    weatherUrl.searchParams.set('current', 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m');
+    weatherUrl.searchParams.set('hourly', 'temperature_2m,precipitation_probability,weather_code,wind_speed_10m');
+    weatherUrl.searchParams.set('daily', 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset');
+    weatherUrl.searchParams.set('temperature_unit', 'fahrenheit');
+    weatherUrl.searchParams.set('wind_speed_unit', 'mph');
+    weatherUrl.searchParams.set('precipitation_unit', 'inch');
+    weatherUrl.searchParams.set('timezone', 'America/Los_Angeles');
+    weatherUrl.searchParams.set('forecast_days', '7');
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(weatherUrl.toString(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Weather API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Transform to golf-friendly format
+    const weatherData = {
+      current: {
+        temperature: data.current?.temperature_2m,
+        feelsLike: data.current?.apparent_temperature,
+        humidity: data.current?.relative_humidity_2m,
+        precipitation: data.current?.precipitation,
+        weatherCode: data.current?.weather_code,
+        wind: {
+          speed: data.current?.wind_speed_10m,
+          direction: data.current?.wind_direction_10m,
+          gusts: data.current?.wind_gusts_10m
+        },
+        golfConditions: getGolfConditions(data.current)
+      },
+      hourly: data.hourly?.time?.slice(0, 24).map((time, i) => ({
+        time,
+        temperature: data.hourly.temperature_2m[i],
+        precipitationProbability: data.hourly.precipitation_probability[i],
+        weatherCode: data.hourly.weather_code[i],
+        windSpeed: data.hourly.wind_speed_10m[i]
+      })),
+      daily: data.daily?.time?.map((date, i) => ({
+        date,
+        high: data.daily.temperature_2m_max[i],
+        low: data.daily.temperature_2m_min[i],
+        precipitationProbability: data.daily.precipitation_probability_max[i],
+        weatherCode: data.daily.weather_code[i],
+        sunrise: data.daily.sunrise[i],
+        sunset: data.daily.sunset[i]
+      })),
+      fetchedAt: new Date().toISOString()
+    };
+
+    setEnvCache(cacheKey, weatherData);
+
+    res.set('Cache-Control', 'public, max-age=900'); // 15 min
+    res.set('X-Cache', 'MISS');
+    res.json({ ...weatherData, course: { id: course.id, name: course.name } });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return res.status(504).json({ error: 'Weather service timeout' });
+    }
+    console.error('Weather API error:', error);
+    res.status(500).json({ error: 'Failed to fetch weather data' });
+  }
+});
+
+/**
+ * Helper to assess golf conditions from weather data
+ */
+function getGolfConditions(current) {
+  if (!current) return { rating: 'unknown', summary: 'Weather data unavailable' };
+
+  const temp = current.temperature_2m;
+  const wind = current.wind_speed_10m;
+  const precip = current.precipitation;
+  const code = current.weather_code;
+
+  // Weather codes: 0=clear, 1-3=partly cloudy, 45-48=fog, 51-67=rain, 71-77=snow, 80-82=showers, 95-99=thunderstorm
+  const isRaining = (code >= 51 && code <= 67) || (code >= 80 && code <= 82);
+  const isStormy = code >= 95;
+  const isFoggy = code >= 45 && code <= 48;
+
+  if (isStormy) {
+    return { rating: 'poor', summary: 'Thunderstorms - not recommended for golf' };
+  }
+  if (isRaining && precip > 0.1) {
+    return { rating: 'poor', summary: 'Active precipitation - consider rescheduling' };
+  }
+  if (wind > 25) {
+    return { rating: 'challenging', summary: 'Very windy conditions - expect difficulty' };
+  }
+  if (temp < 45 || temp > 100) {
+    return { rating: 'challenging', summary: temp < 45 ? 'Cold conditions - dress warmly' : 'Hot conditions - stay hydrated' };
+  }
+  if (isFoggy) {
+    return { rating: 'fair', summary: 'Foggy - limited visibility on some holes' };
+  }
+  if (wind > 15) {
+    return { rating: 'fair', summary: 'Breezy conditions - club selection important' };
+  }
+  if (temp >= 60 && temp <= 80 && wind < 10 && !isRaining) {
+    return { rating: 'excellent', summary: 'Ideal golf weather!' };
+  }
+  return { rating: 'good', summary: 'Good conditions for golf' };
+}
+
+// GET /api/tides/:courseId - Get tides for coastal course
+app.get('/api/tides/:courseId', async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await getCourseCoordinates(courseId);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Check if this is a coastal course
+    const courseSlug = (await db.execute({
+      sql: 'SELECT slug FROM courses WHERE id = ?',
+      args: [course.id]
+    })).rows[0]?.slug;
+
+    if (!isCoastalCourse(courseSlug, course.id)) {
+      return res.status(400).json({
+        error: 'Tide data not relevant for this course',
+        message: 'This course is not near the coast',
+        course: { id: course.id, name: course.name }
+      });
+    }
+
+    const cacheKey = `tides:sf-bay`;
+    const cached = getEnvCache(cacheKey, TIDES_CACHE_TTL);
+    if (cached) {
+      res.set('Cache-Control', 'public, max-age=1800'); // 30 min
+      res.set('X-Cache', 'HIT');
+      return res.json({ ...cached, course: { id: course.id, name: course.name } });
+    }
+
+    // Use NOAA CO-OPS API (free, no API key required)
+    // Station 9414290 = San Francisco
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 2);
+
+    const formatDate = (d) => {
+      return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    };
+
+    const tidesUrl = new URL('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter');
+    tidesUrl.searchParams.set('begin_date', formatDate(today));
+    tidesUrl.searchParams.set('end_date', formatDate(tomorrow));
+    tidesUrl.searchParams.set('station', '9414290');
+    tidesUrl.searchParams.set('product', 'predictions');
+    tidesUrl.searchParams.set('datum', 'MLLW');
+    tidesUrl.searchParams.set('time_zone', 'lst_ldt');
+    tidesUrl.searchParams.set('interval', 'hilo');
+    tidesUrl.searchParams.set('units', 'english');
+    tidesUrl.searchParams.set('format', 'json');
+    tidesUrl.searchParams.set('application', 'BayAreaGolfTimes');
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const response = await fetch(tidesUrl.toString(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`NOAA API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    // Transform to golf-friendly format
+    const now = new Date();
+    const predictions = (data.predictions || []).map(p => {
+      const time = new Date(p.t.replace(' ', 'T'));
+      return {
+        time: p.t,
+        timeISO: time.toISOString(),
+        height: parseFloat(p.v),
+        type: p.type,
+        typeLabel: p.type === 'H' ? 'High' : 'Low',
+        isFuture: time > now
+      };
+    });
+
+    // Find current tide status
+    const pastTides = predictions.filter(p => !p.isFuture);
+    const futureTides = predictions.filter(p => p.isFuture);
+    const previousTide = pastTides[pastTides.length - 1];
+    const nextTide = futureTides[0];
+
+    let tideState = 'unknown';
+    let estimatedHeight = null;
+
+    if (previousTide && nextTide) {
+      // Determine if rising or falling
+      if (previousTide.type === 'L' && nextTide.type === 'H') {
+        tideState = 'rising';
+      } else if (previousTide.type === 'H' && nextTide.type === 'L') {
+        tideState = 'falling';
+      }
+
+      // Interpolate current height
+      const prevTime = new Date(previousTide.timeISO).getTime();
+      const nextTime = new Date(nextTide.timeISO).getTime();
+      const nowTime = now.getTime();
+      const progress = (nowTime - prevTime) / (nextTime - prevTime);
+      const cosProgress = (1 - Math.cos(progress * Math.PI)) / 2;
+      estimatedHeight = previousTide.height + (nextTide.height - previousTide.height) * cosProgress;
+      estimatedHeight = Math.round(estimatedHeight * 10) / 10;
+    }
+
+    const tidesData = {
+      station: {
+        id: '9414290',
+        name: 'San Francisco',
+        note: 'Tides may vary slightly at different coastal locations'
+      },
+      current: {
+        state: tideState,
+        estimatedHeight,
+        previousTide,
+        nextTide
+      },
+      predictions,
+      golfNotes: getTideGolfNotes(tideState, estimatedHeight, nextTide),
+      fetchedAt: new Date().toISOString()
+    };
+
+    setEnvCache(cacheKey, tidesData);
+
+    res.set('Cache-Control', 'public, max-age=1800'); // 30 min
+    res.set('X-Cache', 'MISS');
+    res.json({ ...tidesData, course: { id: course.id, name: course.name } });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return res.status(504).json({ error: 'Tide service timeout' });
+    }
+    console.error('Tides API error:', error);
+    res.status(500).json({ error: 'Failed to fetch tide data' });
+  }
+});
+
+/**
+ * Helper to generate golf-specific tide notes
+ */
+function getTideGolfNotes(state, height, nextTide) {
+  const notes = [];
+
+  if (state === 'rising') {
+    notes.push('Tide is coming in (rising)');
+  } else if (state === 'falling') {
+    notes.push('Tide is going out (falling)');
+  }
+
+  if (height !== null) {
+    if (height < 1.5) {
+      notes.push('Very low tide - exposed beach areas, possible wildlife viewing');
+    } else if (height > 5.5) {
+      notes.push('High tide - water closer to coastal holes');
+    }
+  }
+
+  if (nextTide) {
+    const nextTime = new Date(nextTide.timeISO);
+    const now = new Date();
+    const minutesUntil = Math.round((nextTime - now) / (1000 * 60));
+    const hoursUntil = Math.floor(minutesUntil / 60);
+    const mins = minutesUntil % 60;
+
+    if (hoursUntil > 0) {
+      notes.push(`Next ${nextTide.typeLabel.toLowerCase()} tide in ${hoursUntil}h ${mins}m`);
+    } else {
+      notes.push(`Next ${nextTide.typeLabel.toLowerCase()} tide in ${minutesUntil} minutes`);
+    }
+  }
+
+  return notes;
+}
+
+// GET /api/air-quality/:courseId - Get AQI for a course
+app.get('/api/air-quality/:courseId', async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const course = await getCourseCoordinates(courseId);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    if (!course.hasCoordinates) {
+      return res.status(400).json({
+        error: 'Course coordinates not available',
+        course: { id: course.id, name: course.name }
+      });
+    }
+
+    // Round coordinates for cache key (roughly 1km precision)
+    const lat = Math.round(course.latitude * 100) / 100;
+    const lng = Math.round(course.longitude * 100) / 100;
+    const cacheKey = `aqi:${lat}:${lng}`;
+
+    const cached = getEnvCache(cacheKey, ENV_CACHE_TTL);
+    if (cached) {
+      res.set('Cache-Control', 'public, max-age=900'); // 15 min
+      res.set('X-Cache', 'HIT');
+      return res.json({ ...cached, course: { id: course.id, name: course.name } });
+    }
+
+    // Use AirNow API if key is available, otherwise use Open-Meteo Air Quality
+    const airnowKey = process.env.AIRNOW_API_KEY;
+
+    let aqiData;
+    if (airnowKey) {
+      aqiData = await fetchAirNowData(course.latitude, course.longitude, airnowKey);
+    } else {
+      aqiData = await fetchOpenMeteoAirQuality(course.latitude, course.longitude);
+    }
+
+    setEnvCache(cacheKey, aqiData);
+
+    res.set('Cache-Control', 'public, max-age=900'); // 15 min
+    res.set('X-Cache', 'MISS');
+    res.json({ ...aqiData, course: { id: course.id, name: course.name } });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return res.status(504).json({ error: 'Air quality service timeout' });
+    }
+    console.error('Air quality API error:', error);
+    res.status(500).json({ error: 'Failed to fetch air quality data' });
+  }
+});
+
+/**
+ * Fetch air quality from AirNow API
+ */
+async function fetchAirNowData(latitude, longitude, apiKey) {
+  const url = new URL('https://www.airnowapi.org/aq/observation/latLong/current/');
+  url.searchParams.set('format', 'application/json');
+  url.searchParams.set('latitude', latitude.toString());
+  url.searchParams.set('longitude', longitude.toString());
+  url.searchParams.set('distance', '25');
+  url.searchParams.set('API_KEY', apiKey);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  const response = await fetch(url.toString(), { signal: controller.signal });
+  clearTimeout(timeoutId);
+
+  if (!response.ok) {
+    throw new Error(`AirNow API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return createFallbackAQI(latitude, longitude, 'No AirNow data available for this location');
+  }
+
+  // Find highest AQI (primary pollutant)
+  const sorted = [...data].sort((a, b) => b.AQI - a.AQI);
+  const primary = sorted[0];
+
+  const aqi = primary.AQI;
+  const category = getAQICategory(aqi);
+  const golfRec = getGolfAQIRecommendation(aqi);
+
+  return {
+    source: 'AirNow',
+    aqi,
+    primaryPollutant: primary.ParameterName,
+    category,
+    golfRecommendation: golfRec,
+    reportingArea: primary.ReportingArea,
+    observedAt: `${primary.DateObserved}T${String(primary.HourObserved).padStart(2, '0')}:00:00`,
+    pollutants: data.map(p => ({
+      name: p.ParameterName,
+      aqi: p.AQI,
+      category: getAQICategory(p.AQI).name
+    })),
+    fetchedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Fetch air quality from Open-Meteo (free fallback)
+ */
+async function fetchOpenMeteoAirQuality(latitude, longitude) {
+  const url = new URL('https://air-quality-api.open-meteo.com/v1/air-quality');
+  url.searchParams.set('latitude', latitude.toString());
+  url.searchParams.set('longitude', longitude.toString());
+  url.searchParams.set('current', 'us_aqi,pm10,pm2_5,ozone,nitrogen_dioxide');
+  url.searchParams.set('timezone', 'America/Los_Angeles');
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  const response = await fetch(url.toString(), { signal: controller.signal });
+  clearTimeout(timeoutId);
+
+  if (!response.ok) {
+    throw new Error(`Open-Meteo Air Quality API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  const aqi = data.current?.us_aqi || 0;
+  const category = getAQICategory(aqi);
+  const golfRec = getGolfAQIRecommendation(aqi);
+
+  return {
+    source: 'Open-Meteo',
+    aqi,
+    primaryPollutant: 'PM2.5',
+    category,
+    golfRecommendation: golfRec,
+    pollutants: [
+      { name: 'PM2.5', value: data.current?.pm2_5, unit: 'ug/m3' },
+      { name: 'PM10', value: data.current?.pm10, unit: 'ug/m3' },
+      { name: 'Ozone', value: data.current?.ozone, unit: 'ug/m3' },
+      { name: 'NO2', value: data.current?.nitrogen_dioxide, unit: 'ug/m3' }
+    ].filter(p => p.value !== undefined),
+    fetchedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Create fallback AQI data when APIs fail
+ */
+function createFallbackAQI(latitude, longitude, message) {
+  return {
+    source: 'unavailable',
+    aqi: null,
+    category: { name: 'Unknown', color: '#999999' },
+    golfRecommendation: {
+      level: 'unknown',
+      summary: 'Air quality data unavailable',
+      details: message
+    },
+    fetchedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Get AQI category from value
+ */
+function getAQICategory(aqi) {
+  if (aqi <= 50) return { name: 'Good', color: '#00E400', level: 1 };
+  if (aqi <= 100) return { name: 'Moderate', color: '#FFFF00', level: 2 };
+  if (aqi <= 150) return { name: 'Unhealthy for Sensitive Groups', color: '#FF7E00', level: 3 };
+  if (aqi <= 200) return { name: 'Unhealthy', color: '#FF0000', level: 4 };
+  if (aqi <= 300) return { name: 'Very Unhealthy', color: '#8F3F97', level: 5 };
+  return { name: 'Hazardous', color: '#7E0023', level: 6 };
+}
+
+/**
+ * Get golf-specific AQI recommendation
+ */
+function getGolfAQIRecommendation(aqi) {
+  if (aqi <= 50) {
+    return {
+      level: 'great',
+      summary: 'Great conditions for golf!',
+      details: 'Air quality is excellent. Perfect for a full round.',
+      showWarning: false
+    };
+  }
+  if (aqi <= 75) {
+    return {
+      level: 'good',
+      summary: 'Good conditions for golf',
+      details: 'Air quality is acceptable for most golfers.',
+      showWarning: false
+    };
+  }
+  if (aqi <= 100) {
+    return {
+      level: 'caution',
+      summary: 'Fair conditions - sensitive groups should take precautions',
+      details: 'Those with respiratory conditions may want to limit exertion.',
+      showWarning: true
+    };
+  }
+  if (aqi <= 150) {
+    return {
+      level: 'warning',
+      summary: 'Poor conditions - consider rescheduling',
+      details: 'Air quality may affect healthy individuals during extended outdoor activity.',
+      showWarning: true
+    };
+  }
+  return {
+    level: 'danger',
+    summary: 'Unhealthy conditions - recommend rescheduling',
+    details: 'Extended outdoor activity is not advised. Consider rescheduling.',
+    showWarning: true
+  };
+}
+
+// GET /api/daylight/:courseId - Get sunrise/sunset for a course
+app.get('/api/daylight/:courseId', async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { date } = req.query; // Optional: YYYY-MM-DD format
+    const course = await getCourseCoordinates(courseId);
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    if (!course.hasCoordinates) {
+      return res.status(400).json({
+        error: 'Course coordinates not available',
+        course: { id: course.id, name: course.name }
+      });
+    }
+
+    const targetDate = date || new Date().toISOString().split('T')[0];
+    const cacheKey = `daylight:${course.latitude}:${course.longitude}:${targetDate}`;
+
+    const cached = getEnvCache(cacheKey, DAYLIGHT_CACHE_TTL);
+    if (cached) {
+      res.set('Cache-Control', 'public, max-age=3600'); // 1 hour
+      res.set('X-Cache', 'HIT');
+      return res.json({ ...cached, course: { id: course.id, name: course.name } });
+    }
+
+    // Use SunriseSunset.io API (free, no API key required)
+    const sunUrl = new URL('https://api.sunrisesunset.io/json');
+    sunUrl.searchParams.set('lat', course.latitude.toString());
+    sunUrl.searchParams.set('lng', course.longitude.toString());
+    sunUrl.searchParams.set('date', targetDate);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(sunUrl.toString(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Sunrise-Sunset API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.status !== 'OK') {
+      throw new Error(`API returned status: ${data.status}`);
+    }
+
+    const results = data.results;
+
+    // Parse times and calculate golf-specific windows
+    const parseTime = (timeStr, baseDate) => {
+      const match = timeStr.match(/^(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)$/i);
+      if (!match) return null;
+
+      let hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const period = match[4].toUpperCase();
+
+      if (period === 'PM' && hours !== 12) hours += 12;
+      else if (period === 'AM' && hours === 12) hours = 0;
+
+      return `${baseDate}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+    };
+
+    // Parse day length (HH:MM:SS format)
+    const parseDayLength = (str) => {
+      const match = str.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+      if (!match) return null;
+      const hours = parseInt(match[1], 10);
+      const mins = parseInt(match[2], 10);
+      return { hours, minutes: mins, formatted: `${hours}h ${mins}m` };
+    };
+
+    const daylightData = {
+      date: targetDate,
+      sunrise: parseTime(results.sunrise, targetDate),
+      sunset: parseTime(results.sunset, targetDate),
+      firstLight: parseTime(results.first_light, targetDate),
+      lastLight: parseTime(results.last_light, targetDate),
+      dawn: parseTime(results.dawn, targetDate),
+      dusk: parseTime(results.dusk, targetDate),
+      solarNoon: parseTime(results.solar_noon, targetDate),
+      goldenHour: parseTime(results.golden_hour, targetDate),
+      dayLength: parseDayLength(results.day_length),
+      timezone: results.timezone,
+      golfWindows: calculateGolfWindows(results, targetDate),
+      fetchedAt: new Date().toISOString()
+    };
+
+    setEnvCache(cacheKey, daylightData);
+
+    res.set('Cache-Control', 'public, max-age=3600'); // 1 hour
+    res.set('X-Cache', 'MISS');
+    res.json({ ...daylightData, course: { id: course.id, name: course.name } });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return res.status(504).json({ error: 'Daylight service timeout' });
+    }
+    console.error('Daylight API error:', error);
+    res.status(500).json({ error: 'Failed to fetch daylight data' });
+  }
+});
+
+/**
+ * Calculate golf-specific time windows from daylight data
+ */
+function calculateGolfWindows(results, baseDate) {
+  const parseTimeToMinutes = (timeStr) => {
+    const match = timeStr.match(/^(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)$/i);
+    if (!match) return null;
+
+    let hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const period = match[4].toUpperCase();
+
+    if (period === 'PM' && hours !== 12) hours += 12;
+    else if (period === 'AM' && hours === 12) hours = 0;
+
+    return hours * 60 + minutes;
+  };
+
+  const formatMinutes = (mins) => {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayHour = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+    return `${displayHour}:${String(m).padStart(2, '0')} ${period}`;
+  };
+
+  const dawnMins = parseTimeToMinutes(results.dawn);
+  const duskMins = parseTimeToMinutes(results.dusk);
+  const sunriseMins = parseTimeToMinutes(results.sunrise);
+  const goldenHourMins = parseTimeToMinutes(results.golden_hour);
+
+  // Round duration: assume 4 hours (240 minutes) for 18 holes
+  const roundDuration = 240;
+  // Buffer before dusk
+  const duskBuffer = 30;
+
+  // Earliest: dawn (enough light to see)
+  const earliestTeeTime = dawnMins;
+  // Latest: needs to finish before dusk with buffer
+  const latestTeeTime = duskMins - roundDuration - duskBuffer;
+
+  // Calculate playable hours
+  const playableMinutes = Math.max(0, latestTeeTime - earliestTeeTime);
+  const playableHours = Math.round(playableMinutes / 60 * 10) / 10;
+
+  return {
+    earliestTeeTime: formatMinutes(earliestTeeTime),
+    latestTeeTime: formatMinutes(latestTeeTime),
+    playableHours,
+    morningGoldenHour: {
+      start: formatMinutes(sunriseMins),
+      end: formatMinutes(sunriseMins + 60),
+      note: 'Beautiful morning light for scenic rounds'
+    },
+    eveningGoldenHour: {
+      start: formatMinutes(goldenHourMins),
+      end: formatMinutes(parseTimeToMinutes(results.sunset)),
+      note: 'Best light for photos - warm golden tones'
+    }
+  };
+}
+
 // ========== USER AUTH ENDPOINTS ==========
 
 app.post('/api/auth/signup', async (req, res) => {

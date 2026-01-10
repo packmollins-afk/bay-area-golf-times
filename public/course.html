@@ -711,6 +711,332 @@
       font-size: 1rem;
     }
 
+    /* Tide widget */
+    .tide-widget {
+      background: linear-gradient(135deg, #1a5276, #2980b9);
+      border-radius: 12px;
+      padding: 20px;
+      color: white;
+      min-height: 100px;
+    }
+    .tide-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .tide-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tide-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: #fff;
+      fill: none;
+    }
+    .tide-status {
+      flex: 1;
+    }
+    .tide-current {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .tide-level {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    .tide-forecast {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .tide-event {
+      flex: 1;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .tide-event-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+    .tide-event-time {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .tide-event-height {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .tide-event.high {
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    .tide-event.low {
+      border: 2px solid rgba(100,200,255,0.3);
+    }
+    .calm-window {
+      background: rgba(46, 204, 113, 0.25);
+      border: 2px solid rgba(46, 204, 113, 0.5);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .calm-window-icon {
+      width: 24px;
+      height: 24px;
+      stroke: #2ecc71;
+      fill: none;
+    }
+    .calm-window-text {
+      flex: 1;
+    }
+    .calm-window-label {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    .calm-window-time {
+      font-weight: 700;
+    }
+    .tide-hidden {
+      display: none;
+    }
+
+    /* AQI Badge */
+    .aqi-widget {
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+    .aqi-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .aqi-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .aqi-badge.aqi-good { background: linear-gradient(135deg, #00e400, #009900); }
+    .aqi-badge.aqi-moderate { background: linear-gradient(135deg, #ffff00, #cccc00); color: #333; text-shadow: none; }
+    .aqi-badge.aqi-sensitive { background: linear-gradient(135deg, #ff7e00, #cc6600); }
+    .aqi-badge.aqi-unhealthy { background: linear-gradient(135deg, #ff0000, #cc0000); }
+    .aqi-badge.aqi-very-unhealthy { background: linear-gradient(135deg, #8f3f97, #663377); }
+    .aqi-badge.aqi-hazardous { background: linear-gradient(135deg, #7e0023, #4c0015); }
+    .aqi-info {
+      flex: 1;
+    }
+    .aqi-category {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .aqi-category.aqi-good { color: #009900; }
+    .aqi-category.aqi-moderate { color: #999900; }
+    .aqi-category.aqi-sensitive { color: #cc6600; }
+    .aqi-category.aqi-unhealthy { color: #cc0000; }
+    .aqi-category.aqi-very-unhealthy { color: #663377; }
+    .aqi-category.aqi-hazardous { color: #4c0015; }
+    .aqi-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .aqi-recommendation {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--bg-paper);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .aqi-recommendation svg {
+      flex-shrink: 0;
+    }
+    .aqi-recommendation.good svg { color: #009900; }
+    .aqi-recommendation.caution svg { color: #cc6600; }
+    .aqi-recommendation.warning svg { color: #cc0000; }
+
+    /* AQI Warning Banner */
+    .aqi-warning-banner {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: fadeInUp var(--anim-normal) var(--ease-out);
+    }
+    .aqi-warning-banner svg {
+      flex-shrink: 0;
+    }
+    .aqi-warning-banner .warning-text {
+      flex: 1;
+    }
+    .aqi-warning-banner .warning-title {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .aqi-warning-banner .warning-desc {
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+
+    /* Daylight Info Widget */
+    .daylight-widget {
+      background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+      border: 2px solid #FDBA74;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+    .daylight-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .daylight-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #9A3412;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .daylight-title svg {
+      width: 20px;
+      height: 20px;
+      stroke: #EA580C;
+    }
+    .golden-hour-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: white;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      animation: goldenPulse 2s ease-in-out infinite;
+    }
+    @keyframes goldenPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    }
+    .daylight-times {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .daylight-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 8px;
+    }
+    .daylight-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .daylight-item.sunrise svg { stroke: #EA580C; }
+    .daylight-item.sunset svg { stroke: #DC2626; }
+    .daylight-item.golden svg { stroke: #F59E0B; fill: #FEF3C7; }
+    .daylight-item .label {
+      font-size: 0.75rem;
+      color: #78350F;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .daylight-item .time {
+      font-family: 'DM Mono', monospace;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #9A3412;
+    }
+    .daylight-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #FDBA74;
+    }
+    .daylight-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .daylight-stat .stat-label {
+      font-size: 0.7rem;
+      color: #78350F;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .daylight-stat .stat-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #9A3412;
+    }
+    .playable-window {
+      flex: 1;
+      text-align: right;
+    }
+    .playable-window .stat-value {
+      color: var(--primary);
+    }
+    @media (max-width: 600px) {
+      .daylight-times {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .daylight-item {
+        padding: 8px 10px;
+      }
+      .daylight-summary {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .playable-window {
+        text-align: left;
+      }
+    }
+
     /* Course fun facts */
     /* Home Course Users */
     .home-users {
@@ -874,6 +1200,83 @@
     .view-all-link:hover {
       text-decoration: underline;
     }
+
+    /* Add to Calendar Button */
+    .calendar-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .calendar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-paper);
+      border: 2px solid var(--border-light);
+      border-radius: 4px;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .calendar-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .calendar-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    .calendar-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      min-width: 180px;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: all 0.2s ease;
+    }
+    .calendar-dropdown.open .calendar-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .calendar-menu a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.9rem;
+      transition: background 0.15s;
+    }
+    .calendar-menu a:first-child {
+      border-radius: 6px 6px 0 0;
+    }
+    .calendar-menu a:last-child {
+      border-radius: 0 0 6px 6px;
+    }
+    .calendar-menu a:hover {
+      background: var(--bg-paper);
+    }
+    .calendar-menu svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .calendar-menu .google-icon { color: #4285f4; }
+    .calendar-menu .apple-icon { color: #333; }
+    .calendar-menu .outlook-icon { color: #0078d4; }
+    .calendar-menu .yahoo-icon { color: #6001d2; }
 
     /* Mobile */
     @media (max-width: 600px) {
@@ -1918,14 +2321,38 @@
           ${upcomingTeeTimes.length > 0 ? `
             <div class="upcoming-tee-times">
               ${upcomingTeeTimes.map(tt => `
-                <a href="tel:${course.phone_number?.replace(/[^\d+]/g, '') || ''}" class="tee-time-slot" onclick="trackCallClick()">
-                  <div class="tee-time-info">
+                <div class="tee-time-slot" style="cursor: default;">
+                  <a href="tel:${course.phone_number?.replace(/[^\d+]/g, '') || ''}" class="tee-time-info" style="text-decoration: none; color: inherit; flex: 1;" onclick="trackCallClick()">
                     <span class="tee-time-date">${formatTeeTimeDate(tt.date)}</span>
                     <span class="tee-time-time">${formatTeeTimeTime(tt.time)}</span>
-                  </div>
+                  </a>
                   <div class="tee-time-price">$${tt.price || '--'}</div>
-                  <span class="tee-time-book">Book</span>
-                </a>
+                  <div class="calendar-dropdown">
+                    <button class="calendar-btn" onclick="toggleCalendarMenu(event)">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                      Calendar
+                    </button>
+                    <div class="calendar-menu">
+                      <a href="#" onclick="addToGoogleCalendar(event, '${tt.date}', '${tt.time}', '${course.name.replace(/'/g, "\\'")}', '${(course.address || '').replace(/'/g, "\\'")} ${course.city}, CA')">
+                        <svg class="google-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22q-2.075 0-3.9-.788-1.825-.787-3.175-2.137-1.35-1.35-2.137-3.175Q2 14.075 2 12t.788-3.9q.787-1.825 2.137-3.175 1.35-1.35 3.175-2.138Q9.925 2 12 2t3.9.787q1.825.788 3.175 2.138 1.35 1.35 2.137 3.175Q22 9.925 22 12t-.788 3.9q-.787 1.825-2.137 3.175-1.35 1.35-3.175 2.137Q14.075 22 12 22z"/></svg>
+                        Google Calendar
+                      </a>
+                      <a href="#" onclick="downloadICS(event, '${tt.date}', '${tt.time}', '${course.name.replace(/'/g, "\\'")}', '${(course.address || '').replace(/'/g, "\\'")} ${course.city}, CA')">
+                        <svg class="apple-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                        Apple Calendar
+                      </a>
+                      <a href="#" onclick="addToOutlookCalendar(event, '${tt.date}', '${tt.time}', '${course.name.replace(/'/g, "\\'")}', '${(course.address || '').replace(/'/g, "\\'")} ${course.city}, CA')">
+                        <svg class="outlook-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.85-.2q-.35-.21-.57-.55-.22-.33-.33-.75-.1-.42-.1-.86t.1-.87q.1-.43.34-.76.22-.34.59-.54.36-.2.87-.2t.86.2q.35.21.57.55.22.34.31.77.1.43.1.88zM24 12v9.38q0 .46-.33.8-.33.32-.8.32H7.13q-.46 0-.8-.33-.32-.33-.32-.8V18H1q-.41 0-.7-.3-.3-.29-.3-.7V7q0-.41.3-.7Q.58 6 1 6h6.01V2.62q0-.46.33-.8.33-.32.8-.32h14.73q.46 0 .8.33.33.33.33.8V12z"/></svg>
+                        Outlook
+                      </a>
+                      <a href="#" onclick="addToYahooCalendar(event, '${tt.date}', '${tt.time}', '${course.name.replace(/'/g, "\\'")}', '${(course.address || '').replace(/'/g, "\\'")} ${course.city}, CA')">
+                        <svg class="yahoo-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13.5l2-3 2 3h2l-3-4.5 3-4.5h-2l-2 3-2-3H8l3 4.5-3 4.5h2z"/></svg>
+                        Yahoo Calendar
+                      </a>
+                    </div>
+                  </div>
+                  <a href="tel:${course.phone_number?.replace(/[^\d+]/g, '') || ''}" class="tee-time-book" onclick="trackCallClick()">Book</a>
+                </div>
               `).join('')}
             </div>
             <a href="/app.html?course=${course.id}" class="view-all-link">View all ${course.teeTimes?.length || 0} tee times →</a>
@@ -2047,13 +2474,38 @@
         html += `
           <div class="section section-animate">
             <h3>Today's Weather</h3>
+            <div id="aqi-warning-container"></div>
             <div id="weather-widget" class="weather-widget">
               <div class="loading">Loading weather...</div>
+            </div>
+            <div id="aqi-widget" class="aqi-widget" style="display: none;">
+              <div class="loading">Loading air quality...</div>
+            </div>
+            <div id="daylight-widget" class="daylight-widget">
+              <div class="loading" style="color: #78350F;">Loading daylight info...</div>
             </div>
           </div>
         `;
         // Load weather after render
         setTimeout(() => loadWeather(course.latitude, course.longitude), 100);
+        // Load air quality after render
+        setTimeout(() => loadAirQuality(course.latitude, course.longitude), 150);
+        // Load daylight info
+        setTimeout(() => loadDaylight(course.latitude, course.longitude), 120);
+      }
+
+      // 5. TIDES (only for coastal courses)
+      if (course.latitude && course.longitude) {
+        html += `
+          <div id="tide-section" class="section section-animate tide-hidden">
+            <h3>Tide Conditions</h3>
+            <div id="tide-widget" class="tide-widget">
+              <div class="loading">Loading tides...</div>
+            </div>
+          </div>
+        `;
+        // Load tides after render (will check if coastal)
+        setTimeout(() => loadTides(course.latitude, course.longitude), 150);
       }
 
       // Facilities
@@ -2263,6 +2715,475 @@
       } catch (e) {
         console.error('Weather error:', e);
         widget.innerHTML = '<div style="text-align: center; opacity: 0.8;">Weather unavailable</div>';
+      }
+    }
+
+    async function loadAirQuality(lat, lon) {
+      const widget = document.getElementById('aqi-widget');
+      const warningContainer = document.getElementById('aqi-warning-container');
+      if (!widget) return;
+
+      try {
+        // Use Open-Meteo Air Quality API (free, no key needed)
+        const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm10,pm2_5&timezone=America%2FLos_Angeles`);
+        const data = await res.json();
+
+        const aqi = Math.round(data.current.us_aqi);
+        let category, colorClass, recommendation, recommendationClass;
+
+        // Determine AQI category and styling based on EPA standards
+        if (aqi <= 50) {
+          category = 'Good';
+          colorClass = 'aqi-good';
+          recommendation = 'Great conditions for golf! Enjoy your round.';
+          recommendationClass = 'good';
+        } else if (aqi <= 100) {
+          category = 'Moderate';
+          colorClass = 'aqi-moderate';
+          recommendation = 'Air quality is acceptable. Unusually sensitive golfers should consider limiting prolonged outdoor exertion.';
+          recommendationClass = 'good';
+        } else if (aqi <= 150) {
+          category = 'Unhealthy for Sensitive Groups';
+          colorClass = 'aqi-sensitive';
+          recommendation = 'Sensitive individuals should reduce prolonged outdoor exertion. Consider a cart instead of walking.';
+          recommendationClass = 'caution';
+        } else if (aqi <= 200) {
+          category = 'Unhealthy';
+          colorClass = 'aqi-unhealthy';
+          recommendation = 'Everyone may begin to experience health effects. Consider postponing your round.';
+          recommendationClass = 'warning';
+        } else if (aqi <= 300) {
+          category = 'Very Unhealthy';
+          colorClass = 'aqi-very-unhealthy';
+          recommendation = 'Health alert: everyone may experience serious health effects. Postpone outdoor activities.';
+          recommendationClass = 'warning';
+        } else {
+          category = 'Hazardous';
+          colorClass = 'aqi-hazardous';
+          recommendation = 'Health warning of emergency conditions. Avoid all outdoor activities.';
+          recommendationClass = 'warning';
+        }
+
+        // Show warning banner for unhealthy conditions (AQI > 150)
+        if (aqi > 150 && warningContainer) {
+          warningContainer.innerHTML = `
+            <div class="aqi-warning-banner">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <div class="warning-text">
+                <div class="warning-title">Air Quality Alert</div>
+                <div class="warning-desc">Current AQI is ${aqi} (${category}). Consider postponing outdoor activities.</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Build the recommendation icon based on severity
+        const recommendationIcon = recommendationClass === 'good'
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
+          : recommendationClass === 'caution'
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+
+        widget.style.display = 'block';
+        widget.innerHTML = `
+          <div class="aqi-header">
+            <div class="aqi-badge ${colorClass}">${aqi}</div>
+            <div class="aqi-info">
+              <div class="aqi-category ${colorClass}">${category}</div>
+              <div class="aqi-label">Air Quality Index</div>
+            </div>
+          </div>
+          <div class="aqi-recommendation ${recommendationClass}">
+            ${recommendationIcon}
+            <span>${recommendation}</span>
+          </div>
+        `;
+      } catch (e) {
+        console.error('Air quality error:', e);
+        // Hide the widget on error - don't show broken state
+        widget.style.display = 'none';
+      }
+    }
+
+    async function loadDaylight(lat, lon) {
+      const widget = document.getElementById('daylight-widget');
+      if (!widget) return;
+
+      try {
+        // Using SunriseSunset.io API
+        const res = await fetch(`https://api.sunrisesunset.io/json?lat=${lat}&lng=${lon}&timezone=America/Los_Angeles`);
+        const data = await res.json();
+
+        if (data.status !== 'OK') {
+          throw new Error('API returned error');
+        }
+
+        const results = data.results;
+
+        // Parse times from API response
+        const sunrise = results.sunrise;
+        const sunset = results.sunset;
+        const goldenHourStart = results.golden_hour;
+        const dayLength = results.day_length;
+
+        // Calculate if we're currently in golden hour
+        const now = new Date();
+
+        // Parse times for comparison
+        function parseTime(timeStr) {
+          const [time, period] = timeStr.split(' ');
+          let [hours, minutes, seconds] = time.split(':').map(Number);
+          if (period === 'PM' && hours !== 12) hours += 12;
+          if (period === 'AM' && hours === 12) hours = 0;
+          return hours * 60 + minutes;
+        }
+
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+        const goldenStartMinutes = parseTime(goldenHourStart);
+        const sunsetMinutes = parseTime(sunset);
+
+        // Golden hour is typically from golden_hour start until sunset
+        const isGoldenHour = nowMinutes >= goldenStartMinutes && nowMinutes <= sunsetMinutes;
+
+        // Calculate playable window (sunrise + 30min buffer to sunset - 30min for last hole)
+        const sunriseMinutes = parseTime(sunrise);
+        const playableStart = sunriseMinutes + 30;
+        const playableEnd = sunsetMinutes - 30;
+        const playableHours = Math.floor((playableEnd - playableStart) / 60);
+        const playableMins = (playableEnd - playableStart) % 60;
+
+        function minutesToTime(mins) {
+          const h = Math.floor(mins / 60);
+          const m = mins % 60;
+          const period = h >= 12 ? 'PM' : 'AM';
+          const hour = h % 12 || 12;
+          return `${hour}:${m.toString().padStart(2, '0')} ${period}`;
+        }
+
+        // Format times without seconds
+        function formatTimeShort(timeStr) {
+          const parts = timeStr.split(':');
+          return `${parts[0]}:${parts[1]} ${timeStr.split(' ')[1]}`;
+        }
+
+        widget.innerHTML = `
+          <div class="daylight-header">
+            <div class="daylight-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              Daylight Info
+            </div>
+            ${isGoldenHour ? '<span class="golden-hour-badge">Golden Hour Now</span>' : ''}
+          </div>
+          <div class="daylight-times">
+            <div class="daylight-item sunrise">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 18a5 5 0 0 0-10 0"></path>
+                <line x1="12" y1="9" x2="12" y2="2"></line>
+                <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line>
+                <line x1="1" y1="18" x2="3" y2="18"></line>
+                <line x1="21" y1="18" x2="23" y2="18"></line>
+                <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line>
+                <line x1="23" y1="22" x2="1" y2="22"></line>
+                <polyline points="8 6 12 2 16 6"></polyline>
+              </svg>
+              <div>
+                <div class="label">Sunrise</div>
+                <div class="time">${formatTimeShort(sunrise)}</div>
+              </div>
+            </div>
+            <div class="daylight-item sunset">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 18a5 5 0 0 0-10 0"></path>
+                <line x1="12" y1="9" x2="12" y2="2"></line>
+                <line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line>
+                <line x1="1" y1="18" x2="3" y2="18"></line>
+                <line x1="21" y1="18" x2="23" y2="18"></line>
+                <line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line>
+                <line x1="23" y1="22" x2="1" y2="22"></line>
+                <polyline points="16 6 12 10 8 6"></polyline>
+              </svg>
+              <div>
+                <div class="label">Sunset</div>
+                <div class="time">${formatTimeShort(sunset)}</div>
+              </div>
+            </div>
+            <div class="daylight-item golden">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <div>
+                <div class="label">Golden Hour</div>
+                <div class="time">${formatTimeShort(goldenHourStart)}</div>
+              </div>
+            </div>
+            <div class="daylight-item" style="background: rgba(45, 90, 39, 0.1);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <div>
+                <div class="label">Day Length</div>
+                <div class="time" style="color: var(--primary);">${dayLength}</div>
+              </div>
+            </div>
+          </div>
+          <div class="daylight-summary">
+            <div class="daylight-stat">
+              <span class="stat-label">First Tee</span>
+              <span class="stat-value">${minutesToTime(playableStart)}</span>
+            </div>
+            <div class="daylight-stat">
+              <span class="stat-label">Last Tee (18 holes)</span>
+              <span class="stat-value">${minutesToTime(playableEnd - 240)}</span>
+            </div>
+            <div class="daylight-stat playable-window">
+              <span class="stat-label">Playable Window</span>
+              <span class="stat-value">${playableHours}h ${playableMins}m</span>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        console.error('Daylight error:', e);
+        widget.style.display = 'none';
+      }
+    }
+
+    // Check if course is near the coast (within ~10 miles of Pacific Ocean)
+    function isCoastalCourse(lat, lon) {
+      // Bay Area coastal reference points (Pacific coast and SF Bay)
+      const coastalPoints = [
+        // Pacific Coast
+        { lat: 37.7849, lon: -122.5094 }, // Ocean Beach SF
+        { lat: 37.6255, lon: -122.4911 }, // Pacifica
+        { lat: 37.5085, lon: -122.4958 }, // Half Moon Bay
+        { lat: 37.1877, lon: -122.3888 }, // Santa Cruz
+        { lat: 36.9741, lon: -122.0308 }, // Santa Cruz boardwalk
+        // SF Bay shoreline
+        { lat: 37.8716, lon: -122.2727 }, // Emeryville
+        { lat: 37.6688, lon: -122.0810 }, // Hayward shoreline
+        { lat: 37.4323, lon: -122.1817 }, // Redwood Shores
+        { lat: 37.5024, lon: -122.2530 }, // Foster City
+        { lat: 37.5930, lon: -122.3688 }, // SFO area
+        { lat: 37.8267, lon: -122.4233 }, // Presidio/Crissy Field
+        { lat: 37.8590, lon: -122.4785 }, // Golden Gate
+        { lat: 37.9101, lon: -122.4774 }, // Sausalito
+        { lat: 37.9040, lon: -122.3569 }, // Richmond shoreline
+        { lat: 37.7289, lon: -122.3878 }, // Oyster Point
+        // Monterey Bay
+        { lat: 36.6177, lon: -121.9166 }, // Monterey
+        { lat: 36.5674, lon: -121.9471 }, // Pacific Grove
+        { lat: 36.5565, lon: -121.9233 }, // Pebble Beach
+      ];
+
+      const milesPerDegreeLat = 69;
+      const milesPerDegreeLon = Math.cos(lat * Math.PI / 180) * 69;
+      const maxDistanceMiles = 10;
+
+      for (const point of coastalPoints) {
+        const latDiff = Math.abs(lat - point.lat) * milesPerDegreeLat;
+        const lonDiff = Math.abs(lon - point.lon) * milesPerDegreeLon;
+        const distance = Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
+        if (distance <= maxDistanceMiles) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Find nearest NOAA tide station
+    function getNearestTideStation(lat, lon) {
+      // NOAA CO-OPS tide stations in Bay Area
+      const stations = [
+        { id: '9414290', name: 'San Francisco', lat: 37.8067, lon: -122.4650 },
+        { id: '9414750', name: 'Alameda', lat: 37.7717, lon: -122.3000 },
+        { id: '9414523', name: 'Redwood City', lat: 37.5067, lon: -122.2117 },
+        { id: '9415020', name: 'Point Reyes', lat: 37.9961, lon: -122.9767 },
+        { id: '9413450', name: 'Monterey', lat: 36.6050, lon: -121.8883 },
+        { id: '9414958', name: 'Bolinas', lat: 37.9083, lon: -122.6783 },
+        { id: '9414863', name: 'Richmond', lat: 37.9283, lon: -122.4000 },
+        { id: '9415144', name: 'Port Chicago', lat: 38.0567, lon: -122.0400 },
+      ];
+
+      let nearest = stations[0];
+      let minDistance = Infinity;
+
+      const milesPerDegreeLat = 69;
+      const milesPerDegreeLon = Math.cos(lat * Math.PI / 180) * 69;
+
+      for (const station of stations) {
+        const latDiff = Math.abs(lat - station.lat) * milesPerDegreeLat;
+        const lonDiff = Math.abs(lon - station.lon) * milesPerDegreeLon;
+        const distance = Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearest = station;
+        }
+      }
+      return nearest;
+    }
+
+    async function loadTides(lat, lon) {
+      const section = document.getElementById('tide-section');
+      const widget = document.getElementById('tide-widget');
+      if (!section || !widget) return;
+
+      // Only show for coastal courses
+      if (!isCoastalCourse(lat, lon)) {
+        section.remove();
+        return;
+      }
+
+      // Show the section since it's a coastal course
+      section.classList.remove('tide-hidden');
+
+      try {
+        const station = getNearestTideStation(lat, lon);
+        const now = new Date();
+        const today = now.toISOString().split('T')[0].replace(/-/g, '');
+        const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0].replace(/-/g, '');
+
+        // Fetch tide predictions from NOAA CO-OPS API
+        const predictionsUrl = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=${today}&end_date=${tomorrow}&station=${station.id}&product=predictions&datum=MLLW&time_zone=lst_ldt&units=english&interval=hilo&format=json`;
+
+        const res = await fetch(predictionsUrl);
+        const data = await res.json();
+
+        if (!data.predictions || data.predictions.length === 0) {
+          throw new Error('No tide data available');
+        }
+
+        // Parse predictions and find next high/low
+        const predictions = data.predictions.map(p => ({
+          time: new Date(p.t.replace(' ', 'T')),
+          height: parseFloat(p.v),
+          type: p.type // 'H' for high, 'L' for low
+        }));
+
+        // Find next high and low tides
+        const nowTime = now.getTime();
+        let nextHigh = null;
+        let nextLow = null;
+        let previousEvent = null;
+
+        for (const pred of predictions) {
+          if (pred.time.getTime() < nowTime) {
+            previousEvent = pred;
+            continue;
+          }
+          if (pred.type === 'H' && !nextHigh) nextHigh = pred;
+          if (pred.type === 'L' && !nextLow) nextLow = pred;
+          if (nextHigh && nextLow) break;
+        }
+
+        // Determine current tide status
+        let currentStatus = 'Unknown';
+        let tideDirection = '';
+        if (previousEvent && (nextHigh || nextLow)) {
+          if (previousEvent.type === 'L') {
+            currentStatus = 'Rising';
+            tideDirection = 'toward high tide';
+          } else {
+            currentStatus = 'Falling';
+            tideDirection = 'toward low tide';
+          }
+        }
+
+        // Calculate calm window (typically 1-2 hours around slack tide)
+        let calmWindow = null;
+        const nextEvent = nextHigh && nextLow
+          ? (nextHigh.time < nextLow.time ? nextHigh : nextLow)
+          : (nextHigh || nextLow);
+
+        if (nextEvent) {
+          const slackStart = new Date(nextEvent.time.getTime() - 45 * 60 * 1000); // 45 min before
+          const slackEnd = new Date(nextEvent.time.getTime() + 45 * 60 * 1000); // 45 min after
+          if (slackEnd.getTime() > nowTime) {
+            calmWindow = {
+              start: slackStart.getTime() < nowTime ? now : slackStart,
+              end: slackEnd,
+              type: nextEvent.type === 'H' ? 'high' : 'low'
+            };
+          }
+        }
+
+        // Format time helper
+        const formatTideTime = (date) => {
+          const hours = date.getHours();
+          const minutes = date.getMinutes();
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const displayHour = hours % 12 || 12;
+          return `${displayHour}:${String(minutes).padStart(2, '0')} ${ampm}`;
+        };
+
+        widget.innerHTML = `
+          <div class="tide-header">
+            <div class="tide-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2">
+                <path d="M2 12c1.5-2 3.5-3 6-3s4.5 1 6 3c1.5 2 3.5 3 6 3"></path>
+                <path d="M2 18c1.5-2 3.5-3 6-3s4.5 1 6 3c1.5 2 3.5 3 6 3"></path>
+                <path d="M2 6c1.5-2 3.5-3 6-3s4.5 1 6 3c1.5 2 3.5 3 6 3"></path>
+              </svg>
+            </div>
+            <div class="tide-status">
+              <div class="tide-current">${currentStatus} Tide</div>
+              <div class="tide-level">${tideDirection} at ${station.name}</div>
+            </div>
+          </div>
+          <div class="tide-forecast">
+            ${nextHigh ? `
+              <div class="tide-event high">
+                <div class="tide-event-label">Next High</div>
+                <div class="tide-event-time">${formatTideTime(nextHigh.time)}</div>
+                <div class="tide-event-height">${nextHigh.height.toFixed(1)} ft</div>
+              </div>
+            ` : ''}
+            ${nextLow ? `
+              <div class="tide-event low">
+                <div class="tide-event-label">Next Low</div>
+                <div class="tide-event-time">${formatTideTime(nextLow.time)}</div>
+                <div class="tide-event-height">${nextLow.height.toFixed(1)} ft</div>
+              </div>
+            ` : ''}
+          </div>
+          ${calmWindow ? `
+            <div class="calm-window">
+              <svg class="calm-window-icon" viewBox="0 0 24 24" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <div class="calm-window-text">
+                <div class="calm-window-label">Calm water window (slack ${calmWindow.type} tide)</div>
+                <div class="calm-window-time">${formatTideTime(calmWindow.start)} - ${formatTideTime(calmWindow.end)}</div>
+              </div>
+            </div>
+          ` : ''}
+        `;
+      } catch (e) {
+        console.error('Tide error:', e);
+        // Hide the section if tide data fails
+        section.remove();
       }
     }
 

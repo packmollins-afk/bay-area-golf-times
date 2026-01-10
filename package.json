@@ -11,7 +11,10 @@
     "dev": "node --watch src/api/server.js",
     "scrape": "node scripts/full-scrape-parallel.js",
     "demo": "node src/scripts/generate-demo-data.js",
-    "setup": "node src/scripts/setup.js"
+    "setup": "node src/scripts/setup.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "golf",
@@ -38,6 +41,8 @@
     "ua-parser-js": "^2.0.7"
   },
   "devDependencies": {
-    "vercel": "^50.1.3"
+    "@vitest/coverage-v8": "^2.1.8",
+    "vercel": "^50.1.6",
+    "vitest": "^2.1.8"
   }
 }
