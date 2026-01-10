@@ -661,7 +661,7 @@ app.get('/api/courses/:idOrSlug', async (req, res) => {
       // Count recent booking clicks (last 24 hours)
       const clicksResult = await db.execute({
         sql: `SELECT COUNT(*) as count FROM clicks
-              WHERE course_slug = ? AND created_at >= datetime('now', '-1 day')`,
+              WHERE course_slug = ? AND clicked_at >= datetime('now', '-1 day')`,
         args: [course.slug]
       });
       bookingActivity.recentBookings = clicksResult.rows[0]?.count || 0;
