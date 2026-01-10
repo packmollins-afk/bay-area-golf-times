@@ -1,0 +1,443 @@
+/**
+ * Bay Area Golf - Empty & Error States
+ * Inspired by Slack & Notion's helpful empty states
+ *
+ * These states provide actionable guidance rather than dead-ends.
+ * Users should always have a clear next step when encountering
+ * empty or error conditions.
+ */
+
+/* ===========================================
+   BASE EMPTY STATE
+   =========================================== */
+
+/* Base empty state container */
+.empty-state {
+  text-align: center;
+  padding: 40px 24px;
+  background: linear-gradient(135deg, var(--bg-paper) 0%, #fefefe 100%);
+  border-radius: 16px;
+  border: 2px dashed var(--border-light);
+  transition: all var(--anim-fast, 200ms) var(--ease-out, ease-out);
+}
+
+.empty-state:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Icon container with subtle animation */
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-paper) 100%);
+  border-radius: 50%;
+  position: relative;
+}
+
+.empty-state-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.empty-state-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px dashed var(--border-light);
+  animation: emptyStatePulse 3s ease-in-out infinite;
+}
+
+@keyframes emptyStatePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.empty-state h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
+}
+
+/* ===========================================
+   ACTION BUTTONS
+   =========================================== */
+
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.empty-state-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all var(--anim-fast, 200ms) var(--ease-out, ease-out);
+  cursor: pointer;
+}
+
+.empty-state-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.empty-state-btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(45, 90, 39, 0.25);
+}
+
+.empty-state-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(45, 90, 39, 0.35);
+}
+
+.empty-state-btn-secondary {
+  background: var(--card-bg);
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.empty-state-btn-secondary:hover {
+  background: #e8f5e9;
+  transform: translateY(-2px);
+}
+
+.empty-state-btn-tertiary {
+  background: transparent;
+  color: var(--text-muted);
+  border: 2px solid var(--border-light);
+}
+
+.empty-state-btn-tertiary:hover {
+  background: var(--bg-paper);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+/* ===========================================
+   HELPFUL SUGGESTIONS
+   =========================================== */
+
+.empty-state-suggestions {
+  text-align: left;
+  max-width: 320px;
+  margin: 16px auto 0;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+}
+
+.empty-state-suggestions-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.empty-state-suggestions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.empty-state-suggestions li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.empty-state-suggestions li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.empty-state-suggestions li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+/* ===========================================
+   ERROR STATE VARIANT
+   =========================================== */
+
+.error-state {
+  text-align: center;
+  padding: 40px 24px;
+  background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%);
+  border-radius: 16px;
+  border: 2px solid #fecaca;
+}
+
+.error-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-radius: 50%;
+}
+
+.error-state-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: #dc2626;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.error-state h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #991b1b;
+  margin-bottom: 8px;
+}
+
+.error-state p {
+  font-size: 0.95rem;
+  color: #b91c1c;
+  max-width: 360px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
+}
+
+.error-state-code {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(220, 38, 38, 0.1);
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: #991b1b;
+  margin-bottom: 16px;
+}
+
+.error-state .empty-state-actions {
+  margin-top: 20px;
+}
+
+/* ===========================================
+   WARNING STATE VARIANT
+   =========================================== */
+
+.warning-state {
+  text-align: center;
+  padding: 40px 24px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border-radius: 16px;
+  border: 2px solid #fcd34d;
+}
+
+.warning-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 50%;
+}
+
+.warning-state-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: #d97706;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.warning-state h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #92400e;
+  margin-bottom: 8px;
+}
+
+.warning-state p {
+  font-size: 0.95rem;
+  color: #b45309;
+  max-width: 360px;
+  margin: 0 auto 20px;
+  line-height: 1.6;
+}
+
+/* ===========================================
+   COMPACT INLINE EMPTY STATES
+   =========================================== */
+
+.inline-empty {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-paper);
+  border-radius: 10px;
+  border: 1px dashed var(--border-light);
+}
+
+.inline-empty-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.inline-empty-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.inline-empty-content {
+  flex: 1;
+}
+
+.inline-empty-content h5 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.inline-empty-content p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.inline-empty-action {
+  flex-shrink: 0;
+}
+
+/* ===========================================
+   SKELETON LOADING
+   =========================================== */
+
+.empty-state-skeleton {
+  padding: 32px 24px;
+}
+
+.skeleton-line {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--border-light) 25%,
+    var(--bg-paper) 50%,
+    var(--border-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite linear;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  will-change: background-position;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-line.short { width: 60%; margin-left: auto; margin-right: auto; }
+.skeleton-line.medium { width: 80%; margin-left: auto; margin-right: auto; }
+.skeleton-line.tall { height: 24px; }
+.skeleton-line.extra-short { width: 40%; margin-left: auto; margin-right: auto; }
+
+/* ===========================================
+   MOBILE RESPONSIVE
+   =========================================== */
+
+@media (max-width: 600px) {
+  .empty-state {
+    padding: 32px 20px;
+  }
+
+  .empty-state-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .empty-state-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .empty-state h4 {
+    font-size: 1.1rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+
+  .empty-state-actions {
+    flex-direction: column;
+  }
+
+  .empty-state-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .inline-empty {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .inline-empty-action {
+    width: 100%;
+  }
+}

@@ -1,0 +1,773 @@
+/**
+ * Bay Area Golf - Micro-Interactions System
+ * Stripe/Linear-inspired subtle interactions
+ * Optimized for 35-65 golfer demographic
+ *
+ * Design Principles:
+ * - Subtle, not flashy (professional audience)
+ * - Consistent timing (150-200ms for most interactions)
+ * - Clear feedback without distraction
+ * - Respects reduced motion preferences
+ */
+
+/* ===========================================
+   GLOBAL SMOOTH TRANSITIONS
+   =========================================== */
+
+/* Subtle default transitions for color/background changes */
+*:not(.map-content):not(.map-content *):not(.no-transition) {
+  transition-property: color, background-color, border-color, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset for elements that need their own timing */
+a, button, .btn, .card, .section,
+[class*="course"], [class*="tee-time"],
+[class*="nav"], [class*="badge"] {
+  transition: all var(--anim-fast, 200ms) var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+/* ===========================================
+   BUTTON MICRO-INTERACTIONS
+   =========================================== */
+
+/* Primary Button Enhanced States */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background 150ms ease;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 50%);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 20px rgba(16, 185, 129, 0.4),
+    0 2px 6px rgba(16, 185, 129, 0.2);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition-duration: 80ms;
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgba(5, 150, 105, 0.5),
+    0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+/* Secondary Button Enhanced States */
+.btn-secondary {
+  position: relative;
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  background-color: #f0fdf4;
+  border-color: var(--primary, #2d5a27);
+  box-shadow:
+    0 4px 12px rgba(45, 90, 39, 0.12),
+    0 1px 3px rgba(45, 90, 39, 0.08);
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+  background-color: #dcfce7;
+  transition-duration: 80ms;
+}
+
+.btn-secondary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgba(45, 90, 39, 0.3);
+}
+
+/* Tertiary Button / Link Buttons */
+.btn-tertiary,
+.view-all-link {
+  position: relative;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.btn-tertiary::after,
+.view-all-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 250ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.btn-tertiary:hover::after,
+.view-all-link:hover::after {
+  width: 100%;
+}
+
+.btn-tertiary:active,
+.view-all-link:active {
+  opacity: 0.7;
+}
+
+/* Nav Buttons - Header */
+.nav-btn {
+  position: relative;
+  transform: translateY(0);
+  transition:
+    transform 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.nav-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #fff;
+  transform: translateX(-50%);
+  transition: width 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.nav-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.8);
+}
+
+.nav-btn:hover::after {
+  width: 60%;
+}
+
+.nav-btn:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 60ms;
+}
+
+/* Back Link */
+.back-link {
+  transition:
+    transform 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.back-link:hover {
+  transform: translateX(-2px);
+}
+
+.back-link:active {
+  transform: translateX(0) scale(0.97);
+}
+
+/* ===========================================
+   CARD HOVER LIFTS
+   =========================================== */
+
+/* Section Cards */
+.section {
+  transform: translateY(0);
+  transition:
+    transform 250ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 250ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    border-color 200ms ease;
+}
+
+.section:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 24px rgba(61, 41, 20, 0.08),
+    0 2px 8px rgba(61, 41, 20, 0.04);
+  border-color: var(--border, #c4a882);
+}
+
+/* Course Stat Cards */
+.course-stat {
+  transform: translateY(0);
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.course-stat:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 6px 16px rgba(45, 90, 39, 0.1),
+    0 2px 4px rgba(45, 90, 39, 0.06);
+  border-color: var(--primary-light, #4a7a3f);
+  background-color: var(--card-bg, #fffef9);
+}
+
+.course-stat:hover .value {
+  transform: scale(1.05);
+}
+
+.course-stat .value {
+  transition: transform 200ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+/* Nearby Course Cards */
+.nearby-course {
+  transform: translateY(0) scale(1);
+  transition:
+    transform 220ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 220ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.nearby-course:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow:
+    0 12px 28px rgba(61, 41, 20, 0.12),
+    0 4px 12px rgba(61, 41, 20, 0.06);
+  border-color: var(--primary, #2d5a27);
+  background-color: var(--card-bg, #fffef9);
+}
+
+.nearby-course:active {
+  transform: translateY(-2px) scale(0.99);
+  transition-duration: 80ms;
+}
+
+/* Review Cards */
+.review-card {
+  transform: translateY(0);
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 20px rgba(61, 41, 20, 0.08),
+    0 2px 6px rgba(61, 41, 20, 0.04);
+}
+
+/* Rating Box */
+.rating-box {
+  transform: scale(1);
+  transition:
+    transform 200ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.rating-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.15);
+}
+
+/* Restaurant Cards */
+.restaurant-card {
+  transform: translateY(0);
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    border-color 150ms ease;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 8px 20px rgba(61, 41, 20, 0.1),
+    0 2px 6px rgba(61, 41, 20, 0.05);
+}
+
+.restaurant-card:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+/* Photo Cards */
+.photo-card {
+  transform: scale(1);
+  transition:
+    transform 300ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 300ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.photo-card:hover {
+  transform: scale(1.03);
+  box-shadow:
+    0 16px 32px rgba(61, 41, 20, 0.16),
+    0 4px 12px rgba(61, 41, 20, 0.08);
+}
+
+.photo-card img {
+  transition: transform 400ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.photo-card:hover img {
+  transform: scale(1.08);
+}
+
+/* ===========================================
+   ICON ANIMATIONS
+   =========================================== */
+
+/* SVG Icons in Buttons & Links */
+.btn svg,
+.nav-btn svg,
+.contact-item svg,
+.calendar-btn svg,
+.trust-badge svg,
+.mobile-nav-item svg {
+  transition: transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.btn:hover svg,
+.nav-btn:hover svg {
+  transform: translateX(2px);
+}
+
+.back-link:hover svg,
+[href*="back"]:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Contact Item Icons */
+.contact-item {
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    box-shadow 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.contact-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.1);
+}
+
+.contact-item:hover svg {
+  transform: scale(1.1);
+}
+
+.contact-item svg {
+  transition: transform 200ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+/* Facility Badge Icons */
+.facility-badge {
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.facility-badge.available:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(46, 125, 50, 0.12);
+}
+
+/* Weather Link Arrow */
+.weather-link {
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.weather-link:hover {
+  transform: translateY(-3px);
+}
+
+.weather-link svg:last-child {
+  transition: transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.weather-link:hover svg:last-child {
+  transform: translateX(3px);
+}
+
+/* Star Ratings Pulse on Hover */
+.rating-badge svg,
+.restaurant-rating svg,
+.review-rating svg {
+  transition: transform 200ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.nearby-course:hover .rating-badge svg,
+.restaurant-card:hover .restaurant-rating svg,
+.review-card:hover .review-rating svg {
+  transform: scale(1.15);
+}
+
+/* Availability Dot Pulse */
+.availability-badge .dot {
+  transition: transform 200ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.nearby-course:hover .availability-badge .dot {
+  animation: dotPulse 1s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+/* ===========================================
+   TEE TIME SLOT INTERACTIONS
+   =========================================== */
+
+.tee-time-slot {
+  transform: translateX(0);
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.tee-time-slot:hover {
+  transform: translateX(6px);
+  box-shadow:
+    0 6px 20px rgba(45, 90, 39, 0.12),
+    0 2px 6px rgba(45, 90, 39, 0.06);
+  background-color: var(--card-bg, #fffef9);
+}
+
+.tee-time-slot:active {
+  transform: translateX(3px) scale(0.99);
+  transition-duration: 80ms;
+}
+
+.tee-time-book {
+  transform: scale(1);
+  transition:
+    transform 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.tee-time-slot:hover .tee-time-book {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+/* ===========================================
+   REGION CHIP INTERACTIONS
+   =========================================== */
+
+.region-chip {
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.region-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.12);
+}
+
+.region-chip:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 60ms;
+}
+
+.region-chip.active {
+  box-shadow:
+    0 4px 14px rgba(45, 90, 39, 0.25),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* ===========================================
+   TOURNAMENT ITEM SLIDE
+   =========================================== */
+
+.tournament-item {
+  transform: translateX(0);
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.tournament-item:hover {
+  transform: translateX(6px);
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.1);
+}
+
+/* ===========================================
+   TRUST BADGE SUBTLE BOUNCE
+   =========================================== */
+
+.trust-badge {
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    box-shadow 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.trust-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.12);
+}
+
+.trust-badge:hover svg {
+  transform: scale(1.1);
+}
+
+/* ===========================================
+   CALENDAR DROPDOWN MENU
+   =========================================== */
+
+.calendar-menu {
+  transform: translateY(-8px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    opacity 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    visibility 200ms;
+}
+
+.calendar-dropdown.open .calendar-menu {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.calendar-menu a {
+  transition:
+    background-color 120ms ease,
+    padding-left 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.calendar-menu a:hover {
+  padding-left: 20px;
+}
+
+/* ===========================================
+   MOBILE NAVIGATION
+   =========================================== */
+
+.mobile-nav-item {
+  transform: scale(1);
+  transition:
+    transform 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.92);
+}
+
+.mobile-nav-item svg {
+  transition: transform 200ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.mobile-nav-item:active svg {
+  transform: scale(0.9);
+}
+
+.mobile-nav-item.active svg {
+  animation: navIconBounce 400ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+@keyframes navIconBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* ===========================================
+   STICKY CTA BAR
+   =========================================== */
+
+.sticky-cta-bar {
+  transition: transform 300ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.sticky-cta-button {
+  transform: translateY(0);
+  transition:
+    transform 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.sticky-cta-button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* ===========================================
+   FOOD HIGHLIGHT CARD
+   =========================================== */
+
+.food-highlight {
+  transform: translateY(0);
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.food-highlight:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(61, 41, 20, 0.1);
+}
+
+.food-highlight img {
+  transition: transform 250ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.food-highlight:hover img {
+  transform: scale(1.06);
+}
+
+/* ===========================================
+   HOME USER BADGES
+   =========================================== */
+
+.home-user {
+  transform: translateY(0);
+  transition:
+    transform 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 180ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    border-color 150ms ease;
+}
+
+.home-user:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 90, 39, 0.1);
+  border-color: var(--primary-light, #4a7a3f);
+}
+
+.home-user-avatar {
+  transition: transform 200ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.home-user:hover .home-user-avatar {
+  transform: scale(1.08);
+}
+
+/* ===========================================
+   COURSE RECORD SCORE POP
+   =========================================== */
+
+.course-record .score {
+  transition: transform 300ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.course-record:hover .score {
+  transform: scale(1.05);
+}
+
+/* ===========================================
+   WEATHER WIDGET INTERACTIONS
+   =========================================== */
+
+.weather-widget,
+.tide-widget,
+.aqi-widget,
+.daylight-widget {
+  transform: translateY(0);
+  transition:
+    transform 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    box-shadow 200ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1));
+}
+
+.weather-widget:hover,
+.tide-widget:hover,
+.aqi-widget:hover,
+.daylight-widget:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(61, 41, 20, 0.12);
+}
+
+.weather-hour,
+.tide-event {
+  transform: translateY(0);
+  transition:
+    transform 150ms var(--ease-out, cubic-bezier(0.33, 1, 0.68, 1)),
+    background-color 150ms ease;
+}
+
+.weather-hour:hover,
+.tide-event:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.25);
+}
+
+/* ===========================================
+   FOCUS STATES FOR ACCESSIBILITY
+   =========================================== */
+
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+.region-chip:focus-visible,
+.nearby-course:focus-visible,
+.tee-time-slot:focus-visible,
+.calendar-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--card-bg, #fffef9),
+    0 0 0 4px var(--primary, #2d5a27);
+}
+
+/* ===========================================
+   REDUCED MOTION PREFERENCES
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Preserve essential feedback */
+  .btn-primary:active,
+  .btn-secondary:active,
+  .nearby-course:active {
+    opacity: 0.8;
+  }
+}

@@ -1,0 +1,768 @@
+/**
+ * Bay Area Golf - Mobile UX Enhancements
+ * Inspired by Uber, DoorDash mobile-first patterns
+ *
+ * Features:
+ * 1. Touch target optimization (48px minimum per WCAG 2.1 AAA)
+ * 2. Thumb zone optimization for one-handed use
+ * 3. Swipe gestures for tee times carousel
+ * 4. Bottom sheet pattern for tee time details
+ */
+
+/* ========================================
+   TOUCH TARGET OPTIMIZATION
+   Minimum 48x48px per WCAG 2.1 AAA & iOS/Android HIG
+   ======================================== */
+@media (max-width: 768px) {
+  /* Primary interactive elements - 48px minimum */
+  .region-chip,
+  .btn,
+  .btn-primary,
+  .btn-secondary {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  .nav-btn,
+  .back-link {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 12px 16px;
+  }
+
+  .nearby-course {
+    min-height: 72px;
+    padding: 16px;
+  }
+
+  .tee-time-slot {
+    min-height: 64px;
+    padding: 16px;
+  }
+
+  .tee-time-book {
+    min-height: 48px;
+    padding: 14px 20px;
+  }
+
+  /* Calendar button - larger touch target */
+  .calendar-btn {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 12px 16px;
+  }
+
+  /* Facility badges - larger for touch */
+  .facility-badge {
+    min-height: 48px;
+    padding: 14px 18px;
+  }
+
+  /* Contact items - larger touch targets */
+  .contact-item {
+    min-height: 56px;
+    padding: 14px 18px;
+  }
+
+  /* Weather hours - touch friendly */
+  .weather-hour {
+    min-width: 56px;
+    min-height: 68px;
+    padding: 12px;
+  }
+
+  /* Trust badges - touchable */
+  .trust-badge {
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  /* Review cards - touchable */
+  .review-card {
+    padding: 18px;
+  }
+
+  /* Restaurant cards - touchable */
+  .restaurant-card {
+    min-height: 72px;
+    padding: 18px;
+  }
+
+  /* View all link - larger tap target */
+  .view-all-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 12px 0;
+  }
+
+  /* Mobile menu links - comfortable touch */
+  .mobile-menu-link {
+    min-height: 56px;
+  }
+
+  /* Bottom nav items - comfortable touch */
+  .mobile-nav-item {
+    min-height: 56px;
+    min-width: 64px;
+  }
+}
+
+/* ========================================
+   THUMB ZONE OPTIMIZATION
+   Key actions in bottom 1/3 of screen
+   where thumbs naturally reach (Uber/DoorDash pattern)
+   ======================================== */
+@media (max-width: 768px) {
+  /* Main content flex layout */
+  main.container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Floating action button for quick booking */
+  .fab-book {
+    position: fixed;
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    z-index: 95;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .fab-book:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+  }
+
+  .fab-book svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Hide FAB when not needed */
+  .fab-book.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+
+  /* Quick action chips in thumb zone */
+  .quick-actions {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 0;
+    margin: 0 -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    scrollbar-width: none;
+  }
+
+  .quick-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quick-action-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: var(--bg-paper);
+    border: 2px solid var(--border-light);
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .quick-action-chip:active {
+    transform: scale(0.96);
+    background: var(--card-bg);
+  }
+
+  .quick-action-chip svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--primary);
+  }
+}
+
+/* ========================================
+   SWIPE GESTURES FOR TEE TIMES
+   Horizontal carousel with snap (DoorDash style)
+   ======================================== */
+.tee-times-swipe-container {
+  position: relative;
+}
+
+.tee-times-swipe {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 8px 0 16px;
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.tee-times-swipe::-webkit-scrollbar {
+  display: none;
+}
+
+.tee-times-swipe .tee-time-card {
+  flex: 0 0 auto;
+  width: 150px;
+  min-height: 130px;
+  scroll-snap-align: start;
+  background: var(--bg-paper);
+  border: 2px solid var(--border-light);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.tee-times-swipe .tee-time-card:active {
+  transform: scale(0.97);
+  background: var(--card-bg);
+}
+
+.tee-times-swipe .tee-time-card.selected {
+  border-color: var(--primary);
+  background: #f0f7ef;
+  box-shadow: 0 4px 16px rgba(45, 90, 39, 0.2);
+}
+
+.tee-time-card .card-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tee-time-card .card-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.tee-time-card .card-price {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: auto;
+}
+
+.tee-time-card .card-spots {
+  font-size: 0.75rem;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tee-time-card .card-spots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Swipe pagination dots */
+.swipe-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.swipe-dots .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.swipe-dots .dot.active {
+  width: 20px;
+  border-radius: 3px;
+  background: var(--primary);
+}
+
+/* Swipe hint animation */
+@keyframes swipeHint {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(-12px); opacity: 0.6; }
+}
+
+.swipe-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 10px;
+  animation: swipeHint 2s ease-in-out 3;
+}
+
+.swipe-hint svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (min-width: 769px) {
+  .swipe-hint {
+    display: none;
+  }
+
+  .tee-times-swipe {
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* ========================================
+   BOTTOM SHEET PATTERN
+   iOS/Android style modal drawer (Uber pattern)
+   ======================================== */
+.bottom-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.bottom-sheet-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border-radius: 20px 20px 0 0;
+  z-index: 2001;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-sheet-overlay.active .bottom-sheet {
+  transform: translateY(0);
+}
+
+.bottom-sheet-handle {
+  width: 40px;
+  height: 5px;
+  background: var(--border-light);
+  border-radius: 3px;
+  margin: 12px auto;
+  cursor: grab;
+}
+
+.bottom-sheet-handle:active {
+  cursor: grabbing;
+  background: var(--border);
+}
+
+.bottom-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bottom-sheet-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.bottom-sheet-close {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-paper);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-sheet-close:active {
+  background: var(--border-light);
+  transform: scale(0.95);
+}
+
+.bottom-sheet-close svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--text);
+  stroke-width: 2;
+}
+
+.bottom-sheet-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px;
+  overscroll-behavior: contain;
+}
+
+.bottom-sheet-actions {
+  padding: 16px 20px;
+  background: var(--bg-paper);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: 12px;
+}
+
+.bottom-sheet-actions .btn {
+  flex: 1;
+}
+
+/* Tee Time Detail in Bottom Sheet */
+.tee-time-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tee-time-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.tee-time-detail-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tee-time-detail-date {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.tee-time-detail-price {
+  text-align: right;
+}
+
+.tee-time-detail-price .amount {
+  font-family: 'DM Mono', monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.tee-time-detail-price .per-player {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.tee-time-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.detail-meta-item {
+  padding: 16px;
+  background: var(--bg-paper);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.detail-meta-item svg {
+  width: 26px;
+  height: 26px;
+  stroke: var(--primary);
+  flex-shrink: 0;
+}
+
+.detail-meta-item .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.detail-meta-item .value {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+/* Player count selector */
+.player-selector-label {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.player-selector {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.player-option {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid var(--border-light);
+  background: var(--bg-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.player-option:active {
+  transform: scale(0.92);
+}
+
+.player-option.selected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(45, 90, 39, 0.35);
+}
+
+.player-option.unavailable {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   MOBILE INTERACTION FEEDBACK
+   Visual cues for touch (like DoorDash)
+   ======================================== */
+@media (max-width: 768px) {
+  /* Touch ripple effect */
+  .touch-ripple {
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .touch-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%),
+      rgba(45, 90, 39, 0.12) 0%,
+      transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .touch-ripple:active::after {
+    opacity: 1;
+  }
+
+  /* Press state for cards */
+  .card-pressable {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .card-pressable:active {
+    transform: scale(0.98);
+    box-shadow: none;
+  }
+}
+
+/* Gesture toast notification */
+.gesture-toast {
+  position: fixed;
+  bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.gesture-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.gesture-toast svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ========================================
+   HAPTIC FEEDBACK VISUAL CUES
+   ======================================== */
+@media (max-width: 768px) {
+  /* Subtle bounce on selection */
+  @keyframes selectBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+
+  .select-bounce {
+    animation: selectBounce 0.2s ease;
+  }
+
+  /* Success checkmark animation */
+  @keyframes checkmark {
+    0% { stroke-dashoffset: 24; }
+    100% { stroke-dashoffset: 0; }
+  }
+
+  .checkmark-animated path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: checkmark 0.3s ease forwards 0.1s;
+  }
+}
+
+/* ========================================
+   PULL TO REFRESH INDICATOR
+   ======================================== */
+.pull-indicator {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.pull-indicator.visible {
+  opacity: 1;
+}
+
+.pull-indicator svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--primary);
+  transition: transform 0.2s;
+}
+
+.pull-indicator.ready svg {
+  transform: rotate(180deg);
+}
+
+@keyframes pullSpin {
+  to { transform: rotate(360deg); }
+}
+
+.pull-indicator.refreshing svg {
+  animation: pullSpin 0.8s linear infinite;
+}
+
+/* ========================================
+   EDGE SWIPE GESTURES
+   ======================================== */
+.edge-gesture-hint {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 80px;
+  background: linear-gradient(90deg, rgba(45, 90, 39, 0.3), transparent);
+  border-radius: 0 4px 4px 0;
+  opacity: 0;
+  transition: opacity 0.3s, width 0.2s;
+  pointer-events: none;
+  z-index: 998;
+}
+
+.edge-gesture-hint.left {
+  left: 0;
+}
+
+.edge-gesture-hint.right {
+  right: 0;
+  background: linear-gradient(-90deg, rgba(45, 90, 39, 0.3), transparent);
+  border-radius: 4px 0 0 4px;
+}
+
+.edge-gesture-hint.active {
+  opacity: 1;
+  width: 24px;
+}
