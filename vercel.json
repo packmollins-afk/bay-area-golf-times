@@ -1,25 +1,5 @@
 {
   "version": 2,
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "bayareagolf.now" }],
-      "destination": "https://golfthebay.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.bayareagolf.now" }],
-      "destination": "https://golfthebay.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "bayareagolf.vercel.app" }],
-      "destination": "https://golfthebay.com/:path*",
-      "permanent": true
-    }
-  ],
   "builds": [
     {
       "src": "api/index.js",
