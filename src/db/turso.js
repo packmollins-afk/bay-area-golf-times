@@ -168,6 +168,14 @@ async function initSchema() {
     )
   `);
 
+  // Add password reset columns if they don't exist
+  try {
+    await db.execute('ALTER TABLE users ADD COLUMN reset_token TEXT');
+  } catch (e) { /* Column already exists */ }
+  try {
+    await db.execute('ALTER TABLE users ADD COLUMN reset_token_expires DATETIME');
+  } catch (e) { /* Column already exists */ }
+
   // Create indexes
   await db.execute('CREATE INDEX IF NOT EXISTS idx_tee_times_datetime ON tee_times(datetime)');
   await db.execute('CREATE INDEX IF NOT EXISTS idx_tee_times_date ON tee_times(date)');

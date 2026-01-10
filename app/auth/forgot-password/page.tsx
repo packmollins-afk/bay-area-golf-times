@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,24 +15,31 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL
-        ? `${process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL}/auth/update-password`
-        : `${window.location.origin}/auth/update-password`,
-    })
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
 
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Failed to send reset email")
+        setLoading(false)
+        return
+      }
+
       setSuccess(true)
+      setLoading(false)
+    } catch (err) {
+      setError("Something went wrong. Please try again.")
       setLoading(false)
     }
   }

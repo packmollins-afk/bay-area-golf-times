@@ -10,6 +10,7 @@ const { Resend } = require('resend');
 const bcrypt = require('bcrypt');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,11 +29,17 @@ const BCRYPT_ROUNDS = 12;
 const hashPassword = async (password) => {
   return bcrypt.hash(password, BCRYPT_ROUNDS);
 };
+// Legacy salt for migrating old SHA-256 password hashes - DEPRECATED, will be removed after migration
+const LEGACY_SALT = process.env.LEGACY_PASSWORD_SALT;
 const verifyPassword = async (password, hash) => {
-  // Support legacy SHA-256 hashes for existing users (migration)
-  const legacyHash = crypto.createHash('sha256').update(password + 'baygolf_salt_2024').digest('hex');
-  if (hash === legacyHash) {
-    return { valid: true, needsRehash: true };
+  // Support legacy SHA-256 hashes for existing users (migration period only)
+  // This will be removed after all users have been migrated to bcrypt
+  if (LEGACY_SALT) {
+    const legacyHash = crypto.createHash('sha256').update(password + LEGACY_SALT).digest('hex');
+    if (hash === legacyHash) {
+      console.warn('Legacy password hash detected - user should be migrated to bcrypt');
+      return { valid: true, needsRehash: true };
+    }
   }
   // Check bcrypt hash
   const valid = await bcrypt.compare(password, hash);
@@ -2048,6 +2055,183 @@ app.post('/api/auth/logout', async (req, res) => {
   }
 });
 
+// ========== PASSWORD RESET ==========
+
+// Request password reset - sends email with reset link
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find user by email
+    const result = await db.execute({
+      sql: 'SELECT id, email, display_name FROM users WHERE email = ?',
+      args: [email.toLowerCase()]
+    });
+
+    // Always return success to prevent email enumeration
+    if (!result.rows.length) {
+      return res.json({
+        success: true,
+        message: 'If an account exists with this email, you will receive a password reset link.'
+      });
+    }
+
+    const user = result.rows[0];
+
+    // Generate reset token (valid for 1 hour)
+    const resetToken = generateToken();
+    const resetExpires = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+    // Store reset token in database
+    await db.execute({
+      sql: 'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?',
+      args: [resetToken, resetExpires, user.id]
+    });
+
+    // Send password reset email
+    if (resend) {
+      const primaryDomain = process.env.PRIMARY_DOMAIN || 'golfthebay.com';
+      const resetUrl = `https://${primaryDomain}/auth/reset-password?token=${resetToken}`;
+
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || 'Golf The Bay <noreply@golfthebay.com>',
+        to: user.email,
+        subject: 'Reset Your Password - Golf The Bay',
+        html: `
+          <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #f9f6ef;">
+            <div style="background: #2d5a27; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
+              <h1 style="color: #f4f1e8; font-size: 28px; margin: 0;">Golf The Bay</h1>
+            </div>
+
+            <div style="background: white; padding: 32px; border-radius: 0 0 8px 8px; border: 1px solid #ddd0bc; border-top: none;">
+              <h2 style="color: #2d5a27; font-size: 24px; margin: 0 0 16px 0;">Reset Your Password</h2>
+
+              <p style="color: #3d2914; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+                Hi ${user.display_name || 'there'},<br><br>
+                We received a request to reset your password. Click the button below to choose a new password:
+              </p>
+
+              <div style="text-align: center; margin-bottom: 32px;">
+                <a href="${resetUrl}" style="display: inline-block; background: #2d5a27; color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">
+                  Reset Password
+                </a>
+              </div>
+
+              <p style="color: #6b5344; font-size: 14px; line-height: 1.5; margin-bottom: 16px;">
+                This link will expire in <strong>1 hour</strong> for security reasons.
+              </p>
+
+              <p style="color: #6b5344; font-size: 14px; line-height: 1.5;">
+                If you didn't request this password reset, you can safely ignore this email. Your password won't be changed.
+              </p>
+
+              <hr style="border: none; border-top: 2px solid #e8efe6; margin: 32px 0;">
+
+              <p style="color: #999; font-size: 12px; text-align: center;">
+                If the button doesn't work, copy and paste this link into your browser:<br>
+                <a href="${resetUrl}" style="color: #2d5a27; word-break: break-all;">${resetUrl}</a>
+              </p>
+            </div>
+          </div>
+        `
+      });
+    } else {
+      console.log('Resend not configured - password reset link:', resetToken);
+    }
+
+    res.json({
+      success: true,
+      message: 'If an account exists with this email, you will receive a password reset link.'
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to process password reset request' });
+  }
+});
+
+// Verify reset token is valid (for UI validation)
+app.get('/api/auth/verify-reset-token', async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ valid: false, error: 'Token is required' });
+    }
+
+    const result = await db.execute({
+      sql: `SELECT id, email FROM users
+            WHERE reset_token = ? AND reset_token_expires > datetime('now')`,
+      args: [token]
+    });
+
+    if (!result.rows.length) {
+      return res.json({ valid: false, error: 'Invalid or expired reset link' });
+    }
+
+    res.json({ valid: true, email: result.rows[0].email });
+  } catch (error) {
+    console.error('Verify reset token error:', error);
+    res.status(500).json({ valid: false, error: 'Failed to verify token' });
+  }
+});
+
+// Reset password with token
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ error: 'Token and password are required' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Find user with valid reset token
+    const result = await db.execute({
+      sql: `SELECT id, email, display_name FROM users
+            WHERE reset_token = ? AND reset_token_expires > datetime('now')`,
+      args: [token]
+    });
+
+    if (!result.rows.length) {
+      return res.status(400).json({ error: 'Invalid or expired reset link. Please request a new one.' });
+    }
+
+    const user = result.rows[0];
+
+    // Hash new password and clear reset token
+    const passwordHash = await hashPassword(password);
+    await db.execute({
+      sql: `UPDATE users SET
+            password_hash = ?,
+            reset_token = NULL,
+            reset_token_expires = NULL,
+            updated_at = datetime('now')
+            WHERE id = ?`,
+      args: [passwordHash, user.id]
+    });
+
+    // Create a new session so user is logged in after reset
+    const sessionToken = await createSession(user.id);
+
+    res.json({
+      success: true,
+      message: 'Password updated successfully',
+      token: sessionToken,
+      user: { id: user.id, email: user.email, displayName: user.display_name }
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
 app.get('/api/auth/me', async (req, res) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
@@ -2558,38 +2742,78 @@ app.get('/api/featured-deals', async (req, res) => {
 
 // ========== ADMIN ENDPOINTS ==========
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'baygolf2024';
+// Admin password is REQUIRED - no default fallback for security
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_JWT_SECRET;
+
+if (!ADMIN_PASSWORD) {
+  console.error('SECURITY WARNING: ADMIN_PASSWORD environment variable is not set. Admin endpoints will be disabled.');
+}
+if (!JWT_SECRET) {
+  console.error('SECURITY WARNING: JWT_SECRET environment variable is not set. Admin endpoints will be disabled.');
+}
+
+// Generate a secure JWT token for admin sessions
+const generateAdminToken = () => {
+  if (!JWT_SECRET) return null;
+  return jwt.sign(
+    { role: 'admin', iat: Math.floor(Date.now() / 1000) },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+};
+
+// Verify JWT token
+const verifyAdminToken = (token) => {
+  if (!JWT_SECRET) return null;
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return null;
+  }
+};
 
 app.post('/api/admin/login', (req, res) => {
+  // Require both env vars to be set
+  if (!ADMIN_PASSWORD || !JWT_SECRET) {
+    return res.status(503).json({ error: 'Admin authentication not configured' });
+  }
+
   const { password } = req.body;
   if (password === ADMIN_PASSWORD) {
-    // Set cookie for stats dashboard
-    res.cookie('admin_token', ADMIN_PASSWORD, {
+    const token = generateAdminToken();
+    // Set secure httpOnly cookie with JWT
+    res.cookie('admin_token', token, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
-    res.json({ success: true, token: Buffer.from(ADMIN_PASSWORD).toString('base64') });
+    res.json({ success: true, token });
   } else {
     res.status(401).json({ error: 'Invalid password' });
   }
 });
 
 const adminAuth = (req, res, next) => {
-  // Support both Basic auth (from admin.html) and cookie auth (from admin-stats.html)
+  // Require JWT_SECRET to be configured
+  if (!JWT_SECRET) {
+    return res.status(503).json({ error: 'Admin authentication not configured' });
+  }
+
+  // Support both Bearer token auth and cookie auth
   const auth = req.headers.authorization;
   const cookieToken = req.cookies?.admin_token;
 
   // Check cookie first (for stats dashboard)
-  if (cookieToken === ADMIN_PASSWORD) {
+  if (cookieToken && verifyAdminToken(cookieToken)) {
     return next();
   }
 
-  // Fall back to Basic auth (for existing admin panel)
+  // Fall back to Bearer token auth
   if (auth) {
     const token = auth.replace('Bearer ', '');
-    if (Buffer.from(token, 'base64').toString() === ADMIN_PASSWORD) {
+    if (verifyAdminToken(token)) {
       return next();
     }
   }
