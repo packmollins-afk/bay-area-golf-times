@@ -27,6 +27,10 @@ import {
   Star,
   ExternalLink,
   Loader2,
+  Sunrise,
+  Sun,
+  Sunset,
+  Tag,
 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -69,6 +73,24 @@ function formatTime(timeStr: string): string {
   const ampm = hour >= 12 ? "PM" : "AM"
   const hour12 = hour % 12 || 12
   return `${hour12}:${minutes} ${ampm}`
+}
+
+function getTimeIcon(timeStr: string) {
+  const hour = Number.parseInt(timeStr.split(":")[0])
+  if (hour < 10) return <Sunrise className="h-4 w-4 text-orange-500" />
+  if (hour < 15) return <Sun className="h-4 w-4 text-yellow-500" />
+  return <Sunset className="h-4 w-4 text-orange-600" />
+}
+
+function isBestDeal(teeTime: TeeTime, allTeeTimes: TeeTime[]): boolean {
+  // Best deal if price is in bottom 20% for the region on that date
+  const sameDateRegion = allTeeTimes.filter(
+    (t) => t.date === teeTime.date && t.region === teeTime.region && t.holes === teeTime.holes,
+  )
+  if (sameDateRegion.length < 3) return false
+  const prices = sameDateRegion.map((t) => t.price).sort((a, b) => a - b)
+  const threshold = prices[Math.floor(prices.length * 0.2)]
+  return teeTime.price <= threshold
 }
 
 function getNextDays(count: number): { value: string; label: string }[] {
@@ -208,6 +230,12 @@ export function TeeTimesClient({ regions, initialFavorites, user }: TeeTimesClie
     setter(value)
   }
 
+  const quickPriceFilters = [
+    { label: "Under $50", value: 50 },
+    { label: "Under $75", value: 75 },
+    { label: "Under $100", value: 100 },
+  ]
+
   const FilterControls = () => (
     <div className="space-y-6">
       {/* Region */}
@@ -261,6 +289,27 @@ export function TeeTimesClient({ regions, initialFavorites, user }: TeeTimesClie
             onChange={(e) => handleFilterChange(setMaxTime, e.target.value)}
             className="border-[#c4a882] bg-white flex-1"
           />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-[#3d2914] font-medium">Quick Price</Label>
+        <div className="flex flex-wrap gap-2">
+          {quickPriceFilters.map((filter) => (
+            <Button
+              key={filter.value}
+              variant={maxPrice === filter.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleFilterChange(setMaxPrice, filter.value)}
+              className={
+                maxPrice === filter.value
+                  ? "bg-[#2d5a27] hover:bg-[#1a3d17] text-white"
+                  : "border-[#c4a882] text-[#3d2914] bg-white hover:bg-[#f4f1e8]"
+              }
+            >
+              {filter.label}
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -528,70 +577,97 @@ export function TeeTimesClient({ regions, initialFavorites, user }: TeeTimesClie
                   const courseSlug = teeTime.course_slug || teeTime.course_name.toLowerCase().replace(/\s+/g, "-")
                   const isFavorite = favorites.has(courseSlug)
                   const isFavoriteLoading = favoritesLoading.has(courseSlug)
+                  const bestDeal = isBestDeal(teeTime, teeTimes || [])
 
                   return (
                     <Card
                       key={teeTime.id}
-                      className="border-[#c4a882] bg-[#fffef9] hover:border-[#2d5a27] transition-colors"
+                      className="border-[#c4a882] bg-[#fffef9] hover:shadow-md transition-shadow overflow-hidden"
                     >
                       <CardContent className="p-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                          {/* Time & Price */}
-                          <div className="flex items-center gap-4 sm:w-32">
-                            <div className="text-center">
-                              <div className="text-xl font-semibold text-[#3d2914]">{formatTime(teeTime.time)}</div>
-                              <div className="text-xs text-[#6b5344]">{teeTime.holes} holes</div>
-                            </div>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                          {/* Time & Date */}
+                          <div className="flex sm:flex-col items-center gap-2 sm:gap-1 sm:w-20 sm:text-center">
+                            {getTimeIcon(teeTime.time)}
+                            <span className="text-xl font-bold text-[#3d2914]">{formatTime(teeTime.time)}</span>
+                            <span className="text-xs text-[#6b5344] hidden sm:block">{formatDate(teeTime.date)}</span>
                           </div>
 
                           {/* Course Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <div>
-                                <h3 className="font-medium text-[#3d2914] truncate">{teeTime.course_name}</h3>
-                                <div className="flex items-center gap-3 text-sm text-[#6b5344] mt-1">
-                                  <span className="flex items-center gap-1">
-                                    <MapPin className="h-3 w-3" />
-                                    {teeTime.city}
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Users className="h-3 w-3" />
-                                    {teeTime.players} spots
-                                  </span>
+                                <Link
+                                  href={`/course/${courseSlug}`}
+                                  className="font-serif text-lg text-[#3d2914] hover:text-[#2d5a27] transition-colors line-clamp-1"
+                                >
+                                  {teeTime.course_name}
+                                </Link>
+                                <div className="flex items-center gap-2 mt-1 text-sm text-[#6b5344]">
+                                  <MapPin className="h-3 w-3" />
+                                  <span>{teeTime.city}</span>
                                   {teeTime.avg_rating && (
-                                    <span className="flex items-center gap-1">
-                                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                                      {teeTime.avg_rating.toFixed(1)}
-                                    </span>
+                                    <>
+                                      <span>•</span>
+                                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                      <span>{teeTime.avg_rating.toFixed(1)}</span>
+                                    </>
                                   )}
                                 </div>
                               </div>
+
+                              {/* Favorite Button */}
                               <button
                                 onClick={() => toggleFavorite(courseSlug)}
                                 disabled={isFavoriteLoading}
-                                className="p-2 rounded-full hover:bg-[#f4f1e8] transition-colors disabled:opacity-50"
+                                className="p-2 hover:bg-[#f4f1e8] rounded-full transition-colors"
                               >
                                 {isFavoriteLoading ? (
-                                  <Loader2 className="h-5 w-5 animate-spin text-[#c4a882]" />
+                                  <Loader2 className="h-5 w-5 animate-spin text-[#6b5344]" />
                                 ) : (
                                   <Heart
-                                    className={`h-5 w-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-[#c4a882]"}`}
+                                    className={`h-5 w-5 ${isFavorite ? "fill-red-500 text-red-500" : "text-[#6b5344]"}`}
                                   />
                                 )}
                               </button>
                             </div>
+
+                            {/* Details Row */}
+                            <div className="flex flex-wrap items-center gap-3 mt-3">
+                              <Badge variant="outline" className="border-[#c4a882] text-[#6b5344]">
+                                {teeTime.holes} holes
+                              </Badge>
+                              <Badge variant="outline" className="border-[#c4a882] text-[#6b5344]">
+                                <Users className="h-3 w-3 mr-1" />
+                                {teeTime.players} players
+                              </Badge>
+                              {teeTime.has_cart === 1 && (
+                                <Badge variant="outline" className="border-[#c4a882] text-[#6b5344]">
+                                  Cart included
+                                </Badge>
+                              )}
+                              {bestDeal && (
+                                <Badge className="bg-green-600 text-white hover:bg-green-700">
+                                  <Tag className="h-3 w-3 mr-1" />
+                                  Best Deal
+                                </Badge>
+                              )}
+                            </div>
                           </div>
 
                           {/* Price & Book */}
-                          <div className="flex items-center justify-between sm:justify-end gap-4 sm:w-40">
-                            <div className="text-right">
-                              <div className="text-xl font-semibold text-[#2d5a27]">${teeTime.price}</div>
+                          <div className="flex sm:flex-col items-center justify-between sm:justify-center gap-2 sm:text-right sm:w-28">
+                            <div>
                               {teeTime.original_price && teeTime.original_price > teeTime.price && (
-                                <div className="text-xs text-[#6b5344] line-through">${teeTime.original_price}</div>
+                                <span className="text-sm text-[#6b5344] line-through">${teeTime.original_price}</span>
                               )}
-                              {teeTime.has_cart === 1 && <div className="text-xs text-[#6b5344]">incl. cart</div>}
+                              <span className="text-2xl font-bold text-[#2d5a27]">${teeTime.price}</span>
                             </div>
-                            <Button asChild size="sm" className="bg-[#2d5a27] hover:bg-[#1a3d17] text-white">
+                            <Button
+                              asChild
+                              size="sm"
+                              className="bg-[#2d5a27] hover:bg-[#1a3d17] text-white whitespace-nowrap"
+                            >
                               <a href={teeTime.booking_url} target="_blank" rel="noopener noreferrer">
                                 Book
                                 <ExternalLink className="h-3 w-3 ml-1" />
