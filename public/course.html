@@ -346,6 +346,194 @@
       border-bottom: 2px solid var(--border-light);
     }
 
+    /* Weather widget */
+    .weather-widget {
+      background: linear-gradient(135deg, #87CEEB, #4A90D9);
+      border-radius: 12px;
+      padding: 20px;
+      color: white;
+      min-height: 100px;
+    }
+    .weather-current {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+    .weather-temp {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 3rem;
+      font-weight: 700;
+    }
+    .weather-details {
+      flex: 1;
+    }
+    .weather-condition {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .weather-wind {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    .weather-hourly {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .weather-hour {
+      text-align: center;
+      min-width: 50px;
+      padding: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      font-size: 0.8rem;
+    }
+    .weather-hour-temp {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    /* AQI Widget */
+    .aqi-widget {
+      background: var(--card-bg);
+      border: 2px solid var(--border-light);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+    .aqi-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .aqi-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+    }
+    .aqi-badge.aqi-good { background: linear-gradient(135deg, #00e400, #009900); }
+    .aqi-badge.aqi-moderate { background: linear-gradient(135deg, #ffff00, #cccc00); color: #333; }
+    .aqi-badge.aqi-sensitive { background: linear-gradient(135deg, #ff7e00, #cc6600); }
+    .aqi-badge.aqi-unhealthy { background: linear-gradient(135deg, #ff0000, #cc0000); }
+    .aqi-badge.aqi-very-unhealthy { background: linear-gradient(135deg, #8f3f97, #663377); }
+    .aqi-badge.aqi-hazardous { background: linear-gradient(135deg, #7e0023, #4c0015); }
+    .aqi-info { flex: 1; }
+    .aqi-category {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .aqi-category.aqi-good { color: #009900; }
+    .aqi-category.aqi-moderate { color: #999900; }
+    .aqi-category.aqi-sensitive { color: #cc6600; }
+    .aqi-category.aqi-unhealthy { color: #cc0000; }
+    .aqi-category.aqi-very-unhealthy { color: #663377; }
+    .aqi-category.aqi-hazardous { color: #4c0015; }
+    .aqi-label { font-size: 0.85rem; color: var(--text-muted); }
+    .aqi-recommendation {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--bg-paper);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .aqi-recommendation svg { flex-shrink: 0; }
+    .aqi-recommendation.good svg { color: #009900; }
+    .aqi-recommendation.caution svg { color: #cc6600; }
+    .aqi-recommendation.warning svg { color: #cc0000; }
+    .aqi-warning-banner {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .aqi-warning-banner svg { flex-shrink: 0; }
+    .aqi-warning-banner .warning-title { font-weight: 700; margin-bottom: 2px; }
+    .aqi-warning-banner .warning-desc { font-size: 0.9rem; opacity: 0.95; }
+
+    /* Daylight Widget */
+    .daylight-widget {
+      background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+      border: 2px solid #FDBA74;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+    }
+    .daylight-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .daylight-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #9A3412;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .daylight-title svg { width: 20px; height: 20px; stroke: #EA580C; }
+    .golden-hour-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: white;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .daylight-times {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .daylight-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 8px;
+    }
+    .daylight-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .daylight-item.sunrise svg { stroke: #EA580C; }
+    .daylight-item.sunset svg { stroke: #DC2626; }
+    .daylight-item.golden svg { stroke: #F59E0B; fill: #FEF3C7; }
+    .daylight-item .label { font-size: 0.75rem; color: #78350F; text-transform: uppercase; }
+    .daylight-item .time { font-size: 1rem; font-weight: 600; color: #9A3412; }
+    .daylight-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #FDBA74;
+    }
+    .daylight-stat { display: flex; flex-direction: column; gap: 2px; }
+    .daylight-stat .stat-label { font-size: 0.7rem; color: #78350F; text-transform: uppercase; }
+    .daylight-stat .stat-value { font-size: 0.95rem; font-weight: 600; color: #9A3412; }
+
     /* Quick Stats */
     .course-stats {
       display: flex;
@@ -2047,13 +2235,22 @@
         html += `
           <div class="section section-animate">
             <h3>Today's Weather</h3>
+            <div id="aqi-warning-container"></div>
             <div id="weather-widget" class="weather-widget">
               <div class="loading">Loading weather...</div>
             </div>
+            <div id="aqi-widget" class="aqi-widget" style="display: none;">
+              <div class="loading">Loading air quality...</div>
+            </div>
+            <div id="daylight-widget" class="daylight-widget">
+              <div class="loading" style="color: #78350F;">Loading daylight info...</div>
+            </div>
           </div>
         `;
-        // Load weather after render
+        // Load weather data after render
         setTimeout(() => loadWeather(course.latitude, course.longitude), 100);
+        setTimeout(() => loadAirQuality(course.latitude, course.longitude), 150);
+        setTimeout(() => loadDaylight(course.latitude, course.longitude), 120);
       }
 
       // Facilities
@@ -2263,6 +2460,161 @@
       } catch (e) {
         console.error('Weather error:', e);
         widget.innerHTML = '<div style="text-align: center; opacity: 0.8;">Weather unavailable</div>';
+      }
+    }
+
+    async function loadAirQuality(lat, lon) {
+      const widget = document.getElementById('aqi-widget');
+      const warningContainer = document.getElementById('aqi-warning-container');
+      if (!widget) return;
+
+      try {
+        const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm10,pm2_5&timezone=America%2FLos_Angeles`);
+        const data = await res.json();
+
+        const aqi = Math.round(data.current.us_aqi);
+        let category, colorClass, recommendation, recommendationClass;
+
+        if (aqi <= 50) {
+          category = 'Good';
+          colorClass = 'aqi-good';
+          recommendation = 'Great conditions for golf! Enjoy your round.';
+          recommendationClass = 'good';
+        } else if (aqi <= 100) {
+          category = 'Moderate';
+          colorClass = 'aqi-moderate';
+          recommendation = 'Air quality is acceptable for most golfers.';
+          recommendationClass = 'good';
+        } else if (aqi <= 150) {
+          category = 'Unhealthy for Sensitive Groups';
+          colorClass = 'aqi-sensitive';
+          recommendation = 'Sensitive individuals should limit prolonged outdoor exertion.';
+          recommendationClass = 'caution';
+        } else if (aqi <= 200) {
+          category = 'Unhealthy';
+          colorClass = 'aqi-unhealthy';
+          recommendation = 'Consider postponing your round.';
+          recommendationClass = 'warning';
+        } else {
+          category = 'Very Unhealthy';
+          colorClass = 'aqi-very-unhealthy';
+          recommendation = 'Avoid outdoor activities.';
+          recommendationClass = 'warning';
+        }
+
+        if (aqi > 150 && warningContainer) {
+          warningContainer.innerHTML = `
+            <div class="aqi-warning-banner">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <div>
+                <div class="warning-title">Air Quality Alert</div>
+                <div class="warning-desc">AQI is ${aqi} (${category}). Consider postponing.</div>
+              </div>
+            </div>
+          `;
+        }
+
+        const icon = recommendationClass === 'good'
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+
+        widget.style.display = 'block';
+        widget.innerHTML = `
+          <div class="aqi-header">
+            <div class="aqi-badge ${colorClass}">${aqi}</div>
+            <div class="aqi-info">
+              <div class="aqi-category ${colorClass}">${category}</div>
+              <div class="aqi-label">Air Quality Index</div>
+            </div>
+          </div>
+          <div class="aqi-recommendation ${recommendationClass}">
+            ${icon}
+            <span>${recommendation}</span>
+          </div>
+        `;
+      } catch (e) {
+        console.error('Air quality error:', e);
+        widget.style.display = 'none';
+      }
+    }
+
+    async function loadDaylight(lat, lon) {
+      const widget = document.getElementById('daylight-widget');
+      if (!widget) return;
+
+      try {
+        const res = await fetch(`https://api.sunrisesunset.io/json?lat=${lat}&lng=${lon}&timezone=America/Los_Angeles`);
+        const data = await res.json();
+
+        if (data.status !== 'OK') throw new Error('API error');
+
+        const results = data.results;
+        const sunrise = results.sunrise;
+        const sunset = results.sunset;
+        const goldenHour = results.golden_hour;
+        const dayLength = results.day_length;
+
+        function formatTime(timeStr) {
+          const parts = timeStr.split(':');
+          return `${parts[0]}:${parts[1]} ${timeStr.split(' ')[1]}`;
+        }
+
+        function parseTime(timeStr) {
+          const [time, period] = timeStr.split(' ');
+          let [hours, minutes] = time.split(':').map(Number);
+          if (period === 'PM' && hours !== 12) hours += 12;
+          if (period === 'AM' && hours === 12) hours = 0;
+          return hours * 60 + minutes;
+        }
+
+        const now = new Date();
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+        const goldenMinutes = parseTime(goldenHour);
+        const sunsetMinutes = parseTime(sunset);
+        const isGoldenHour = nowMinutes >= goldenMinutes && nowMinutes <= sunsetMinutes;
+
+        widget.innerHTML = `
+          <div class="daylight-header">
+            <div class="daylight-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+              </svg>
+              Daylight Info
+            </div>
+            ${isGoldenHour ? '<span class="golden-hour-badge">Golden Hour Now</span>' : ''}
+          </div>
+          <div class="daylight-times">
+            <div class="daylight-item sunrise">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="9" x2="12" y2="2"></line><polyline points="8 6 12 2 16 6"></polyline></svg>
+              <div><div class="label">Sunrise</div><div class="time">${formatTime(sunrise)}</div></div>
+            </div>
+            <div class="daylight-item sunset">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M17 18a5 5 0 0 0-10 0"></path><line x1="12" y1="9" x2="12" y2="2"></line><polyline points="16 6 12 10 8 6"></polyline></svg>
+              <div><div class="label">Sunset</div><div class="time">${formatTime(sunset)}</div></div>
+            </div>
+            <div class="daylight-item golden">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="5"></circle></svg>
+              <div><div class="label">Golden Hour</div><div class="time">${formatTime(goldenHour)}</div></div>
+            </div>
+            <div class="daylight-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <div><div class="label">Day Length</div><div class="time">${dayLength}</div></div>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        console.error('Daylight error:', e);
+        widget.style.display = 'none';
       }
     }
 
