@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { MapPin, Phone, ExternalLink, Flag, Ruler, ArrowLeft, Heart } from "lucide-react"
+import { MapPin, Phone, ExternalLink, Flag, Ruler, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -30,6 +30,9 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   const { slug } = await params
   const course = getCourseBySlug(slug)
 
+  console.log("[v0] Course page slug:", slug)
+  console.log("[v0] Course found:", course?.name || "NOT FOUND")
+
   if (!course) {
     notFound()
   }
@@ -48,14 +51,19 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
             Bay Area Golf
           </Link>
           <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button variant="outline" size="sm" className="bg-white text-primary hover:bg-gray-100">
+                Home
+              </Button>
+            </Link>
             <Link href="/tee-times">
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-transparent border-primary-foreground/50 text-primary-foreground hover:bg-primary-foreground/10"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Tee Times
+              <Button variant="outline" size="sm" className="bg-white text-primary hover:bg-gray-100">
+                Tee Times
+              </Button>
+            </Link>
+            <Link href="/courses">
+              <Button variant="outline" size="sm" className="bg-white text-primary hover:bg-gray-100">
+                Courses
               </Button>
             </Link>
           </div>
@@ -66,15 +74,22 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
       <div className="relative h-64 md:h-80 overflow-hidden">
         <img src={courseImage || "/placeholder.svg"} alt={course.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-          <div className="container mx-auto">
-            <Badge className="mb-2 bg-primary">{course.region}</Badge>
-            <h1 className="text-3xl md:text-4xl font-bold font-serif mb-2">{course.name}</h1>
-            <div className="flex items-center gap-2 text-white/90">
-              <MapPin className="w-4 h-4" />
-              <span>{course.city}, CA</span>
-            </div>
-          </div>
+      </div>
+
+      {/* Breadcrumb */}
+      <div className="bg-muted border-b">
+        <div className="container mx-auto px-4 py-3">
+          <nav className="flex items-center gap-2 text-sm">
+            <Link href="/" className="text-muted-foreground hover:text-primary">
+              Home
+            </Link>
+            <span className="text-muted-foreground">/</span>
+            <Link href="/courses" className="text-muted-foreground hover:text-primary">
+              Courses
+            </Link>
+            <span className="text-muted-foreground">/</span>
+            <span className="font-medium">{course.name}</span>
+          </nav>
         </div>
       </div>
 
@@ -83,6 +98,16 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         <div className="grid md:grid-cols-3 gap-8">
           {/* Left Column - Details */}
           <div className="md:col-span-2 space-y-6">
+            {/* Course Title */}
+            <div>
+              <Badge className="mb-2">{course.region}</Badge>
+              <h1 className="text-3xl md:text-4xl font-bold font-serif mb-2">{course.name}</h1>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <MapPin className="w-4 h-4" />
+                <span>{course.city}, CA</span>
+              </div>
+            </div>
+
             {/* Course Info Card */}
             <Card>
               <CardHeader>
@@ -148,13 +173,18 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                 <CardTitle className="font-serif text-center">Book a Tee Time</CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
-                {course.booking_url && (
+                {course.booking_url ? (
                   <a href={course.booking_url} target="_blank" rel="noopener noreferrer">
                     <Button className="w-full" size="lg">
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Book Online
                     </Button>
                   </a>
+                ) : (
+                  <Button className="w-full" size="lg" disabled>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Online Booking Unavailable
+                  </Button>
                 )}
 
                 {course.phone_number && (
