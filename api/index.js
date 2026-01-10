@@ -211,7 +211,7 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
       frameSrc: ["https://js.stripe.com"],
-      connectSrc: ["'self'", "https://api.open-meteo.com", "https://api.stripe.com"]
+      connectSrc: ["'self'", "https://api.open-meteo.com", "https://air-quality-api.open-meteo.com", "https://api.sunrisesunset.io", "https://api.tidesandcurrents.noaa.gov", "https://api.stripe.com"]
     }
   },
   crossOriginEmbedderPolicy: false
@@ -622,11 +622,73 @@ app.get('/api/courses/:idOrSlug', async (req, res) => {
       args: [course.id]
     });
 
+    // Get approved reviews for this course (from course_reviews table)
+    let reviewsResult = { rows: [] };
+    try {
+      reviewsResult = await db.execute({
+        sql: `SELECT cr.id, cr.rating, cr.title, cr.content, cr.created_at,
+              u.display_name as author_name
+              FROM course_reviews cr
+              JOIN users u ON cr.user_id = u.id
+              WHERE cr.course_id = ? AND cr.is_approved = 1
+              ORDER BY cr.created_at DESC
+              LIMIT 10`,
+        args: [course.id]
+      });
+    } catch (e) {
+      // Table may not exist yet - that's ok
+    }
+
+    // Get rating distribution (1-5 stars count)
+    let ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    try {
+      const distResult = await db.execute({
+        sql: `SELECT rating, COUNT(*) as count FROM course_reviews
+              WHERE course_id = ? AND is_approved = 1
+              GROUP BY rating`,
+        args: [course.id]
+      });
+      for (const row of distResult.rows) {
+        ratingDistribution[row.rating] = row.count;
+      }
+    } catch (e) {
+      // Table may not exist yet
+    }
+
+    // Get booking activity stats (recent clicks/bookings)
+    let bookingActivity = { recentBookings: 0, viewsToday: 0, peakHours: [] };
+    try {
+      // Count recent booking clicks (last 24 hours)
+      const clicksResult = await db.execute({
+        sql: `SELECT COUNT(*) as count FROM clicks
+              WHERE course_slug = ? AND created_at >= datetime('now', '-1 day')`,
+        args: [course.slug]
+      });
+      bookingActivity.recentBookings = clicksResult.rows[0]?.count || 0;
+
+      // Get peak booking hours from tee times distribution
+      const peakResult = await db.execute({
+        sql: `SELECT substr(time, 1, 2) as hour, COUNT(*) as count
+              FROM tee_times
+              WHERE course_id = ? AND datetime >= ?
+              GROUP BY hour
+              ORDER BY count DESC
+              LIMIT 3`,
+        args: [course.id, pacificNow]
+      });
+      bookingActivity.peakHours = peakResult.rows.map(r => parseInt(r.hour));
+    } catch (e) {
+      // Stats tables may not exist
+    }
+
     res.json({
       ...course,
       teeTimes: teeTimesResult.rows,
       tournamentHistory: tournamentsResult.rows,
-      homeUsers: homeUsersResult.rows
+      homeUsers: homeUsersResult.rows,
+      reviews: reviewsResult.rows,
+      ratingDistribution,
+      bookingActivity
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

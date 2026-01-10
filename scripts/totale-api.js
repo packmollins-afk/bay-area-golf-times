@@ -25,6 +25,7 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
 // Note: Courses also on GolfNow removed to avoid duplicates (GolfNow has lower prices):
 // - Boundary Oak, Metropolitan, Pacific Grove, Laguna Seca, Valley of the Moon, Napa
 const TOTALE_COURSES_API = {
+  // Bay Area / Sacramento
   'san-jose-municipal-golf-course': {
     courseId: 'SANJOSE',
     origin: 'https://sanjose.totaleintegrated.net',
@@ -44,6 +45,40 @@ const TOTALE_COURSES_API = {
     courseId: 'CHERRYISLAND',
     origin: 'https://cherryisland.totaleintegrated.net',
     name: 'Cherry Island Golf Course'
+  },
+  // Sacramento Extended
+  'bidwell-park-golf-course': {
+    courseId: 'BIDWELL',
+    origin: 'https://bidwellpark.totaleintegrated.net',
+    name: 'Bidwell Park Golf Course'
+  },
+  'haggin-oaks-golf-complex': {
+    courseId: 'MORTON',
+    origin: 'https://mortongolf.totaleintegrated.com',
+    name: 'Haggin Oaks Golf Complex'
+  },
+  // Central Valley
+  'riverside-golf-course': {
+    courseId: 'RIVERSIDE',
+    origin: 'https://playriverside.totaleintegrated.com',
+    name: 'Riverside Golf Course'
+  },
+  'valley-oaks-golf-course': {
+    courseId: 'VALLEYOAKS',
+    origin: 'https://playvalleyoaks.totaleintegrated.com',
+    name: 'Valley Oaks Golf Course'
+  },
+  // Inland Empire
+  'green-river-golf-club': {
+    courseId: 'GREENRIVER',
+    origin: 'https://playgreenriver.totaleintegrated.com',
+    name: 'Green River Golf Club'
+  },
+  // San Diego
+  'reidy-creek-golf-course': {
+    courseId: 'REIDYCREEK',
+    origin: 'https://reidycreek.totaleintegrated.net',
+    name: 'Reidy Creek Golf Course'
   }
 };
 

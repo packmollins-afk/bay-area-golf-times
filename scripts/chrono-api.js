@@ -60,6 +60,12 @@ const CHRONOGOLF_COURSES = {
     uuid: '039d1b9b-2723-4b50-b02c-2925ae207f83',
     name: 'Blue Rock Springs Golf Club (East)',
     clubUrl: 'https://www.chronogolf.com/club/blue-rock-springs-golf-club'
+  },
+  // Sacramento Extended
+  'wild-wings-golf-club': {
+    uuid: '77b0b0a1-3db7-47fa-8347-6268c94b1b9d',
+    name: 'Wild Wings Golf Club',
+    clubUrl: 'https://www.chronogolf.com/club/wild-wings-golf-club'
   }
   // NOTE: The following courses are on Chronogolf but have online booking DISABLED:
   // - de-laveaga-golf-course (UUID: f1b4da64-623b-4400-a48d-c8fd30f945c6)

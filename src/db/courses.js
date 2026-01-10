@@ -128,6 +128,26 @@ const courses = [
   { name: "Ancil Hoffman Golf Course", city: "Carmichael", region: "Sacramento", holes: 18, par: 72, yardage: 6794, latitude: 38.6247, longitude: -121.3287, phone_number: "(916) 482-3813", golfnow_id: null, booking_url: "https://ancilhoffman.totaleintegrated.net/web/tee-times", booking_system: "totaleintegrated" },
   { name: "Mather Golf Course", city: "Mather", region: "Sacramento", holes: 18, par: 72, yardage: 6725, latitude: 38.5527, longitude: -121.2958, phone_number: "(916) 364-4354", golfnow_id: null, booking_url: "https://mather.totaleintegrated.net/web/tee-times", booking_system: "totaleintegrated" },
   { name: "Cherry Island Golf Course", city: "Elverta", region: "Sacramento", holes: 18, par: 72, yardage: 6605, latitude: 38.7142, longitude: -121.4569, phone_number: "(916) 991-7293", golfnow_id: null, booking_url: "https://cherryisland.totaleintegrated.net/web/tee-times", booking_system: "totaleintegrated" },
+
+  // Sacramento Extended - TotaleIntegrated
+  { name: "Bidwell Park Golf Course", city: "Chico", region: "Sacramento", holes: 18, par: 72, yardage: 6300, latitude: 39.7351, longitude: -121.8254, phone_number: "(530) 891-8417", golfnow_id: null, booking_url: "https://bidwellpark.totaleintegrated.net/web/tee-times", booking_system: "totaleintegrated" },
+  { name: "Haggin Oaks Golf Complex", city: "Sacramento", region: "Sacramento", holes: 36, par: 72, yardage: 6900, latitude: 38.5816, longitude: -121.4944, phone_number: "(916) 808-2531", golfnow_id: null, booking_url: "https://mortongolf.totaleintegrated.com/web/tee-times", booking_system: "totaleintegrated" },
+  { name: "Wild Wings Golf Club", city: "Woodland", region: "Sacramento", holes: 9, par: 36, yardage: 3500, latitude: 38.6596, longitude: -121.7817, phone_number: "(530) 661-4720", golfnow_id: null, booking_url: "https://www.chronogolf.com/club/wild-wings-golf-club", booking_system: "chronogolf" },
+
+  // Central Valley - TotaleIntegrated
+  { name: "Riverside Golf Course", city: "Fresno", region: "Central Valley", holes: 18, par: 72, yardage: 6500, latitude: 36.7318, longitude: -119.7871, phone_number: "(559) 256-1800", golfnow_id: null, booking_url: "https://playriverside.totaleintegrated.com/web/tee-times", booking_system: "totaleintegrated" },
+  { name: "Valley Oaks Golf Course", city: "Visalia", region: "Central Valley", holes: 18, par: 72, yardage: 6300, latitude: 36.3303, longitude: -119.3248, phone_number: "(559) 651-1441", golfnow_id: null, booking_url: "https://playvalleyoaks.totaleintegrated.com/web/tee-times", booking_system: "totaleintegrated" },
+
+  // Inland Empire - TotaleIntegrated
+  { name: "Green River Golf Club", city: "Corona", region: "Inland Empire", holes: 18, par: 71, yardage: 6400, latitude: 33.8953, longitude: -117.5117, phone_number: "(951) 737-7393", golfnow_id: null, booking_url: "https://playgreenriver.totaleintegrated.com/web/tee-times", booking_system: "totaleintegrated" },
+
+  // San Diego Region - TotaleIntegrated & CPS Golf
+  { name: "Reidy Creek Golf Course", city: "Escondido", region: "San Diego", holes: 18, par: 58, yardage: 3100, latitude: 33.0853, longitude: -117.0644, phone_number: "(760) 740-2450", golfnow_id: null, booking_url: "https://reidycreek.totaleintegrated.net/web/tee-times", booking_system: "totaleintegrated" },
+  { name: "Encinitas Ranch Golf Course", city: "Encinitas", region: "San Diego", holes: 18, par: 72, yardage: 6587, latitude: 33.0317, longitude: -117.2485, phone_number: "(760) 944-1936", golfnow_id: null, booking_url: "https://jcgpub35.cps.golf/onlineresweb/search-teetime", booking_system: "cpsgolf" },
+  { name: "San Vicente Golf Resort", city: "Ramona", region: "San Diego", holes: 18, par: 72, yardage: 6611, latitude: 33.0317, longitude: -116.8678, phone_number: "(760) 789-3477", golfnow_id: null, booking_url: "https://sanvicentev3.cps.golf/onlineresweb/search-teetime", booking_system: "cpsgolf" },
+
+  // Palm Springs Region - CPS Golf
+  { name: "Indian Canyons Golf Resort", city: "Palm Springs", region: "Palm Springs", holes: 36, par: 72, yardage: 6900, latitude: 33.7866, longitude: -116.5445, phone_number: "(760) 833-8700", golfnow_id: null, booking_url: "https://indiancanyonca.cps.golf/onlineresweb/search-teetime", booking_system: "cpsgolf" },
 ];
 
 // Insert courses if they don't exist

@@ -8,9 +8,9 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Primary Meta Tags -->
-  <title>Bay Area Golf - Compare Tee Times & Prices | 80+ Courses</title>
-  <meta name="title" content="Bay Area Golf - Compare Tee Times & Prices | 80+ Courses">
-  <meta name="description" content="Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 80+ courses. Live availability.">
+  <title>Bay Area Golf - Compare Tee Times & Prices | 100+ Courses</title>
+  <meta name="title" content="Bay Area Golf - Compare Tee Times & Prices | 100+ Courses">
+  <meta name="description" content="Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 100+ courses. Live availability.">
   <meta name="keywords" content="bay area golf, golf courses san francisco, public golf bay area, tee times sf, golf near me, bay area golf map, san francisco golf, east bay golf, south bay golf, north bay golf">
   <meta name="author" content="Bay Area Golf">
   <meta name="robots" content="index, follow">
@@ -21,8 +21,8 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bayareagolf.now/">
-  <meta property="og:title" content="Bay Area Golf - Compare Tee Times & Prices | 80+ Courses">
-  <meta property="og:description" content="Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 80+ courses. Live availability.">
+  <meta property="og:title" content="Bay Area Golf - Compare Tee Times & Prices | 100+ Courses">
+  <meta property="og:description" content="Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 100+ courses. Live availability.">
   <meta property="og:image" content="https://bayareagolf.now/og-image.svg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -32,8 +32,8 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://bayareagolf.now/">
-  <meta name="twitter:title" content="Bay Area Golf - Compare Tee Times & Prices | 80+ Courses">
-  <meta name="twitter:description" content="Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 80+ courses.">
+  <meta name="twitter:title" content="Bay Area Golf - Compare Tee Times & Prices | 100+ Courses">
+  <meta name="twitter:description" content="Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 100+ courses.">
   <meta name="twitter:image" content="https://bayareagolf.now/og-image.svg">
 
   <!-- Geo Meta Tags for Local SEO -->
@@ -64,7 +64,7 @@
     "@type": "WebSite",
     "name": "Bay Area Golf",
     "url": "https://bayareagolf.now",
-    "description": "Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 80+ courses.",
+    "description": "Find the best tee times across San Francisco, East Bay, South Bay, North Bay, and Monterey. Compare prices from 100+ courses.",
     "potentialAction": {
       "@type": "SearchAction",
       "target": "https://bayareagolf.now/courses.html?search={search_term_string}",
@@ -210,6 +210,15 @@
     /* South Bay / Santa Cruz Mtns contours */
     .contour-sb-1 { top: 60%; left: 22%; width: 35%; height: 38%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
     .contour-sb-2 { top: 68%; left: 28%; width: 26%; height: 28%; transform: rotate(12deg); border-radius: 50% 50% 60% 40%; }
+
+    /* Sierra Nevada foothills (Sacramento/Central Valley) */
+    .contour-sierra-1 { top: 0%; left: 78%; width: 30%; height: 50%; transform: rotate(-5deg); border-radius: 40% 60% 55% 45%; }
+    .contour-sierra-2 { top: 15%; left: 85%; width: 22%; height: 40%; transform: rotate(-5deg); border-radius: 40% 60% 55% 45%; }
+    .contour-sierra-3 { top: 35%; left: 90%; width: 18%; height: 45%; transform: rotate(-8deg); border-radius: 45% 55% 50% 50%; }
+
+    /* Southern California mountains */
+    .contour-socal-1 { top: 78%; left: 80%; width: 25%; height: 22%; transform: rotate(15deg); border-radius: 55% 45% 50% 50%; }
+    .contour-socal-2 { top: 85%; left: 88%; width: 18%; height: 16%; transform: rotate(12deg); border-radius: 50% 50% 55% 45%; }
 
     /* San Francisco Bay - GPS-based positioning */
     /* Bay center: ~37.55, -122.15 -> top: 55.9%, left: 61.8% */
@@ -550,8 +559,6 @@
     .fw-seascape { top: 87.0%; left: 76.5%; width: 20px; height: 32px; border-radius: 50%; transform: rotate(12deg); }
     /* Pajaro Valley: 36.9136, -121.7577 - Royal Oaks */
     .fw-pajaro { top: 90.0%; left: 86.0%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(15deg); }
-    /* Salinas Fairways: 36.685, -121.638 - Salinas */
-    .fw-salinas { top: 96.0%; left: 93.5%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(20deg); }
     /* Los Lagos: 37.3055, -121.8165 - San Jose */
     .fw-loslagos { top: 70.5%; left: 81.5%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(18deg); }
     /* Gilroy: 37.0058, -121.5681 - Gilroy */
@@ -589,15 +596,31 @@
     /* Silverado South: 38.35, -122.26 */
     .fw-silverado-s { top: 8.8%; left: 55.3%; width: 24px; height: 38px; border-radius: 48% 52% 50% 50%; transform: rotate(-12deg); }
 
-    /* Monterey Peninsula Courses */
-    /* Pacific Grove: 36.6364, -121.9233 */
-    .fw-pacificgrove { top: 94.0%; left: 58.0%; width: 22px; height: 34px; border-radius: 50%; transform: rotate(8deg); }
-    /* Laguna Seca: 36.5836, -121.7603 */
-    .fw-lagunaseca { top: 96.5%; left: 70.0%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(12deg); }
-    /* Bayonet: 36.6256, -121.8164 */
-    .fw-bayonet { top: 94.5%; left: 66.5%; width: 22px; height: 34px; border-radius: 50% 50% 52% 48%; transform: rotate(10deg); }
-    /* Black Horse: 36.6278, -121.8231 */
-    .fw-blackhorse { top: 94.8%; left: 64.5%; width: 20px; height: 32px; border-radius: 48% 52% 50% 50%; transform: rotate(6deg); }
+    /* Monterey Peninsula Courses - All 12 courses with non-overlapping positions */
+    /* Pacific Grove: 36.6364, -121.9233 - westernmost, coastal */
+    .fw-pacificgrove { top: 93.5%; left: 56.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-5deg); }
+    /* Del Monte: 36.5950, -121.8780 - downtown Monterey */
+    .fw-delmonte { top: 95.5%; left: 59.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(0deg); }
+    /* Monterey Pines: 36.5780, -121.8520 - airport area */
+    .fw-montereypines { top: 94.0%; left: 62.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(3deg); }
+    /* Black Horse: 36.6278, -121.8231 - Seaside */
+    .fw-blackhorse { top: 93.0%; left: 65.0%; width: 18px; height: 28px; border-radius: 48% 52% 50% 50%; transform: rotate(6deg); }
+    /* Bayonet: 36.6256, -121.8164 - Seaside */
+    .fw-bayonet { top: 95.0%; left: 68.0%; width: 18px; height: 28px; border-radius: 50% 50% 52% 48%; transform: rotate(8deg); }
+    /* Laguna Seca: 36.5836, -121.7603 - east */
+    .fw-lagunaseca { top: 96.0%; left: 72.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(10deg); }
+    /* The Quail: 36.4850, -121.8420 - Carmel, south */
+    .fw-quail { top: 98.0%; left: 60.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(-3deg); }
+    /* Carmel Valley Ranch: 36.4780, -121.7320 - Carmel Valley */
+    .fw-carmelvalley { top: 97.5%; left: 76.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(12deg); }
+    /* Corral de Tierra: 36.5380, -121.6950 - northeast */
+    .fw-corral { top: 95.5%; left: 79.5%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(14deg); }
+    /* Salinas Fairways: 36.6850, -121.6380 - Salinas (9-hole) */
+    .fw-salinasfairways { top: 93.0%; left: 83.0%; width: 16px; height: 24px; border-radius: 50%; transform: rotate(5deg); }
+    /* Twin Creeks: 36.6780, -121.6550 - Salinas area (9-hole) */
+    .fw-twincreeks { top: 91.5%; left: 86.5%; width: 16px; height: 24px; border-radius: 50%; transform: rotate(8deg); }
+    /* Crazy Horse Ranch: 36.7120, -121.5980 - far northeast inland */
+    .fw-crazyhorse { top: 90.0%; left: 90.0%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(10deg); }
 
     /* Additional East Bay Courses */
     /* Canyon Lakes: 37.7158, -121.8703 */
@@ -627,6 +650,42 @@
 
     /* Napa Golf Course: 38.2981, -122.2981 */
     .fw-napagc { top: 11.5%; left: 52.0%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-5deg); }
+
+    /* Sacramento Region - spread across top-right quadrant */
+    /* Bidwell Park (Chico): 39.7351, -121.8254 - furthest north */
+    .fw-bidwell { top: 2%; left: 82%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(-5deg); }
+    /* Cherry Island: 38.7142, -121.4569 */
+    .fw-cherry { top: 8%; left: 90%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(3deg); }
+    /* Wild Wings (Woodland): 38.6596, -121.7817 */
+    .fw-wildwings { top: 10%; left: 84%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(2deg); }
+    /* Ancil Hoffman: 38.6247, -121.3287 */
+    .fw-ancil { top: 12%; left: 94%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(5deg); }
+    /* Haggin Oaks: 38.5816, -121.4944 */
+    .fw-haggin { top: 15%; left: 88%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(6deg); }
+    /* Mather: 38.5527, -121.2958 */
+    .fw-mather { top: 18%; left: 96%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(8deg); }
+
+    /* Central Valley - spread down the right side */
+    /* Riverside (Fresno): 36.7318, -119.7871 */
+    .fw-riverside { top: 55%; left: 96%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(15deg); }
+    /* Valley Oaks (Visalia): 36.3303, -119.3248 */
+    .fw-valleyoaks { top: 68%; left: 98%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(18deg); }
+
+    /* Inland Empire */
+    /* Green River (Corona): 33.8953, -117.5117 */
+    .fw-greenriver { top: 82%; left: 94%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(20deg); }
+
+    /* San Diego Region - spread across bottom */
+    /* Encinitas Ranch: 33.0317, -117.2485 - coastal */
+    .fw-encinitas { top: 92%; left: 82%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(20deg); }
+    /* Reidy Creek (Escondido): 33.0853, -117.0644 */
+    .fw-reidycreek { top: 95%; left: 88%; width: 18px; height: 28px; border-radius: 50%; transform: rotate(22deg); }
+    /* San Vicente: 33.0317, -116.8678 - inland */
+    .fw-sanvicente { top: 94%; left: 94%; width: 20px; height: 30px; border-radius: 50%; transform: rotate(24deg); }
+
+    /* Palm Springs Region */
+    /* Indian Canyons: 33.7866, -116.5445 */
+    .fw-indiancanyons { top: 88%; left: 98%; width: 22px; height: 32px; border-radius: 50%; transform: rotate(25deg); }
 
     /* Price tags under fairways */
     .fairway .price-tag {
@@ -672,7 +731,19 @@
     .fw-delaveaga .price-tag { --counter-rotate: -8deg; }
     .fw-seascape .price-tag { --counter-rotate: -12deg; }
     .fw-pajaro .price-tag { --counter-rotate: -15deg; }
-    .fw-salinas .price-tag { --counter-rotate: -20deg; }
+    /* Monterey area price tag rotations */
+    .fw-pacificgrove .price-tag { --counter-rotate: 5deg; }
+    .fw-delmonte .price-tag { --counter-rotate: 0deg; }
+    .fw-montereypines .price-tag { --counter-rotate: -3deg; }
+    .fw-blackhorse .price-tag { --counter-rotate: -6deg; }
+    .fw-bayonet .price-tag { --counter-rotate: -8deg; }
+    .fw-lagunaseca .price-tag { --counter-rotate: -10deg; }
+    .fw-quail .price-tag { --counter-rotate: 3deg; }
+    .fw-carmelvalley .price-tag { --counter-rotate: -12deg; }
+    .fw-corral .price-tag { --counter-rotate: -14deg; }
+    .fw-salinasfairways .price-tag { --counter-rotate: -5deg; }
+    .fw-twincreeks .price-tag { --counter-rotate: -8deg; }
+    .fw-crazyhorse .price-tag { --counter-rotate: -10deg; }
     .fw-loslagos .price-tag { --counter-rotate: -18deg; }
     .fw-gilroy .price-tag { --counter-rotate: -22deg; }
     .fw-roosterrun .price-tag { --counter-rotate: 18deg; }
@@ -810,6 +881,11 @@
       stroke-width: 2;
     }
 
+    /* Nav zoom controls */
+    .nav-zoom-controls {
+      display: none; /* Hidden on desktop */
+    }
+
     /* Zoom controls - fixed bottom right corner */
     .zoom-controls {
       position: fixed;
@@ -870,55 +946,6 @@
       stroke-linecap: round;
     }
 
-    /* Legend */
-    .legend {
-      position: absolute;
-      bottom: 2rem;
-      left: 2rem;
-      background: rgba(244, 235, 224, 0.95);
-      border: 2px solid var(--contour);
-      padding: 1rem 1.5rem;
-      font-size: 0.85rem;
-      z-index: 15;
-    }
-
-    .legend-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 0.75rem;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 0.5rem;
-    }
-
-    .legend-item:last-child { margin-bottom: 0; }
-
-    .legend-fairway {
-      width: 20px;
-      height: 12px;
-      background: var(--fairway);
-      border-radius: 40%;
-    }
-
-    .legend-water {
-      width: 20px;
-      height: 12px;
-      background: var(--water);
-      border-radius: 2px;
-    }
-
-    .legend-contour {
-      width: 20px;
-      height: 0;
-      border-top: 2px solid var(--contour-light);
-    }
 
     /* Scale bar */
     .scale-bar {
@@ -1055,6 +1082,91 @@
     .label-napa { top: 6%; left: 52%; color: #722F37; font-style: italic; }
     .label-sonoma { top: 4%; left: 38%; color: #5a3e36; font-style: italic; }
     .label-pacific { top: 50%; left: 8%; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.3em; color: var(--water-dark); }
+    .label-monterey { top: 92%; left: 62%; color: #2563eb; font-style: italic; }
+    .label-sacramento { top: 6%; left: 88%; color: #b8860b; font-style: italic; }
+    .label-centralvalley { top: 58%; left: 94%; color: #8b7355; font-style: italic; font-size: 10px; }
+    .label-sandiego { top: 93%; left: 80%; color: #2f6b6b; font-style: italic; }
+    .label-palmsprings { top: 85%; left: 95%; color: #cd853f; font-style: italic; font-size: 10px; }
+
+    /* Region background colors - subtle natural tints */
+    .region-bg {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.35;
+      z-index: 1;
+    }
+
+    /* San Francisco - urban gray */
+    .region-bg-sf {
+      top: 38%; left: 38%; width: 18%; height: 18%;
+      background: radial-gradient(ellipse, #8b8b8b 0%, transparent 70%);
+    }
+
+    /* South Bay - warm golden valley */
+    .region-bg-sb {
+      top: 58%; left: 62%; width: 35%; height: 35%;
+      background: radial-gradient(ellipse, #d4a574 0%, transparent 70%);
+    }
+
+    /* East Bay - brown hills */
+    .region-bg-eb {
+      top: 32%; left: 52%; width: 40%; height: 30%;
+      background: radial-gradient(ellipse, #c9a87c 0%, transparent 70%);
+    }
+
+    /* North Bay - green redwoods */
+    .region-bg-nb {
+      top: 20%; left: 30%; width: 30%; height: 25%;
+      background: radial-gradient(ellipse, #7cb07c 0%, transparent 70%);
+    }
+
+    /* Napa - wine purple tint */
+    .region-bg-napa {
+      top: 5%; left: 48%; width: 20%; height: 18%;
+      background: radial-gradient(ellipse, #b08db0 0%, transparent 70%);
+    }
+
+    /* Sonoma - green rolling hills */
+    .region-bg-sonoma {
+      top: 2%; left: 28%; width: 25%; height: 18%;
+      background: radial-gradient(ellipse, #8fbc8f 0%, transparent 70%);
+    }
+
+    /* Monterey - coastal blue */
+    .region-bg-monterey {
+      top: 85%; left: 55%; width: 35%; height: 18%;
+      background: radial-gradient(ellipse, #87ceeb 0%, transparent 70%);
+    }
+
+    /* Sacramento Region - gold valley */
+    .region-bg-sacramento {
+      top: 2%; left: 78%; width: 30%; height: 28%;
+      background: radial-gradient(ellipse, #daa520 0%, transparent 70%);
+    }
+
+    /* Central Valley - agricultural tan/brown */
+    .region-bg-centralvalley {
+      top: 45%; left: 88%; width: 25%; height: 35%;
+      background: radial-gradient(ellipse, #c4a35a 0%, transparent 70%);
+    }
+
+    /* Inland Empire - desert sand */
+    .region-bg-inland {
+      top: 75%; left: 88%; width: 20%; height: 20%;
+      background: radial-gradient(ellipse, #d2b48c 0%, transparent 70%);
+    }
+
+    /* San Diego - coastal green/blue */
+    .region-bg-sandiego {
+      top: 88%; left: 75%; width: 28%; height: 18%;
+      background: radial-gradient(ellipse, #5f9ea0 0%, transparent 70%);
+    }
+
+    /* Palm Springs / Desert - warm desert */
+    .region-bg-desert {
+      top: 82%; left: 92%; width: 20%; height: 20%;
+      background: radial-gradient(ellipse, #e6c288 0%, transparent 70%);
+    }
 
     /* Landmarks */
     .landmarks {
@@ -1434,49 +1546,62 @@
       }
 
       .nav-bar {
-        padding: 0.6rem 0.5rem calc(1rem + env(safe-area-inset-bottom, 12px));
-        gap: 0.4rem;
+        padding: 0.4rem 0.4rem calc(0.6rem + env(safe-area-inset-bottom, 8px));
+        gap: 0.3rem;
         bottom: 0;
+        background: rgba(244, 235, 224, 0.92);
       }
 
       .nav-btn {
-        padding: 0.6rem 0.8rem;
-        font-size: 0.7rem;
-        min-width: 65px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.65rem;
+        min-width: 55px;
       }
 
       .nav-btn svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
       }
 
+      /* Hide fixed zoom controls on mobile */
       .zoom-controls {
-        bottom: calc(80px + env(safe-area-inset-bottom, 12px));
-        right: 12px;
+        display: none;
       }
 
-      .zoom-btn {
+      /* Show nav zoom controls on mobile */
+      .nav-zoom-controls {
+        display: flex;
+        gap: 4px;
+      }
+
+      .nav-zoom-btn {
         width: 44px;
         height: 44px;
-      }
-
-      .zoom-label {
-        font-size: 8px;
-      }
-
-      .login-btn {
-        top: 0.5rem;
-        right: 4rem;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.7rem;
-        min-width: 44px;
-        min-height: 44px;
+        border: 2px solid var(--contour);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.95);
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
       }
 
-      .legend, .scale-bar {
+      .nav-zoom-btn svg {
+        width: 22px;
+        height: 22px;
+        stroke: var(--text-dark);
+        stroke-width: 2.5;
+      }
+
+      .nav-zoom-btn:active {
+        background: var(--paper-dark);
+      }
+
+      .login-btn {
+        display: none; /* Hidden on mobile - Account is in nav bar */
+      }
+
+      .scale-bar {
         display: none;
       }
 
@@ -1521,7 +1646,28 @@
       <div class="contour contour-ma-2"></div>
       <div class="contour contour-sb-1"></div>
       <div class="contour contour-sb-2"></div>
+      <!-- Sierra Nevada foothills -->
+      <div class="contour contour-sierra-1"></div>
+      <div class="contour contour-sierra-2"></div>
+      <div class="contour contour-sierra-3"></div>
+      <!-- Southern California mountains -->
+      <div class="contour contour-socal-1"></div>
+      <div class="contour contour-socal-2"></div>
     </div>
+
+    <!-- Region background colors -->
+    <div class="region-bg region-bg-sf"></div>
+    <div class="region-bg region-bg-sb"></div>
+    <div class="region-bg region-bg-eb"></div>
+    <div class="region-bg region-bg-nb"></div>
+    <div class="region-bg region-bg-napa"></div>
+    <div class="region-bg region-bg-sonoma"></div>
+    <div class="region-bg region-bg-monterey"></div>
+    <div class="region-bg region-bg-sacramento"></div>
+    <div class="region-bg region-bg-centralvalley"></div>
+    <div class="region-bg region-bg-inland"></div>
+    <div class="region-bg region-bg-sandiego"></div>
+    <div class="region-bg region-bg-desert"></div>
 
     <!-- California Coastline - accurate SVG trace -->
     <div class="california-coast">
@@ -1767,7 +1913,6 @@
       <a href="/course/los-lagos-golf-course" class="fairway fw-loslagos" data-course="Los Lagos Golf Course" data-initial="LL"><span class="price-tag loading">...</span></a>
       <a href="/course/gilroy-golf-course" class="fairway fw-gilroy" data-course="Gilroy Golf Course" data-initial="GI"><span class="price-tag loading">...</span></a>
       <a href="/course/pajaro-valley-golf-club" class="fairway fw-pajaro" data-course="Pajaro Valley Golf Club" data-initial="PV"><span class="price-tag loading">...</span></a>
-      <a href="/course/salinas-fairways-golf-course" class="fairway fw-salinas" data-course="Salinas Fairways Golf Course" data-initial="SF"><span class="price-tag loading">...</span></a>
 
       <!-- East Bay -->
       <a href="/course/corica-park-south-course" class="fairway fw-corica" data-course="Corica Park - South Course" data-initial="CS"><span class="price-tag loading">...</span></a>
@@ -1810,11 +1955,19 @@
       <a href="/course/silverado-resort-north-course" class="fairway fw-silverado-n" data-course="Silverado Resort - North Course" data-initial="SN"><span class="price-tag loading">...</span></a>
       <a href="/course/silverado-resort-south-course" class="fairway fw-silverado-s" data-course="Silverado Resort - South Course" data-initial="SS"><span class="price-tag loading">...</span></a>
 
-      <!-- Monterey -->
+      <!-- Monterey - All 12 courses -->
       <a href="/course/pacific-grove-golf-links" class="fairway fw-pacificgrove" data-course="Pacific Grove Golf Links" data-initial="PG"><span class="price-tag loading">...</span></a>
-      <a href="/course/laguna-seca-golf-ranch" class="fairway fw-lagunaseca" data-course="Laguna Seca Golf Ranch" data-initial="LS"><span class="price-tag loading">...</span></a>
-      <a href="/course/bayonet-golf-course" class="fairway fw-bayonet" data-course="Bayonet Golf Course" data-initial="BY"><span class="price-tag loading">...</span></a>
+      <a href="/course/del-monte-golf-course" class="fairway fw-delmonte" data-course="Del Monte Golf Course" data-initial="DM"><span class="price-tag loading">...</span></a>
+      <a href="/course/monterey-pines-golf-club" class="fairway fw-montereypines" data-course="Monterey Pines Golf Club" data-initial="MP"><span class="price-tag loading">...</span></a>
       <a href="/course/black-horse-golf-club" class="fairway fw-blackhorse" data-course="Black Horse Golf Club" data-initial="BH"><span class="price-tag loading">...</span></a>
+      <a href="/course/bayonet-golf-course" class="fairway fw-bayonet" data-course="Bayonet Golf Course" data-initial="BY"><span class="price-tag loading">...</span></a>
+      <a href="/course/laguna-seca-golf-ranch" class="fairway fw-lagunaseca" data-course="Laguna Seca Golf Ranch" data-initial="LS"><span class="price-tag loading">...</span></a>
+      <a href="/course/the-quail-golf-club" class="fairway fw-quail" data-course="The Quail Golf Club" data-initial="QU"><span class="price-tag loading">...</span></a>
+      <a href="/course/carmel-valley-ranch" class="fairway fw-carmelvalley" data-course="Carmel Valley Ranch" data-initial="CV"><span class="price-tag loading">...</span></a>
+      <a href="/course/corral-de-tierra-country-club" class="fairway fw-corral" data-course="Corral de Tierra Country Club" data-initial="CT"><span class="price-tag loading">...</span></a>
+      <a href="/course/salinas-fairways-golf-course" class="fairway fw-salinasfairways" data-course="Salinas Fairways Golf Course" data-initial="SF"><span class="price-tag loading">...</span></a>
+      <a href="/course/twin-creeks-golf-course" class="fairway fw-twincreeks" data-course="Twin Creeks Golf Course" data-initial="TC"><span class="price-tag loading">...</span></a>
+      <a href="/course/the-club-at-crazy-horse-ranch" class="fairway fw-crazyhorse" data-course="The Club at Crazy Horse Ranch" data-initial="CH"><span class="price-tag loading">...</span></a>
 
       <!-- Additional East Bay -->
       <a href="/course/canyon-lakes-golf-course" class="fairway fw-canyonlakes" data-course="Canyon Lakes Golf Course" data-initial="CL"><span class="price-tag loading">...</span></a>
@@ -1833,6 +1986,29 @@
       <!-- Additional Sonoma -->
       <a href="/course/foxtail-golf-club-north" class="fairway fw-foxtailn" data-course="Foxtail Golf Club North" data-initial="FN"><span class="price-tag loading">...</span></a>
       <a href="/course/foxtail-golf-club-south" class="fairway fw-foxtails" data-course="Foxtail Golf Club South" data-initial="FS"><span class="price-tag loading">...</span></a>
+
+      <!-- Sacramento Region -->
+      <a href="/course/ancil-hoffman-golf-course" class="fairway fw-ancil" data-course="Ancil Hoffman Golf Course" data-initial="AH"><span class="price-tag loading">...</span></a>
+      <a href="/course/mather-golf-course" class="fairway fw-mather" data-course="Mather Golf Course" data-initial="MA"><span class="price-tag loading">...</span></a>
+      <a href="/course/cherry-island-golf-course" class="fairway fw-cherry" data-course="Cherry Island Golf Course" data-initial="CI"><span class="price-tag loading">...</span></a>
+      <a href="/course/bidwell-park-golf-course" class="fairway fw-bidwell" data-course="Bidwell Park Golf Course" data-initial="BP"><span class="price-tag loading">...</span></a>
+      <a href="/course/haggin-oaks-golf-complex" class="fairway fw-haggin" data-course="Haggin Oaks Golf Complex" data-initial="HO"><span class="price-tag loading">...</span></a>
+      <a href="/course/wild-wings-golf-club" class="fairway fw-wildwings" data-course="Wild Wings Golf Club" data-initial="WW"><span class="price-tag loading">...</span></a>
+
+      <!-- Central Valley -->
+      <a href="/course/riverside-golf-course" class="fairway fw-riverside" data-course="Riverside Golf Course" data-initial="RV"><span class="price-tag loading">...</span></a>
+      <a href="/course/valley-oaks-golf-course" class="fairway fw-valleyoaks" data-course="Valley Oaks Golf Course" data-initial="VO"><span class="price-tag loading">...</span></a>
+
+      <!-- Inland Empire -->
+      <a href="/course/green-river-golf-club" class="fairway fw-greenriver" data-course="Green River Golf Club" data-initial="GR"><span class="price-tag loading">...</span></a>
+
+      <!-- San Diego Region -->
+      <a href="/course/reidy-creek-golf-course" class="fairway fw-reidycreek" data-course="Reidy Creek Golf Course" data-initial="RD"><span class="price-tag loading">...</span></a>
+      <a href="/course/encinitas-ranch-golf-course" class="fairway fw-encinitas" data-course="Encinitas Ranch Golf Course" data-initial="ER"><span class="price-tag loading">...</span></a>
+      <a href="/course/san-vicente-golf-resort" class="fairway fw-sanvicente" data-course="San Vicente Golf Resort" data-initial="SV"><span class="price-tag loading">...</span></a>
+
+      <!-- Palm Springs Region -->
+      <a href="/course/indian-canyons-golf-resort" class="fairway fw-indiancanyons" data-course="Indian Canyons Golf Resort" data-initial="IC"><span class="price-tag loading">...</span></a>
     </div>
 
     <!-- Region labels -->
@@ -1843,12 +2019,17 @@
     <div class="region-label label-napa">Napa</div>
     <div class="region-label label-sonoma">Sonoma</div>
     <div class="region-label label-pacific">Pacific Ocean</div>
+    <div class="region-label label-monterey">Monterey</div>
+    <div class="region-label label-sacramento">Sacramento</div>
+    <div class="region-label label-centralvalley">Central Valley</div>
+    <div class="region-label label-sandiego">San Diego</div>
+    <div class="region-label label-palmsprings">Palm Springs</div>
     </div><!-- End map-content -->
 
     <!-- Top title bar -->
     <div class="title-bar">
       <h1 class="map-title">Bay Area Golf</h1>
-      <p class="map-subtitle">San Francisco & Vicinity • 80+ Public Courses</p>
+      <p class="map-subtitle">California Golf • 100+ Public Courses</p>
     </div>
 
     <!-- Simple Search Link -->
@@ -1896,38 +2077,23 @@
         </svg>
         Courses
       </a>
-      <a href="/monterey.html" class="nav-btn">
+      <a href="/account.html" class="nav-btn" id="nav-account-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        Monterey
+        <span id="nav-account-text">Account</span>
       </a>
-      <a href="mailto:hello@bayareagolfnow.com" class="nav-btn">
-        <svg viewBox="0 0 24 24">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-          <polyline points="22,6 12,13 2,6"></polyline>
-        </svg>
-        Contact
-      </a>
+      <div class="nav-zoom-controls">
+        <button class="nav-zoom-btn" id="nav-zoom-out" title="Zoom Out">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button class="nav-zoom-btn" id="nav-zoom-in" title="Zoom In">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+      </div>
     </nav>
 
-    <!-- Legend -->
-    <div class="legend">
-      <div class="legend-title">Legend</div>
-      <div class="legend-item">
-        <div class="legend-fairway"></div>
-        <span>Golf Course</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-water"></div>
-        <span>Water</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-contour"></div>
-        <span>Contour Line</span>
-      </div>
-    </div>
 
     <!-- Scale bar -->
     <div class="scale-bar">
@@ -2033,12 +2199,16 @@
       });
     });
 
-    // Check auth state and update login button
+    // Check auth state and update login/account buttons
     function updateLoginBtn() {
       const authToken = localStorage.getItem('authToken');
       const loginText = document.getElementById('login-text');
+      const navAccountText = document.getElementById('nav-account-text');
       if (loginText) {
         loginText.textContent = authToken ? 'Account' : 'Log In';
+      }
+      if (navAccountText) {
+        navAccountText.textContent = authToken ? 'Account' : 'Log In';
       }
     }
     document.addEventListener('DOMContentLoaded', updateLoginBtn);
@@ -2172,6 +2342,22 @@
       zoomOutBtn.addEventListener('click', () => {
         zoomTo(currentZoom - config.zoomOutStep);
       });
+
+      // Nav zoom buttons (mobile)
+      const navZoomIn = document.getElementById('nav-zoom-in');
+      const navZoomOut = document.getElementById('nav-zoom-out');
+
+      if (navZoomIn) {
+        navZoomIn.addEventListener('click', () => {
+          zoomTo(currentZoom + config.zoomInStep);
+        });
+      }
+
+      if (navZoomOut) {
+        navZoomOut.addEventListener('click', () => {
+          zoomTo(currentZoom - config.zoomOutStep);
+        });
+      }
 
       // === MOUSE WHEEL ZOOM ===
       container.addEventListener('wheel', (e) => {

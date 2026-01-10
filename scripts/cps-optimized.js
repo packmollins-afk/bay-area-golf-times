@@ -27,6 +27,7 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
 }
 
 const CPS_COURSES = {
+  // Bay Area
   'diablo-creek-golf-course': {
     url: 'https://diablocreek.cps.golf/onlineresweb/search-teetime',
     name: 'Diablo Creek Golf Course'
@@ -34,6 +35,20 @@ const CPS_COURSES = {
   'northwood-golf-club': {
     url: 'https://northwood.cps.golf/onlineresweb/search-teetime',
     name: 'Northwood Golf Club'
+  },
+  // San Diego Region
+  'encinitas-ranch-golf-course': {
+    url: 'https://jcgpub35.cps.golf/onlineresweb/search-teetime',
+    name: 'Encinitas Ranch Golf Course'
+  },
+  'san-vicente-golf-resort': {
+    url: 'https://sanvicentev3.cps.golf/onlineresweb/search-teetime',
+    name: 'San Vicente Golf Resort'
+  },
+  // Palm Springs Region
+  'indian-canyons-golf-resort': {
+    url: 'https://indiancanyonca.cps.golf/onlineresweb/search-teetime',
+    name: 'Indian Canyons Golf Resort'
   }
   // NOTE: Presidio Golf Course removed - requires login (uses GolfNow instead)
 };
