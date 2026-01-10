@@ -14,11 +14,12 @@ Bay Area Golf (bayareagolf.now) - A tee time aggregation platform for 80+ golf c
 Any overlays or search UI must use `pointer-events: none` or link to `/app.html` instead of being interactive on the homepage.
 
 ### Adding New Courses Workflow
-When courses are added to the database, they need THREE things to appear on the homepage:
+When courses are added to the database, they need FOUR things to appear correctly:
 
 1. **Database entry** with exact `name` field
 2. **HTML element** in `public/index.html` with `data-course` matching the database name exactly
 3. **CSS positioning** class (`.fw-{shortname}`) with map coordinates
+4. **Beautiful hole photo** (NOT a logo) - run `node scripts/fetch-course-photos.js` or add URL manually
 
 See `WORKFLOW.md` for detailed steps.
 

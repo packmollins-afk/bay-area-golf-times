@@ -52,10 +52,38 @@ Position values are percentages of the map area:
 - North Bay: left ~24-48%, top ~3-35%
 - Monterey/Santa Cruz: left ~69-97%, top ~86-98%
 
-### Step 4: Verify Data Flow
+### Step 4: Add Course Image
+Every course MUST have a beautiful hole photo (not just a logo). Options:
+
+#### Option A: Auto-fetch from Pexels (recommended for batch updates)
+```bash
+node scripts/fetch-course-photos.js
+```
+
+#### Option B: Manual URL (for specific courses)
+Add the photo URL to `src/scripts/update-course-photos.js`:
+```javascript
+"Course Name": "https://example.com/beautiful-hole.jpg",
+```
+Then run: `node src/scripts/update-course-photos.js`
+
+#### Option C: Local file
+Save image to `public/images/courses/{slug}.jpg` and update database:
+```sql
+UPDATE courses SET photo_url = '/images/courses/{slug}.jpg' WHERE slug = '{slug}';
+```
+
+**Image requirements:**
+- Must show an actual golf hole (fairway, green, scenic view)
+- Landscape orientation preferred
+- Minimum 800px width
+- NO logos or text graphics
+
+### Step 5: Verify Data Flow
 1. Run the scraper: `node scripts/full-scrape-parallel.js`
 2. Check API returns course data: `curl https://bayareagolf.now/api/tee-times/next-available`
 3. Verify homepage shows price tags for new courses
+4. Verify course page shows beautiful hole photo
 
 ### Debugging Course Data Mismatches
 
