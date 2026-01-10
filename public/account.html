@@ -496,7 +496,7 @@
         <!-- Profile Picture -->
         <div class="profile-picture-section">
           <div class="profile-picture-preview" id="profile-picture-preview">
-            <img id="profile-img" src="" alt="Profile" style="display: none;">
+            <img id="profile-img" src="" alt="User profile photo" loading="lazy" width="120" height="120" decoding="async" style="display: none;">
             <span id="profile-initial">?</span>
           </div>
           <label class="upload-btn">
@@ -918,7 +918,7 @@
       showAuthForms();
     }
   </script>
-  <script src="/js/analytics.js"></script>
+  <script src="/js/analytics.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

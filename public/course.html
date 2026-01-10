@@ -6,8 +6,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 
   <!-- Primary Meta Tags (dynamically updated by JavaScript) -->
-  <title>Loading... | Bay Area Golf</title>
-  <meta name="description" content="Course details and tee times for Bay Area public golf courses.">
+  <title>Golf Course Tee Times | Bay Area Golf</title>
+  <meta name="description" content="Book tee times online at Bay Area golf courses. View real-time availability, pricing, course details, and reserve your round today.">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph (dynamically updated by JavaScript) -->
@@ -45,6 +45,9 @@
   <!-- Mobile UX enhancements - touch targets, swipe gestures, bottom sheets -->
   <link rel="stylesheet" href="/css/mobile-ux.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="/css/mobile-ux.css"></noscript>
+  <!-- CTA optimizations for improved conversion -->
+  <link rel="stylesheet" href="/css/cta-optimizations.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="/css/cta-optimizations.css"></noscript>
   <style>
     :root {
       --primary: #2d5a27;
@@ -109,10 +112,15 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     header .container { display: flex; justify-content: space-between; align-items: center; }
-    header h1 {
+    .site-title {
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.4rem;
       font-weight: 700;
+      color: inherit;
+      text-decoration: none;
+    }
+    .site-title:hover {
+      opacity: 0.9;
     }
     .back-link {
       color: #f4f1e8;
@@ -175,7 +183,7 @@
       padding: var(--space-10, 40px) var(--space-5, 20px) var(--space-6, 24px);
       color: #fff;
     }
-    .hero-overlay h2 {
+    .hero-overlay h1 {
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 2.2rem;
       margin-bottom: var(--space-2, 8px);
@@ -340,6 +348,39 @@
     /* Main content */
     main { padding: 32px 0 60px; }
 
+    /* Breadcrumb navigation */
+    .breadcrumb {
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+    }
+    .breadcrumb ol {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      gap: 8px;
+    }
+    .breadcrumb li {
+      display: flex;
+      align-items: center;
+    }
+    .breadcrumb li:not(:last-child)::after {
+      content: '/';
+      margin-left: 8px;
+      color: var(--text-muted);
+    }
+    .breadcrumb a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .breadcrumb li:last-child span {
+      color: var(--text-muted);
+    }
+
     /* Section */
     .section {
       background: var(--card-bg);
@@ -352,6 +393,7 @@
     .section:hover {
       box-shadow: var(--shadow-sm);
     }
+    .section h2,
     .section h3 {
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.25rem;
@@ -1249,7 +1291,7 @@
     /* Mobile */
     @media (max-width: 600px) {
       .hero { height: 220px; }
-      .hero-overlay h2 { font-size: 1.6rem; }
+      .hero-overlay h1 { font-size: 1.6rem; }
       .course-stat { min-width: 70px; padding: 12px 8px; }
       .course-stat .value { font-size: 1.2rem; }
       .action-buttons { flex-direction: column; }
@@ -1707,7 +1749,7 @@
         }
       }
 
-      header h1 {
+      .site-title {
         font-size: 1.1rem;
       }
 
@@ -1724,7 +1766,7 @@
         height: 200px;
       }
 
-      .hero-overlay h2 {
+      .hero-overlay h1 {
         font-size: 1.5rem;
       }
     }
@@ -1979,12 +2021,12 @@
 <body>
   <header>
     <div class="container">
-      <h1>Bay Area Golf</h1>
-      <div class="header-nav">
+      <a href="/" class="site-title" aria-label="Bay Area Golf home">Bay Area Golf</a>
+      <nav class="header-nav" aria-label="Main navigation">
         <a href="/" class="nav-btn">Home</a>
         <a href="/app.html" class="nav-btn">Tee Times</a>
         <a href="/courses.html" class="nav-btn">Courses</a>
-      </div>
+      </nav>
       <!-- Mobile hamburger menu button -->
       <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -2053,9 +2095,9 @@
 
   <div id="hero-container">
     <div class="hero">
-      <img id="hero-img" src="" alt="">
+      <img id="hero-img" src="" alt="Golf course aerial view showing fairways and greens" loading="lazy" width="1200" height="400" decoding="async">
       <div class="hero-overlay">
-        <h2 id="course-name">Loading...</h2>
+        <h1 id="course-name">Loading...</h1>
         <div class="subtitle" id="course-location"></div>
       </div>
     </div>
@@ -2172,9 +2214,9 @@
     }
 
     function renderCourse(course) {
-      // Update page title and meta for SEO
-      document.title = `${course.name} | Bay Area Golf`;
-      const description = `${course.name} in ${course.city} - ${course.holes} holes, Par ${course.par || 'N/A'}. View course details, reviews, and book tee times.`;
+      // Update page title and meta for SEO - optimized for "[course name] tee times" searches
+      document.title = `${course.name} Tee Times - Book Online | Bay Area Golf`;
+      const description = `Book ${course.name} tee times online. ${course.holes}-hole ${course.par ? `par ${course.par} ` : ''}golf course in ${course.city}, CA. View real-time availability, pricing, and reserve your round today.`;
       document.querySelector('meta[name="description"]').content = description;
 
       // Update canonical URL
@@ -2209,23 +2251,42 @@
       };
 
       setMetaProperty('og:url', canonicalUrl);
-      setMetaProperty('og:title', `${course.name} | Bay Area Golf`);
+      setMetaProperty('og:title', `${course.name} Tee Times - Book Online | Bay Area Golf`);
       setMetaProperty('og:description', description);
       setMetaName('twitter:url', canonicalUrl);
-      setMetaName('twitter:title', `${course.name} | Bay Area Golf`);
+      setMetaName('twitter:title', `${course.name} Tee Times - Book Online | Bay Area Golf`);
       setMetaName('twitter:description', description);
 
       // Inject JSON-LD structured data for GolfCourse
+      // Calculate price range from tee times if available
+      const teeTimes = course.teeTimes || [];
+      let priceRange = undefined;
+      if (teeTimes.length > 0) {
+        const prices = teeTimes.map(tt => tt.price).filter(p => p && !isNaN(p));
+        if (prices.length > 0) {
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          priceRange = minPrice === maxPrice ? `$${minPrice}` : `$${minPrice} - $${maxPrice}`;
+        }
+      }
+
+      // Get hero image URL for structured data
+      const heroImageUrl = course.photos?.[0]?.url || course.photo_url || `https://bayareagolf.now/og-image.svg`;
+
       const jsonLd = {
         "@context": "https://schema.org",
         "@type": "GolfCourse",
+        "@id": canonicalUrl,
         "name": course.name,
         "url": canonicalUrl,
+        "image": heroImageUrl,
         "description": description,
         "address": {
           "@type": "PostalAddress",
+          "streetAddress": course.address || undefined,
           "addressLocality": course.city,
           "addressRegion": "CA",
+          "postalCode": course.zip_code || undefined,
           "addressCountry": "US"
         },
         "geo": course.latitude && course.longitude ? {
@@ -2233,9 +2294,28 @@
           "latitude": course.latitude,
           "longitude": course.longitude
         } : undefined,
+        "hasMap": course.latitude && course.longitude
+          ? `https://www.google.com/maps/search/?api=1&query=${course.latitude},${course.longitude}`
+          : undefined,
         "telephone": course.phone_number || undefined,
         "numberOfHoles": course.holes || 18,
+        "priceRange": priceRange,
+        "currenciesAccepted": "USD",
+        "paymentAccepted": "Cash, Credit Card",
+        "publicAccess": true,
+        "isAccessibleForFree": false,
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            "opens": "06:00",
+            "closes": "19:00"
+          }
+        ],
         "amenityFeature": [
+          {"@type": "LocationFeatureSpecification", "name": "Golf Course", "value": true},
+          course.par ? {"@type": "LocationFeatureSpecification", "name": "Par", "value": course.par} : null,
+          course.yardage ? {"@type": "LocationFeatureSpecification", "name": "Yardage", "value": course.yardage} : null,
           course.has_driving_range ? {"@type": "LocationFeatureSpecification", "name": "Driving Range", "value": true} : null,
           course.has_practice_green ? {"@type": "LocationFeatureSpecification", "name": "Practice Green", "value": true} : null,
           course.has_pro_shop ? {"@type": "LocationFeatureSpecification", "name": "Pro Shop", "value": true} : null
@@ -2246,11 +2326,67 @@
           "ratingCount": course.total_reviews || 1,
           "bestRating": "5",
           "worstRating": "1"
-        } : undefined
+        } : undefined,
+        "potentialAction": course.booking_url ? {
+          "@type": "ReserveAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": course.booking_url,
+            "actionPlatform": [
+              "https://schema.org/DesktopWebPlatform",
+              "https://schema.org/MobileWebPlatform"
+            ]
+          },
+          "result": {
+            "@type": "Reservation",
+            "name": "Golf Tee Time Reservation"
+          }
+        } : undefined,
+        "sameAs": course.booking_url ? [course.booking_url] : undefined,
+        "areaServed": {
+          "@type": "GeoCircle",
+          "geoMidpoint": course.latitude && course.longitude ? {
+            "@type": "GeoCoordinates",
+            "latitude": course.latitude,
+            "longitude": course.longitude
+          } : {
+            "@type": "GeoCoordinates",
+            "latitude": 37.7749,
+            "longitude": -122.4194
+          },
+          "geoRadius": "50000"
+        },
+        "containedInPlace": {
+          "@type": "City",
+          "name": course.city,
+          "containedInPlace": {
+            "@type": "State",
+            "name": "California",
+            "containedInPlace": {
+              "@type": "Country",
+              "name": "United States"
+            }
+          }
+        }
       };
 
-      // Remove undefined values
-      Object.keys(jsonLd).forEach(key => jsonLd[key] === undefined && delete jsonLd[key]);
+      // Remove undefined/null values recursively for clean JSON-LD output
+      const cleanObject = (obj) => {
+        if (Array.isArray(obj)) {
+          return obj.filter(item => item !== null && item !== undefined).map(cleanObject);
+        }
+        if (obj && typeof obj === 'object') {
+          const cleaned = {};
+          for (const [key, value] of Object.entries(obj)) {
+            if (value !== undefined && value !== null) {
+              cleaned[key] = cleanObject(value);
+            }
+          }
+          return cleaned;
+        }
+        return obj;
+      };
+      const cleanedJsonLd = cleanObject(jsonLd);
 
       // Inject breadcrumb schema
       const breadcrumbLd = {
@@ -2271,7 +2407,7 @@
 
       const script1 = document.createElement('script');
       script1.type = 'application/ld+json';
-      script1.textContent = JSON.stringify(jsonLd);
+      script1.textContent = JSON.stringify(cleanedJsonLd);
       document.head.appendChild(script1);
 
       const script2 = document.createElement('script');
@@ -2282,7 +2418,7 @@
       // Hero image
       const heroImg = course.photos?.[0]?.url || course.photo_url || `https://picsum.photos/seed/${course.id}/1200/400`;
       document.getElementById('hero-img').src = heroImg;
-      document.getElementById('hero-img').alt = course.name;
+      document.getElementById('hero-img').alt = `${course.name} golf course aerial view - ${course.city}, California`;
       document.getElementById('course-name').textContent = course.name;
       document.getElementById('course-location').textContent = `${course.city}, ${course.region} • ${course.holes} holes`;
 
@@ -2299,11 +2435,31 @@
       let html = '';
       let sectionIndex = 0;
 
+      // Breadcrumb navigation for SEO and user navigation
+      html += `
+        <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+          <ol itemscope itemtype="https://schema.org/BreadcrumbList">
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+              <a itemprop="item" href="/"><span itemprop="name">Home</span></a>
+              <meta itemprop="position" content="1" />
+            </li>
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+              <a itemprop="item" href="/courses.html"><span itemprop="name">Courses</span></a>
+              <meta itemprop="position" content="2" />
+            </li>
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+              <span itemprop="name">${course.name}</span>
+              <meta itemprop="position" content="3" />
+            </li>
+          </ol>
+        </nav>
+      `;
+
       // 1. TEE TIMES FIRST
       const upcomingTeeTimes = (course.teeTimes || []).slice(0, 5);
       html += `
-        <div class="section section-animate">
-          <h3>Tee Times</h3>
+        <section class="section section-animate" aria-labelledby="tee-times-heading">
+          <h2 id="tee-times-heading">Tee Times</h2>
           ${upcomingTeeTimes.length > 0 ? `
             <div class="upcoming-tee-times">
               ${upcomingTeeTimes.map(tt => `
@@ -2368,11 +2524,11 @@
       html += `
         <div class="section section-animate">
           <div class="action-buttons" style="justify-content: center;">
-            ${course.booking_url ? `<a href="/go/${course.slug}" target="_blank" class="btn btn-primary ripple-container" onclick="trackBookClick()">
+            ${course.booking_url ? `<a href="/go/${course.slug}" target="_blank" class="btn-primary ripple-container" onclick="trackBookClick()">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              Book Now
+              <span class="btn-text">Book Now</span>
             </a>` : ''}
-            ${course.phone_number ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="btn btn-secondary ripple-container" onclick="trackCallClick()">
+            ${course.phone_number ? `<a href="tel:${course.phone_number.replace(/[^\d+]/g, '')}" class="btn-secondary ripple-container" onclick="trackCallClick()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
               Call to Book
             </a>` : ''}
@@ -2405,11 +2561,11 @@
 
           ${course.website_url || course.bluegolf_url ? `
           <div class="action-buttons secondary-actions" style="justify-content: center; margin-top: 16px;">
-            ${course.website_url ? `<a href="${course.website_url}" target="_blank" class="btn btn-tertiary">
+            ${course.website_url ? `<a href="${course.website_url}" target="_blank" class="btn-tertiary">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
               Course Website
             </a>` : ''}
-            ${course.bluegolf_url ? `<a href="${course.bluegolf_url}" target="_blank" class="btn btn-tertiary">
+            ${course.bluegolf_url ? `<a href="${course.bluegolf_url}" target="_blank" class="btn-tertiary">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
               Hole by Hole Info
             </a>` : ''}
@@ -2569,7 +2725,7 @@
             <div class="photos-grid">
               ${course.photos.map(p => `
                 <div class="photo-card">
-                  <img src="${p.url}" alt="${p.caption || 'Course photo'}">
+                  <img src="${p.url}" alt="${p.caption || 'Golf course photo showing course conditions and scenery'}" loading="lazy" width="300" height="200" decoding="async">
                   ${p.year_taken ? `<span class="year">${p.year_taken}</span>` : ''}
                 </div>
               `).join('')}
@@ -2584,7 +2740,7 @@
           <div class="section section-animate">
             <h3>Food & Beverage</h3>
             <div class="food-highlight">
-              ${course.top_food.photo_url ? `<img src="${course.top_food.photo_url}" alt="${course.top_food.name}">` : ''}
+              ${course.top_food.photo_url ? `<img src="${course.top_food.photo_url}" alt="${course.top_food.name} - popular menu item at the clubhouse" loading="lazy" width="100" height="80" decoding="async">` : ''}
               <div class="food-info">
                 <h4>${course.top_food.name}</h4>
                 <div class="rating">${'★'.repeat(Math.round(course.top_food.avg_rating || 0))} ${course.top_food.avg_rating?.toFixed(1) || ''}</div>
@@ -3333,7 +3489,7 @@
       initStickyCTA();
     }, 500);
   </script>
-  <script src="/js/analytics.js"></script>
+  <script src="/js/analytics.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

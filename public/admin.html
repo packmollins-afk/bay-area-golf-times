@@ -1295,7 +1295,7 @@
         <tr>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
-              ${u.profile_picture ? `<img src="${u.profile_picture}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">` : ''}
+              ${u.profile_picture ? `<img src="${u.profile_picture}" alt="${u.display_name || 'User'} profile photo" loading="lazy" width="32" height="32" decoding="async" style="border-radius: 50%; object-fit: cover;">` : ''}
               <span>${u.display_name || 'Anonymous'}</span>
             </div>
           </td>
